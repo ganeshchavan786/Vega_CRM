@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation Features Guide - CRM SAAS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; line-height: 1.6; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .nav { background: white; padding: 15px 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .nav a { color: #667eea; text-decoration: none; margin-right: 20px; font-weight: 500; }
+        .container { max-width: 1000px; margin: 30px auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        h2 { color: #667eea; margin-top: 30px; margin-bottom: 15px; font-size: 1.8em; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+        .feature-box { background: #e7f3ff; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 4px solid #667eea; }
+        .feature-box h4 { color: #667eea; margin-bottom: 10px; }
+        ul { margin-left: 30px; margin-top: 10px; }
+        li { margin-bottom: 8px; }
+        .tip { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚙️ Automation Features Guide</h1>
+        <p>Learn About All Automated Features</p>
+    </div>
+    <div class="nav">
+        <a href="index.html">← Back to Guides</a>
+        <a href="leads.html">Leads Guide</a>
+        <a href="conversion.html">Conversion Guide</a>
+    </div>
+    <div class="container">
+        <h2>Overview</h2>
+        <p>The CRM includes powerful automation features that work behind the scenes to help you manage leads and customers more effectively.</p>
+        
+        <h2>Lead Scoring</h2>
+        <div class="feature-box">
+            <h4>📊 Automatic Lead Scoring (0-100)</h4>
+            <p>Leads are automatically scored based on:</p>
+            <ul>
+                <li>Source quality (0-20 points)</li>
+                <li>BANT qualification (0-30 points)</li>
+                <li>Engagement activities (0-25 points)</li>
+                <li>Data completeness (0-15 points)</li>
+                <li>Authority/Priority (0-10 points)</li>
+            </ul>
+            <p><strong>Auto-Updates:</strong> Scores increase when leads engage with emails (+5 open, +10 click) or when activities are logged.</p>
+        </div>
+        
+        <h2>Duplicate Detection</h2>
+        <div class="feature-box">
+            <h4>🔍 Real-Time Duplicate Check</h4>
+            <p>Before creating a lead, the system checks for duplicates using:</p>
+            <ul>
+                <li>Email: Exact match</li>
+                <li>Phone: 90% similarity</li>
+                <li>Company: 85% fuzzy matching</li>
+            </ul>
+            <p><strong>Result:</strong> If duplicate found, you'll see an error with duplicate lead details. You can merge or update existing lead.</p>
+        </div>
+        
+        <h2>Assignment Rules</h2>
+        <div class="feature-box">
+            <h4>👥 Automatic Lead Assignment</h4>
+            <p>Leads are automatically assigned using:</p>
+            <ul>
+                <li><strong>Round-Robin:</strong> Evenly distributes leads</li>
+                <li><strong>Territory-Based:</strong> Assigns by country/region</li>
+                <li><strong>Load-Balanced:</strong> Assigns to least loaded SDR</li>
+            </ul>
+        </div>
+        
+        <h2>Email Sequences</h2>
+        <div class="feature-box">
+            <h4>📧 Automatic Email Nurturing</h4>
+            <p>When a lead is created with email:</p>
+            <ul>
+                <li>5-email sequence starts automatically</li>
+                <li>Emails scheduled: Day 0, 3, 7, 10, 14</li>
+                <li>Open tracking: +5 points per open</li>
+                <li>Click tracking: +10 points per click</li>
+            </ul>
+        </div>
+        
+        <h2>Task Automation</h2>
+        <div class="feature-box">
+            <h4>✅ Auto Task Creation</h4>
+            <p>Follow-up tasks are automatically created:</p>
+            <ul>
+                <li>After 7 days for new leads</li>
+                <li>Assigned to lead owner (SDR)</li>
+                <li>Prevents duplicate tasks</li>
+            </ul>
+        </div>
+        
+        <h2>Health Score Calculation</h2>
+        <div class="feature-box">
+            <h4>💚 Customer Health Score</h4>
+            <p>Automatically calculated for customers based on:</p>
+            <ul>
+                <li>Activity count</li>
+                <li>Deal stages</li>
+                <li>Recency of interactions</li>
+                <li>Account status</li>
+            </ul>
+        </div>
+        
+        <h2>Lifecycle Stage Automation</h2>
+        <div class="feature-box">
+            <h4>🔄 Auto Stage Transition</h4>
+            <p>Customer lifecycle stages automatically transition:</p>
+            <ul>
+                <li>MQA → SQA → Customer → Churned</li>
+                <li>Based on deals, activities, health score</li>
+            </ul>
+        </div>
+        
+        <h2>Tips</h2>
+        <div class="tip"><strong>💡 Tip:</strong> Automation works best when you provide complete lead information and log activities regularly.</div>
+    </div>
+</body>
+</html>
+

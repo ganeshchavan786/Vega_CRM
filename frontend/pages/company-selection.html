@@ -1,0 +1,51 @@
+<!-- Company Selection Page -->
+<section id="company-selection" class="section">
+    <div class="company-selection-wrapper">
+        <div class="company-selection-header">
+            <div class="company-header-content">
+                <h1>📊 CRM SAAS</h1>
+                <h2>Select Your Company</h2>
+                <p class="company-header-description">Choose a company to access your workspace</p>
+            </div>
+        </div>
+        
+        <div class="company-selection-body">
+            <div class="company-search-section">
+                <div class="search-box">
+                    <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M7 12C9.76142 12 12 9.76142 12 7C12 4.23858 9.76142 2 7 2C4.23858 2 2 4.23858 2 7C2 9.76142 4.23858 12 7 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M14 14L10.5 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <input type="text" id="companySearchInput" placeholder="Search companies..." onkeyup="filterCompanies()">
+                </div>
+            </div>
+            
+            <div id="companyListPage" class="company-list-advanced"></div>
+            
+            <div id="companyErrorPage" class="error-message"></div>
+            
+            <div id="companyLoading" class="company-loading">
+                <div class="loading-spinner"></div>
+                <p>Loading companies...</p>
+            </div>
+            
+            <div id="companyEmpty" class="company-empty" style="display: none;">
+                <div class="empty-icon">🏢</div>
+                <h3>No Companies Found</h3>
+                <p>No companies are available. Please contact your administrator.</p>
+            </div>
+        </div>
+        
+        <div class="company-selection-footer">
+            <button class="btn-secondary btn-logout-company" onclick="handleLogout()">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right: 8px;">
+                    <path d="M6 14H3C2.44772 14 2 13.5523 2 13V3C2 2.44772 2.44772 2 3 2H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M10 11L14 7L10 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M14 7H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Logout
+            </button>
+        </div>
+    </div>
+</section>
+

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deals Guide - CRM SAAS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .nav {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .nav a {
+            color: #fa709a;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: 500;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #fa709a;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #fa709a;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #333;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #fa709a;
+            border-radius: 5px;
+        }
+        
+        .step-number {
+            background: #fa709a;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .feature-box {
+            background: #fff0f5;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #fa709a;
+        }
+        
+        .feature-box h4 {
+            color: #fa709a;
+            margin-bottom: 10px;
+        }
+        
+        .pipeline-box {
+            background: #e8f5e9;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .pipeline-box h4 {
+            color: #4caf50;
+            margin-bottom: 10px;
+        }
+        
+        ul, ol {
+            margin-left: 30px;
+            margin-top: 10px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .tip {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .tip strong {
+            color: #856404;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        table th {
+            background: #fa709a;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>💰 Deals (Opportunities) Guide</h1>
+        <p>Track Sales Pipeline & Revenue</p>
+    </div>
+    
+    <div class="nav">
+        <a href="index.html">← Back to Guides</a>
+        <a href="customers.html">Customers Guide</a>
+        <a href="leads.html">Leads Guide</a>
+        <a href="contacts.html">Contacts Guide</a>
+    </div>
+    
+    <div class="container">
+        <h2>Overview</h2>
+        <p>Deals (also called Opportunities) represent potential revenue from customer accounts. Track deals through the sales pipeline from initial prospect to closed won or lost.</p>
+        
+        <div class="pipeline-box">
+            <h4>📊 Sales Pipeline</h4>
+            <p>The CRM uses a 6-stage pipeline to track deals:</p>
+            <ol>
+                <li><strong>Prospect (10%):</strong> Initial opportunity identified</li>
+                <li><strong>Qualified (25%):</strong> Opportunity qualified</li>
+                <li><strong>Proposal (50%):</strong> Proposal sent</li>
+                <li><strong>Negotiation (75%):</strong> In negotiation</li>
+                <li><strong>Closed Won (100%):</strong> Deal won</li>
+                <li><strong>Closed Lost (0%):</strong> Deal lost</li>
+            </ol>
+        </div>
+        
+        <h2>How to Create a Deal</h2>
+        
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Navigate to Deals Page</strong>
+            <p>Click on "Deals" in the sidebar navigation menu.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Click "Add Deal" Button</strong>
+            <p>Click the "Add Deal" button at the top right of the deals page.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>Select Customer Account</strong>
+            <p><strong>Required:</strong> Select the customer account this deal belongs to. Deals must be linked to an account.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">4</span>
+            <strong>Fill in Deal Information</strong>
+            <p>Complete the deal form:</p>
+            
+            <h3>Basic Information:</h3>
+            <ul>
+                <li><strong>Deal Name:</strong> Name of the opportunity (required)</li>
+                <li><strong>Deal Value:</strong> Expected revenue amount (required)</li>
+                <li><strong>Currency:</strong> INR, USD, etc.</li>
+            </ul>
+            
+            <h3>Pipeline Information:</h3>
+            <ul>
+                <li><strong>Stage:</strong> Current pipeline stage (Prospect, Qualified, Proposal, etc.)</li>
+                <li><strong>Probability:</strong> Win probability percentage (0-100%)</li>
+                <li><strong>Forecast Category:</strong> Best Case, Commit, Most Likely, Worst Case</li>
+            </ul>
+            
+            <h3>Dates:</h3>
+            <ul>
+                <li><strong>Expected Close Date:</strong> When you expect to close the deal</li>
+                <li><strong>Actual Close Date:</strong> Actual close date (filled when won/lost)</li>
+            </ul>
+            
+            <h3>Additional:</h3>
+            <ul>
+                <li><strong>Primary Contact:</strong> Link to contact (optional)</li>
+                <li><strong>Lead:</strong> Link to source lead (optional)</li>
+                <li><strong>Notes:</strong> Additional information</li>
+                <li><strong>Assigned To:</strong> Sales rep responsible</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">5</span>
+            <strong>Save Deal</strong>
+            <p>Click "Save" to create the deal. It will appear in your sales pipeline.</p>
+        </div>
+        
+        <h2>Pipeline Stages Explained</h2>
+        
+        <table>
+            <tr>
+                <th>Stage</th>
+                <th>Probability</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>Prospect</td>
+                <td>10%</td>
+                <td>Initial opportunity identified, needs qualification</td>
+            </tr>
+            <tr>
+                <td>Qualified</td>
+                <td>25%</td>
+                <td>Opportunity qualified, meets BANT criteria</td>
+            </tr>
+            <tr>
+                <td>Proposal</td>
+                <td>50%</td>
+                <td>Proposal sent, waiting for response</td>
+            </tr>
+            <tr>
+                <td>Negotiation</td>
+                <td>75%</td>
+                <td>In active negotiation, close to closing</td>
+            </tr>
+            <tr>
+                <td>Closed Won</td>
+                <td>100%</td>
+                <td>Deal won, revenue realized</td>
+            </tr>
+            <tr>
+                <td>Closed Lost</td>
+                <td>0%</td>
+                <td>Deal lost, record loss reason</td>
+            </tr>
+        </table>
+        
+        <h2>Moving Deals Through Pipeline</h2>
+        
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Edit Deal</strong>
+            <p>Click "Edit" on the deal you want to move.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Update Stage</strong>
+            <p>Change the "Stage" field to the next stage in your pipeline.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>Update Probability</strong>
+            <p>The probability will automatically update based on stage, but you can manually adjust it.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">4</span>
+            <strong>Save Changes</strong>
+            <p>Save to update the deal stage. The deal will move in your pipeline view.</p>
+        </div>
+        
+        <h2>Closing Deals</h2>
+        
+        <h3>Winning a Deal:</h3>
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Update Status</strong>
+            <p>Change deal status to "Won" and stage to "Closed Won".</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Set Close Date</strong>
+            <p>Enter the actual close date.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>Update Probability</strong>
+            <p>Set probability to 100%.</p>
+        </div>
+        
+        <h3>Losing a Deal:</h3>
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Update Status</strong>
+            <p>Change deal status to "Lost" and stage to "Closed Lost".</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Record Loss Reason</strong>
+            <p><strong>Important:</strong> Always record why the deal was lost. This helps improve future sales.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>Set Close Date</strong>
+            <p>Enter the date the deal was lost.</p>
+        </div>
+        
+        <h2>Viewing Deals</h2>
+        
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Deal List</strong>
+            <p>The deals page shows all deals with:</p>
+            <ul>
+                <li>Deal name</li>
+                <li>Customer account</li>
+                <li>Deal value</li>
+                <li>Current stage</li>
+                <li>Probability</li>
+                <li>Expected close date</li>
+                <li>Assigned owner</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Pipeline View</strong>
+            <p>View deals organized by pipeline stage to see your sales funnel.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>Filter & Search</strong>
+            <p>Filter deals by:</p>
+            <ul>
+                <li>Stage</li>
+                <li>Status (Open, Won, Lost)</li>
+                <li>Assigned owner</li>
+                <li>Customer account</li>
+            </ul>
+        </div>
+        
+        <h2>Revenue Forecasting</h2>
+        
+        <div class="feature-box">
+            <h4>📈 Forecast Categories</h4>
+            <ul>
+                <li><strong>Best Case:</strong> Optimistic forecast</li>
+                <li><strong>Commit:</strong> Committed revenue</li>
+                <li><strong>Most Likely:</strong> Realistic forecast</li>
+                <li><strong>Worst Case:</strong> Conservative forecast</li>
+            </ul>
+            <p>Use forecast categories to create different revenue scenarios for planning.</p>
+        </div>
+        
+        <h2>Probability & Win Rates</h2>
+        
+        <p>Probability indicates the likelihood of winning the deal:</p>
+        <ul>
+            <li><strong>0-25%:</strong> Early stage, needs qualification</li>
+            <li><strong>26-50%:</strong> Qualified, proposal stage</li>
+            <li><strong>51-75%:</strong> Strong opportunity, negotiation</li>
+            <li><strong>76-99%:</strong> Very likely to close</li>
+            <li><strong>100%:</strong> Won</li>
+            <li><strong>0%:</strong> Lost</li>
+        </ul>
+        
+        <h2>Tips & Best Practices</h2>
+        
+        <div class="tip">
+            <strong>💡 Tip 1:</strong> Always link deals to customer accounts - this is required for proper revenue tracking.
+        </div>
+        
+        <div class="tip">
+            <strong>💡 Tip 2:</strong> Update deal stages regularly to maintain accurate pipeline visibility.
+        </div>
+        
+        <div class="tip">
+            <strong>💡 Tip 3:</strong> Set realistic expected close dates to improve forecasting accuracy.
+        </div>
+        
+        <div class="tip">
+            <strong>💡 Tip 4:</strong> Always record loss reasons for lost deals - this data helps improve sales processes.
+        </div>
+        
+        <div class="tip">
+            <strong>💡 Tip 5:</strong> Use forecast categories to create multiple revenue scenarios for planning.
+        </div>
+        
+        <div class="tip">
+            <strong>💡 Tip 6:</strong> Link deals to source leads to track conversion from lead to revenue.
+        </div>
+        
+        <h2>Related Features</h2>
+        <ul>
+            <li><a href="customers.html">Customers:</a> Create accounts before creating deals</li>
+            <li><a href="contacts.html">Contacts:</a> Link deals to primary contacts</li>
+            <li><a href="leads.html">Leads:</a> Convert leads to deals</li>
+            <li><a href="activities.html">Activities:</a> Log interactions related to deals</li>
+        </ul>
+    </div>
+</body>
+</html>
+

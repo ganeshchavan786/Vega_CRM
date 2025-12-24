@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leads Guide - CRM SAAS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .nav {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .nav a {
+            color: #f5576c;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: 500;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #f5576c;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #f5576c;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #333;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #f5576c;
+            border-radius: 5px;
+        }
+        
+        .step-number {
+            background: #f5576c;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .feature-box {
+            background: #ffe5e8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #f5576c;
+        }
+        
+        .feature-box h4 {
+            color: #f5576c;
+            margin-bottom: 10px;
+        }
+        
+        .automation-box {
+            background: #e8f5e9;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .automation-box h4 {
+            color: #4caf50;
+            margin-bottom: 10px;
+        }
+        
+        ul, ol {
+            margin-left: 30px;
+            margin-top: 10px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .tip {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .tip strong {
+            color: #856404;
+        }
+        
+        .warning {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .warning strong {
+            color: #721c24;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        table th {
+            background: #f5576c;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎯 Leads Guide</h1>
+        <p>Complete Guide to Lead Management & Automation</p>
+    </div>
+    
+    <div class="nav">
+        <a href="index.html">← Back to Guides</a>
+        <a href="customers.html">Customers Guide</a>
+        <a href="conversion.html">Conversion Guide</a>
+        <a href="automation.html">Automation Guide</a>
+    </div>
+    
+    <div class="container">
+        <h2>Overview</h2>
+        <p>Leads are potential customers who have shown interest in your products or services. The CRM system automatically scores, assigns, and nurtures leads to help you convert them into customers.</p>
+        
+        <h2>Key Features</h2>
+        
+        <div class="automation-box">
+            <h4>🤖 Automatic Features</h4>
+            <ul>
+                <li><strong>Auto-Scoring:</strong> Leads are automatically scored (0-100) based on multiple factors</li>
+                <li><strong>Auto-Assignment:</strong> Leads are automatically assigned to SDRs using round-robin or territory rules</li>
+                <li><strong>Duplicate Detection:</strong> System checks for duplicates before creating leads</li>
+                <li><strong>Email Sequences:</strong> Automatic email nurturing sequences start when lead is created</li>
+                <li><strong>Task Creation:</strong> Follow-up tasks are automatically created after 7 days</li>
+            </ul>
+        </div>
+        
+        <h2>How to Create a Lead</h2>
+        
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Navigate to Leads Page</strong>
+            <p>Click on "Leads" in the sidebar navigation menu.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Click "Add Lead" Button</strong>
+            <p>Click the "Add Lead" button at the top right of the leads page.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>Fill in Lead Information</strong>
+            <p>Complete the lead form with the following sections:</p>
+            
+            <h3>Basic Information:</h3>
+            <ul>
+                <li><strong>First Name:</strong> Lead's first name (required)</li>
+                <li><strong>Last Name:</strong> Lead's last name (required)</li>
+                <li><strong>Company Name:</strong> Company name (required)</li>
+                <li><strong>Email:</strong> Primary email address (required, used for duplicate check)</li>
+                <li><strong>Phone:</strong> Contact phone number (required, used for duplicate check)</li>
+                <li><strong>Country:</strong> Country location</li>
+            </ul>
+            
+            <h3>Source Attribution (UTM Parameters):</h3>
+            <ul>
+                <li><strong>Source:</strong> Where the lead came from (Google Ads, Website, etc.)</li>
+                <li><strong>Campaign:</strong> Campaign name (e.g., CRM-Q4-2025)</li>
+                <li><strong>Medium:</strong> Marketing medium (CPC, Email, Social)</li>
+                <li><strong>Term:</strong> Search term or keyword</li>
+            </ul>
+            
+            <h3>Qualification (BANT):</h3>
+            <ul>
+                <li><strong>Budget Range:</strong> Available budget (e.g., ₹5-7 Lakh)</li>
+                <li><strong>Authority Level:</strong> Decision Maker, Influencer, User, Gatekeeper</li>
+                <li><strong>Timeline:</strong> Purchase timeline (e.g., 3-6 Months)</li>
+                <li><strong>Interest Product:</strong> Product or service of interest</li>
+            </ul>
+            
+            <h3>Privacy & Compliance:</h3>
+            <ul>
+                <li><strong>GDPR Consent:</strong> Consent for data processing</li>
+                <li><strong>DND Status:</strong> Do Not Disturb status</li>
+                <li><strong>Opt-in Date:</strong> When lead opted in</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">4</span>
+            <strong>System Processing</strong>
+            <p>When you save the lead, the system automatically:</p>
+            <ul>
+                <li>Checks for duplicates (Email + Phone + Company)</li>
+                <li>Calculates initial lead score (0-100)</li>
+                <li>Assigns lead to SDR (if not manually assigned)</li>
+                <li>Starts email sequence (if email provided)</li>
+            </ul>
+        </div>
+        
+        <div class="warning">
+            <strong>⚠️ Duplicate Warning:</strong> If a duplicate lead is detected, you'll see an error message with details about the existing lead. You can either merge the leads or update the existing one.
+        </div>
+        
+        <h2>Lead Scoring Explained</h2>
+        
+        <p>Leads are automatically scored from 0-100 based on multiple factors:</p>
+        
+        <table>
+            <tr>
+                <th>Factor</th>
+                <th>Points</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>Source Quality</td>
+                <td>0-20</td>
+                <td>High-quality sources (referrals, events) score higher</td>
+            </tr>
+            <tr>
+                <td>BANT Qualification</td>
+                <td>0-30</td>
+                <td>Budget, Authority, Need, Timeline completeness</td>
+            </tr>
+            <tr>
+                <td>Engagement</td>
+                <td>0-25</td>
+                <td>Activities, email opens (+5), clicks (+10)</td>
+            </tr>
+            <tr>
+                <td>Data Completeness</td>
+                <td>0-15</td>
+                <td>How complete the lead information is</td>
+            </tr>
+            <tr>
+                <td>Authority/Priority</td>
+                <td>0-10</td>
+                <td>Decision maker status, priority level</td>
+            </tr>
+        </table>
+        
+        <div class="tip">
+            <strong>💡 Tip:</strong> Lead scores automatically increase when leads engage with emails (+5 for opens, +10 for clicks) or when activities are logged.
+        </div>
+        
+        <h2>Lead Status & Stages</h2>
+        
+        <h3>Lead Status:</h3>
+        <ul>
+            <li><strong>New:</strong> Just captured lead</li>
+            <li><strong>Contacted:</strong> Initial contact made</li>
+            <li><strong>Qualified:</strong> BANT/MEDDICC qualified</li>
+            <li><strong>Unqualified:</strong> Does not meet criteria</li>
+            <li><strong>Converted:</strong> Converted to Account</li>
+            <li><strong>Recycled:</strong> Re-engaged after disqualification</li>
+            <li><strong>Disqualified:</strong> Permanently disqualified</li>
+        </ul>
+        
+        <h3>Lead Stage:</h3>
+        <ul>
+            <li><strong>Awareness:</strong> Just aware of product</li>
+            <li><strong>Consideration:</strong> Evaluating options</li>
+            <li><strong>Decision:</strong> Ready to purchase</li>
+            <li><strong>Converted:</strong> Converted to Account</li>
+        </ul>
+        
+        <h2>Viewing & Managing Leads</h2>
+        
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Lead List</strong>
+            <p>The leads page shows a table with all leads, including:</p>
+            <ul>
+                <li>Lead name and company</li>
+                <li>Email and phone</li>
+                <li>Lead score (color-coded)</li>
+                <li>Status and stage</li>
+                <li>Assigned owner</li>
+                <li>Source and campaign</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Search & Filter</strong>
+            <p>Use the search box to find leads by name, email, phone, or company. Filter by:</p>
+            <ul>
+                <li>Status (New, Contacted, Qualified, etc.)</li>
+                <li>Priority (High, Medium, Low)</li>
+                <li>Assigned Owner</li>
+                <li>Source</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>View Lead Details</strong>
+            <p>Click on a lead to view:</p>
+            <ul>
+                <li>Complete lead information</li>
+                <li>Lead score breakdown</li>
+                <li>Qualification status (BANT/MEDDICC)</li>
+                <li>Conversion eligibility</li>
+                <li>Related activities</li>
+                <li>Email sequence status</li>
+            </ul>
+        </div>
+        
+        <h2>Editing Leads</h2>
+        
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Open Edit Form</strong>
+            <p>Click the "Edit" button next to the lead you want to edit.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Update Information</strong>
+            <p>Modify any fields. When you update qualification fields (Budget, Authority, Timeline), the lead score will be automatically recalculated.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>Duplicate Check</strong>
+            <p>If you change email, phone, or company name, the system will re-check for duplicates.</p>
+        </div>
+        
+        <h2>Lead Assignment</h2>
+        
+        <div class="automation-box">
+            <h4>Automatic Assignment Rules</h4>
+            <p>Leads are automatically assigned using one of these methods:</p>
+            <ul>
+                <li><strong>Round-Robin:</strong> Evenly distributes leads among SDRs</li>
+                <li><strong>Territory-Based:</strong> Assigns based on country/region</li>
+                <li><strong>Load-Balanced:</strong> Assigns to SDR with least active leads</li>
+            </ul>
+            <p>You can manually assign leads, or let the system auto-assign them.</p>
+        </div>
+        
+        <h2>Duplicate Detection</h2>
+        
+        <div class="warning">
+            <strong>⚠️ How It Works:</strong> The system checks for duplicates using Email + Phone + Company combination with fuzzy matching:
+            <ul>
+                <li>Email: Exact match (case-insensitive)</li>
+                <li>Phone: 90% similarity (normalized)</li>
+                <li>Company: 85% similarity (fuzzy matching)</li>
+            </ul>
+        </div>
+        
+        <p>If a duplicate is found:</p>
+        <ul>
+            <li>You'll see an error message with duplicate lead details</li>
+            <li>You can view the duplicate lead</li>
+            <li>You can merge duplicates if needed</li>
+            <li>Or update the existing lead instead</li>
+        </ul>
+        
+        <h2>Email Sequences</h2>
+        
+        <div class="automation-box">
+            <h4>Automatic Email Nurturing</h4>
+            <p>When a lead is created with an email address, the system automatically:</p>
+            <ul>
+                <li>Starts a 5-email sequence over 14 days</li>
+                <li>Schedules emails: Day 0, 3, 7, 10, 14</li>
+                <li>Tracks email opens (+5 points) and clicks (+10 points)</li>
+                <li>Updates lead score based on engagement</li>
+            </ul>
+        </div>
+        
+        <h2>Conversion Eligibility</h2>
+        
+        <div class="tip">
+            <strong>✅ Conversion Trigger:</strong> A lead is eligible for conversion when:
+            <ul>
+                <li>Lead Score > 70</li>
+                <li>Lead Status = "Contacted"</li>
+            </ul>
+            <p>Check conversion eligibility on the lead detail page or use the conversion preview feature.</p>
+        </div>
+        
+        <h2>Tips & Best Practices</h2>
+        
+        <div class="tip">
+            <strong>💡 Tip 1:</strong> Always fill in source attribution (Source, Campaign, Medium, Term) to track marketing effectiveness.
+        </div>
+        
+        <div class="tip">
+            <strong>💡 Tip 2:</strong> Complete BANT qualification fields to get accurate lead scores.
+        </div>
+        
+        <div class="tip">
+            <strong>💡 Tip 3:</strong> Update lead status to "Contacted" after initial outreach to enable conversion.
+        </div>
+        
+        <div class="tip">
+            <strong>💡 Tip 4:</strong> Monitor lead scores regularly - scores above 70 are ready for conversion.
+        </div>
+        
+        <div class="tip">
+            <strong>💡 Tip 5:</strong> Use duplicate detection to maintain data quality and avoid duplicate follow-ups.
+        </div>
+        
+        <h2>Related Features</h2>
+        <ul>
+            <li><a href="conversion.html">Lead Conversion:</a> Convert qualified leads to customers</li>
+            <li><a href="automation.html">Automation Features:</a> Learn about all automation features</li>
+            <li><a href="activities.html">Activities:</a> Log interactions to increase lead scores</li>
+            <li><a href="tasks.html">Tasks:</a> Manage follow-up tasks for leads</li>
+        </ul>
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Conversion Guide - CRM SAAS</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; line-height: 1.6; }
+        .header { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 30px; text-align: center; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .nav { background: white; padding: 15px 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .nav a { color: #f5576c; text-decoration: none; margin-right: 20px; font-weight: 500; }
+        .container { max-width: 1000px; margin: 30px auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        h2 { color: #f5576c; margin-top: 30px; margin-bottom: 15px; font-size: 1.8em; border-bottom: 2px solid #f5576c; padding-bottom: 10px; }
+        .step { background: #f8f9fa; padding: 15px; margin: 15px 0; border-left: 4px solid #f5576c; border-radius: 5px; }
+        .step-number { background: #f5576c; color: white; width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 10px; }
+        .feature-box { background: #ffe5e8; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 4px solid #f5576c; }
+        .feature-box h4 { color: #f5576c; margin-bottom: 10px; }
+        ul { margin-left: 30px; margin-top: 10px; }
+        li { margin-bottom: 8px; }
+        .tip { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 5px; }
+        .warning { background: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; margin: 20px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔄 Lead Conversion Guide</h1>
+        <p>Convert Leads to Customers - One Click</p>
+    </div>
+    <div class="nav">
+        <a href="index.html">← Back to Guides</a>
+        <a href="leads.html">Leads Guide</a>
+        <a href="customers.html">Customers Guide</a>
+    </div>
+    <div class="container">
+        <h2>Overview</h2>
+        <p>Conversion transforms a qualified lead into a permanent customer account with contacts and opportunities. The system uses an Account-First Model where accounts are created first, then contacts, then opportunities.</p>
+        
+        <div class="feature-box">
+            <h4>✅ Conversion Eligibility</h4>
+            <p>A lead is eligible for conversion when:</p>
+            <ul>
+                <li>Lead Score > 70</li>
+                <li>Lead Status = "Contacted"</li>
+            </ul>
+        </div>
+        
+        <h2>Conversion Process</h2>
+        <p>The system automatically performs these steps:</p>
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Create Account (Customer)</strong>
+            <p>Company name becomes account name. All account fields are populated from lead data.</p>
+        </div>
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Create Contact</strong>
+            <p>Lead's name becomes contact. Contact is linked to account and marked as primary.</p>
+        </div>
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>Create Opportunity (Deal)</strong>
+            <p>Deal created with:</p>
+            <ul>
+                <li>Deal value from budget range</li>
+                <li>Close date from timeline</li>
+                <li>Stage: Prospect (25% probability)</li>
+            </ul>
+        </div>
+        <div class="step">
+            <span class="step-number">4</span>
+            <strong>Log Activity</strong>
+            <p>Conversion activity is automatically logged in timeline.</p>
+        </div>
+        <div class="step">
+            <span class="step-number">5</span>
+            <strong>Update Lead Status</strong>
+            <p>Lead status changes to "Converted" and is linked to the new account.</p>
+        </div>
+        
+        <h2>How to Convert a Lead</h2>
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Check Eligibility</strong>
+            <p>View lead details and check conversion eligibility. System shows if lead meets criteria.</p>
+        </div>
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Preview Conversion</strong>
+            <p>Click "Preview Conversion" to see what will be created (Account, Contact, Deal details).</p>
+        </div>
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>Convert Lead</strong>
+            <p>Click "Convert Lead" button. System performs all steps automatically.</p>
+        </div>
+        <div class="step">
+            <span class="step-number">4</span>
+            <strong>Review Results</strong>
+            <p>After conversion, you'll see:</p>
+            <ul>
+                <li>Created account ID and name</li>
+                <li>Created contact ID and name</li>
+                <li>Created deal ID and value</li>
+                <li>Activity log entry</li>
+            </ul>
+        </div>
+        
+        <div class="warning">
+            <strong>⚠️ Important:</strong> Once converted, lead status cannot be changed back. All lead data is preserved for historical tracking.
+        </div>
+        
+        <h2>Data Mapping</h2>
+        <ul>
+            <li><strong>Company Name</strong> → Account Name</li>
+            <li><strong>First Name + Last Name</strong> → Contact Name</li>
+            <li><strong>Email</strong> → Contact Email</li>
+            <li><strong>Phone</strong> → Contact Phone</li>
+            <li><strong>Budget Range</strong> → Deal Value</li>
+            <li><strong>Timeline</strong> → Expected Close Date</li>
+            <li><strong>Interest Product</strong> → Deal Name</li>
+        </ul>
+        
+        <h2>Tips</h2>
+        <div class="tip"><strong>💡 Tip:</strong> Always preview conversion before converting to ensure data mapping is correct.</div>
+        <div class="tip"><strong>💡 Tip:</strong> Make sure lead status is "Contacted" and score is above 70 before converting.</div>
+        <div class="tip"><strong>💡 Tip:</strong> After conversion, review the created account, contact, and deal to ensure everything is correct.</div>
+    </div>
+</body>
+</html>
+

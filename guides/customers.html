@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers Guide - CRM SAAS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .nav {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: 500;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #667eea;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #333;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+        }
+        
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .feature-box {
+            background: #e7f3ff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+        }
+        
+        .feature-box h4 {
+            color: #2196F3;
+            margin-bottom: 10px;
+        }
+        
+        ul, ol {
+            margin-left: 30px;
+            margin-top: 10px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .tip {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .tip strong {
+            color: #856404;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .screenshot-placeholder {
+            background: #e9ecef;
+            padding: 40px;
+            text-align: center;
+            border-radius: 5px;
+            margin: 20px 0;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>👥 Customers (Accounts) Guide</h1>
+        <p>Complete Guide to Managing Customer Accounts</p>
+    </div>
+    
+    <div class="nav">
+        <a href="index.html">← Back to Guides</a>
+        <a href="leads.html">Leads Guide</a>
+        <a href="contacts.html">Contacts Guide</a>
+        <a href="deals.html">Deals Guide</a>
+    </div>
+    
+    <div class="container">
+        <h2>Overview</h2>
+        <p>Customers (also called Accounts) are permanent entities in your CRM. They represent companies or organizations you do business with. Unlike leads, accounts are never deleted - they can only be marked as inactive.</p>
+        
+        <h2>Key Features</h2>
+        <div class="feature-box">
+            <h4>🏢 Enterprise Fields</h4>
+            <ul>
+                <li><strong>Account Type:</strong> Customer, Prospect, Partner, Competitor, Reseller</li>
+                <li><strong>Industry:</strong> IT Services, Healthcare, Manufacturing, etc.</li>
+                <li><strong>Company Size:</strong> Small (1-50), Medium (51-200), Large (200+)</li>
+                <li><strong>Annual Revenue:</strong> Track yearly revenue</li>
+                <li><strong>GSTIN:</strong> Indian tax identification number</li>
+            </ul>
+        </div>
+        
+        <div class="feature-box">
+            <h4>📊 Health Score (Auto-Calculated)</h4>
+            <p>The system automatically calculates health scores (0-100) based on:</p>
+            <ul>
+                <li>Activity count (more activities = higher score)</li>
+                <li>Deal stages (active deals = higher score)</li>
+                <li>Recency (recent activities = higher score)</li>
+                <li>Account status</li>
+            </ul>
+        </div>
+        
+        <div class="feature-box">
+            <h4>🔄 Lifecycle Stage (Auto-Determined)</h4>
+            <p>Automatically transitions between stages:</p>
+            <ul>
+                <li><strong>MQA:</strong> Marketing Qualified Account</li>
+                <li><strong>SQA:</strong> Sales Qualified Account</li>
+                <li><strong>Customer:</strong> Has won deals</li>
+                <li><strong>Churned:</strong> Inactive for 90+ days</li>
+            </ul>
+        </div>
+        
+        <h2>How to Create a Customer</h2>
+        
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Navigate to Customers Page</strong>
+            <p>Click on "Customers" in the sidebar navigation menu.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Click "Add Customer" Button</strong>
+            <p>You'll find the "Add Customer" button at the top right of the customers list page.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>Fill in Customer Information</strong>
+            <p>Complete the customer form with the following information:</p>
+            <ul>
+                <li><strong>Name:</strong> Company or customer name (required)</li>
+                <li><strong>Email:</strong> Primary email address</li>
+                <li><strong>Phone:</strong> Contact phone number</li>
+                <li><strong>Account Type:</strong> Select from dropdown (Customer, Prospect, etc.)</li>
+                <li><strong>Industry:</strong> Select or enter industry</li>
+                <li><strong>Company Size:</strong> Select size category</li>
+                <li><strong>Annual Revenue:</strong> Enter revenue amount</li>
+                <li><strong>GSTIN:</strong> Enter GSTIN if applicable</li>
+                <li><strong>Address:</strong> Complete address information</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">4</span>
+            <strong>Assign Owner</strong>
+            <p>Select the account owner who will be responsible for this customer.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">5</span>
+            <strong>Save Customer</strong>
+            <p>Click "Save" or "Create" button. The system will:</p>
+            <ul>
+                <li>Create the customer record</li>
+                <li>Calculate initial health score</li>
+                <li>Set initial lifecycle stage</li>
+            </ul>
+        </div>
+        
+        <h2>Viewing Customers</h2>
+        
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Customer List</strong>
+            <p>The customers page shows a table with all customers, including:</p>
+            <ul>
+                <li>Customer name</li>
+                <li>Email and phone</li>
+                <li>Account type</li>
+                <li>Health score</li>
+                <li>Lifecycle stage</li>
+                <li>Assigned owner</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Search & Filter</strong>
+            <p>Use the search box to find customers by name, email, or phone. You can also filter by:</p>
+            <ul>
+                <li>Status (Active, Inactive)</li>
+                <li>Account Type</li>
+                <li>Assigned Owner</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>View Customer Details</strong>
+            <p>Click on a customer name or row to view full details, including:</p>
+            <ul>
+                <li>All customer information</li>
+                <li>Related contacts</li>
+                <li>Associated deals</li>
+                <li>Activity timeline</li>
+                <li>Health score breakdown</li>
+            </ul>
+        </div>
+        
+        <h2>Editing Customers</h2>
+        
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Open Edit Form</strong>
+            <p>Click the "Edit" button (pencil icon) next to the customer you want to edit.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Update Information</strong>
+            <p>Modify any fields you want to update. The form will pre-fill with existing data.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>Save Changes</strong>
+            <p>Click "Save" to update the customer. Health score and lifecycle stage will be recalculated automatically.</p>
+        </div>
+        
+        <h2>Deleting Customers</h2>
+        
+        <div class="tip">
+            <strong>⚠️ Important:</strong> Accounts are NEVER deleted in the CRM system. Instead, they are marked as inactive. This preserves all historical data and maintains data integrity.
+        </div>
+        
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Mark as Inactive</strong>
+            <p>To "delete" a customer, edit the customer and change the status to "Inactive".</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Data Preservation</strong>
+            <p>All customer data, contacts, deals, and activities remain in the system for historical tracking.</p>
+        </div>
+        
+        <h2>Health Score Explained</h2>
+        
+        <p>The health score is automatically calculated and ranges from 0-100:</p>
+        <ul>
+            <li><strong>0-30:</strong> Low health - Needs attention</li>
+            <li><strong>31-60:</strong> Medium health - Regular monitoring</li>
+            <li><strong>61-80:</strong> Good health - Active engagement</li>
+            <li><strong>81-100:</strong> Excellent health - Strong relationship</li>
+        </ul>
+        
+        <p><strong>Factors affecting health score:</strong></p>
+        <ul>
+            <li>Number of activities (calls, emails, meetings)</li>
+            <li>Active deals in pipeline</li>
+            <li>Recency of last activity</li>
+            <li>Account status (active vs inactive)</li>
+        </ul>
+        
+        <h2>Lifecycle Stages</h2>
+        
+        <p>The system automatically determines lifecycle stage based on:</p>
+        <ul>
+            <li><strong>MQA (Marketing Qualified Account):</strong> New account with initial engagement</li>
+            <li><strong>SQA (Sales Qualified Account):</strong> Account with active deals</li>
+            <li><strong>Customer:</strong> Account with won deals</li>
+            <li><strong>Churned:</strong> Account inactive for 90+ days</li>
+        </ul>
+        
+        <h2>Tips & Best Practices</h2>
+        
+        <div class="tip">
+            <strong>💡 Tip 1:</strong> Always fill in complete address information for accurate reporting and territory management.
+        </div>
+        
+        <div class="tip">
+            <strong>💡 Tip 2:</strong> Regularly update customer information to maintain accurate health scores.
+        </div>
+        
+        <div class="tip">
+            <strong>💡 Tip 3:</strong> Assign account owners to ensure proper follow-up and accountability.
+        </div>
+        
+        <div class="tip">
+            <strong>💡 Tip 4:</strong> Use account type to segment customers for better reporting and analysis.
+        </div>
+        
+        <div class="tip">
+            <strong>💡 Tip 5:</strong> Monitor health scores regularly to identify accounts that need attention.
+        </div>
+        
+        <h2>Related Features</h2>
+        <ul>
+            <li><a href="contacts.html">Contacts:</a> Add multiple contacts to each customer account</li>
+            <li><a href="deals.html">Deals:</a> Track opportunities and revenue for customers</li>
+            <li><a href="activities.html">Activities:</a> Log interactions and track engagement</li>
+        </ul>
+    </div>
+</body>
+</html>
+

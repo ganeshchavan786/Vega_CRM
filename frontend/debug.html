@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Customer Form Debug</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1e1e1e; color: #d4d4d4; }
+        .section { margin: 20px 0; padding: 15px; background: #252526; border-radius: 5px; }
+        h2 { color: #4ec9b0; }
+        .success { color: #4ec9b0; }
+        .error { color: #f48771; }
+        .warning { color: #dcdcaa; }
+        button { padding: 10px 20px; margin: 5px; background: #0e639c; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #1177bb; }
+        #output { background: #1e1e1e; padding: 15px; border-radius: 5px; white-space: pre-wrap; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>Customer Form Debug Tool</h1>
+    
+    <div class="section">
+        <h2>Quick Actions</h2>
+        <button onclick="runDebug()">Run Full Debug</button>
+        <button onclick="testShowCustomerForm()">Test showCustomerForm()</button>
+        <button onclick="checkElements()">Check Elements</button>
+        <button onclick="checkFunctions()">Check Functions</button>
+        <button onclick="clearOutput()">Clear Output</button>
+    </div>
+    
+    <div class="section">
+        <h2>Debug Output</h2>
+        <div id="output"></div>
+    </div>
+    
+    <script>
+        function log(msg, type = 'info') {
+            const output = document.getElementById('output');
+            const colors = {
+                success: '#4ec9b0',
+                error: '#f48771',
+                warning: '#dcdcaa',
+                info: '#d4d4d4'
+            };
+            const prefix = {
+                success: '✓',
+                error: '✗',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+            output.innerHTML += `<div style="color: ${colors[type]}">${prefix[type]} ${msg}</div>`;
+            output.scrollTop = output.scrollHeight;
+            console.log(`[${type.toUpperCase()}] ${msg}`);
+        }
+        
+        function clearOutput() {
+            document.getElementById('output').innerHTML = '';
+        }
+        
+        function checkElements() {
+            clearOutput();
+            log('Checking HTML Elements...', 'info');
+            
+            const formModal = document.getElementById('formModal');
+            const formContent = document.getElementById('formContent');
+            const customersTable = document.getElementById('customersTable');
+            
+            if (formModal) {
+                log('formModal element found', 'success');
+            } else {
+                log('formModal element NOT found - CRITICAL!', 'error');
+            }
+            
+            if (formContent) {
+                log('formContent element found', 'success');
+            } else {
+                log('formContent element NOT found - CRITICAL!', 'error');
+            }
+            
+            if (customersTable) {
+                log('customersTable element found', 'success');
+            } else {
+                log('customersTable element NOT found', 'warning');
+            }
+        }
+        
+        function checkFunctions() {
+            clearOutput();
+            log('Checking JavaScript Functions...', 'info');
+            
+            if (typeof window.showCustomerForm === 'function') {
+                log('showCustomerForm function is defined', 'success');
+                log(`Function: ${window.showCustomerForm.toString().substring(0, 100)}...`, 'info');
+            } else {
+                log('showCustomerForm function NOT defined - CRITICAL!', 'error');
+            }
+            
+            if (typeof window.editCustomer === 'function') {
+                log('editCustomer function is defined', 'success');
+            } else {
+                log('editCustomer function NOT defined', 'error');
+            }
+            
+            if (typeof window.openCustomerModal === 'function') {
+                log('openCustomerModal function is accessible', 'success');
+            } else {
+                log('openCustomerModal function is private (expected)', 'warning');
+            }
+        }
+        
+        function testShowCustomerForm() {
+            clearOutput();
+            log('Testing showCustomerForm()...', 'info');
+            
+            if (typeof window.showCustomerForm === 'function') {
+                try {
+                    log('Calling showCustomerForm()...', 'info');
+                    window.showCustomerForm();
+                    log('Function executed - check if modal opened', 'success');
+                } catch (error) {
+                    log(`Error: ${error.message}`, 'error');
+                    log(error.stack, 'error');
+                }
+            } else {
+                log('showCustomerForm is not defined!', 'error');
+                log('Check if customers.js is loaded', 'warning');
+            }
+        }
+        
+        function runDebug() {
+            clearOutput();
+            log('=== FULL DEBUG SESSION ===', 'info');
+            log('', 'info');
+            
+            // Check elements
+            checkElements();
+            log('', 'info');
+            
+            // Check functions
+            checkFunctions();
+            log('', 'info');
+            
+            // Check scripts
+            log('Checking Script Loading...', 'info');
+            const scripts = Array.from(document.querySelectorAll('script[src]'));
+            const customersScript = scripts.find(s => s.src.includes('customers.js'));
+            
+            if (customersScript) {
+                log(`customers.js found: ${customersScript.src}`, 'success');
+            } else {
+                log('customers.js script tag NOT found', 'error');
+            }
+            
+            // Check globals
+            log('', 'info');
+            log('Checking Global Variables...', 'info');
+            if (typeof API_BASE !== 'undefined') {
+                log(`API_BASE: ${API_BASE}`, 'success');
+            } else {
+                log('API_BASE is undefined', 'error');
+            }
+            
+            if (typeof companyId !== 'undefined') {
+                log(`companyId: ${companyId}`, 'success');
+            } else {
+                log('companyId is undefined', 'error');
+            }
+            
+            // Check button
+            log('', 'info');
+            log('Checking Add Customer Button...', 'info');
+            const buttons = document.querySelectorAll('button');
+            const addButton = Array.from(buttons).find(b => 
+                b.textContent.includes('Add Customer') || 
+                b.getAttribute('onclick')?.includes('showCustomerForm')
+            );
+            
+            if (addButton) {
+                log('Add Customer button found', 'success');
+                log(`onclick: ${addButton.getAttribute('onclick')}`, 'info');
+                log(`visible: ${addButton.offsetParent !== null}`, 'info');
+            } else {
+                log('Add Customer button NOT found', 'error');
+            }
+        }
+        
+        // Auto-run on load if on customers page
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const customersSection = document.querySelector('#customers, .section#customers');
+                if (customersSection || window.location.href.includes('customers')) {
+                    log('Customers page detected - auto-running debug...', 'info');
+                    setTimeout(runDebug, 500);
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
+

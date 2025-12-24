@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacts Guide - CRM SAAS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .nav {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .nav a {
+            color: #4facfe;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: 500;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #4facfe;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #4facfe;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #333;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #4facfe;
+            border-radius: 5px;
+        }
+        
+        .step-number {
+            background: #4facfe;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .feature-box {
+            background: #e3f2fd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #4facfe;
+        }
+        
+        .feature-box h4 {
+            color: #4facfe;
+            margin-bottom: 10px;
+        }
+        
+        ul, ol {
+            margin-left: 30px;
+            margin-top: 10px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .tip {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .tip strong {
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📇 Contacts Guide</h1>
+        <p>Manage Multiple Contacts Per Account</p>
+    </div>
+    
+    <div class="nav">
+        <a href="index.html">← Back to Guides</a>
+        <a href="customers.html">Customers Guide</a>
+        <a href="deals.html">Deals Guide</a>
+    </div>
+    
+    <div class="container">
+        <h2>Overview</h2>
+        <p>Contacts are individual people associated with customer accounts. One account (customer) can have multiple contacts, allowing you to track all decision-makers, influencers, and users at each company.</p>
+        
+        <div class="feature-box">
+            <h4>🔗 Account-First Model</h4>
+            <p>Contacts are always linked to an Account (Customer). You cannot create a contact without first having a customer account.</p>
+        </div>
+        
+        <h2>Key Features</h2>
+        
+        <div class="feature-box">
+            <h4>👥 Multi-Person Support</h4>
+            <ul>
+                <li><strong>Multiple Contacts:</strong> Add unlimited contacts per account</li>
+                <li><strong>Primary Contact:</strong> Mark one contact as primary</li>
+                <li><strong>Roles:</strong> Decision Maker, Influencer, User, Gatekeeper, Champion, Economic Buyer</li>
+                <li><strong>Influence Score:</strong> High, Medium, Low</li>
+                <li><strong>Preferred Channel:</strong> Email, WhatsApp, Phone, SMS, LinkedIn</li>
+            </ul>
+        </div>
+        
+        <h2>How to Create a Contact</h2>
+        
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Navigate to Contacts Page</strong>
+            <p>Click on "Contacts" in the sidebar navigation menu.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Click "Add Contact" Button</strong>
+            <p>Click the "Add Contact" button at the top right.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>Select Account</strong>
+            <p><strong>Important:</strong> First select the Account (Customer) this contact belongs to. You cannot create a contact without an account.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">4</span>
+            <strong>Fill in Contact Information</strong>
+            <p>Complete the contact form:</p>
+            <ul>
+                <li><strong>Name:</strong> Contact's full name (required)</li>
+                <li><strong>Job Title:</strong> Position/title (e.g., Manager, Director)</li>
+                <li><strong>Role:</strong> Select role (Decision Maker, Influencer, User, etc.)</li>
+                <li><strong>Email:</strong> Contact email address</li>
+                <li><strong>Phone:</strong> Contact phone number</li>
+                <li><strong>Influence Score:</strong> High, Medium, or Low</li>
+                <li><strong>Preferred Channel:</strong> How they prefer to be contacted</li>
+                <li><strong>Is Primary Contact:</strong> Check if this is the primary contact</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">5</span>
+            <strong>Save Contact</strong>
+            <p>Click "Save" to create the contact. The contact will be linked to the selected account.</p>
+        </div>
+        
+        <h2>Viewing Contacts</h2>
+        
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Contact List</strong>
+            <p>The contacts page shows all contacts with:</p>
+            <ul>
+                <li>Contact name</li>
+                <li>Job title</li>
+                <li>Account name</li>
+                <li>Email and phone</li>
+                <li>Role</li>
+                <li>Primary contact indicator</li>
+            </ul>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Filter by Account</strong>
+            <p>Use the account filter to view contacts for a specific customer account.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>Search Contacts</strong>
+            <p>Search by name, email, phone, or job title to quickly find contacts.</p>
+        </div>
+        
+        <h2>Editing Contacts</h2>
+        
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>Open Edit Form</strong>
+            <p>Click the "Edit" button next to the contact you want to edit.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Update Information</strong>
+            <p>Modify any fields. You can change the account if needed, but contacts should typically stay with their original account.</p>
+        </div>
+        
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>Save Changes</strong>
+            <p>Click "Save" to update the contact information.</p>
+        </div>
+        
+        <h2>Primary Contact</h2>
+        
+        <div class="tip">
+            <strong>💡 Primary Contact:</strong> Each account should have one primary contact. This is the main person you communicate with at that company. When you mark a contact as primary, any existing primary contact for that account will be automatically unmarked.
+        </div>
+        
+        <h2>Contact Roles Explained</h2>
+        
+        <ul>
+            <li><strong>Decision Maker:</strong> Has authority to make purchasing decisions</li>
+            <li><strong>Influencer:</strong> Influences the decision but doesn't make it</li>
+            <li><strong>User:</strong> Will use the product/service</li>
+            <li><strong>Gatekeeper:</strong> Controls access to decision makers</li>
+            <li><strong>Champion:</strong> Internal advocate for your solution</li>
+            <li><strong>Economic Buyer:</strong> Controls the budget</li>
+        </ul>
+        
+        <h2>Tips & Best Practices</h2>
+        
+        <div class="tip">
+            <strong>💡 Tip 1:</strong> Always create the customer account first, then add contacts to it.
+        </div>
+        
+        <div class="tip">
+            <strong>💡 Tip 2:</strong> Mark the main decision maker as the primary contact.
+        </div>
+        
+        <div class="tip">
+            <strong>💡 Tip 3:</strong> Use roles to identify who has decision-making authority.
+        </div>
+        
+        <div class="tip">
+            <strong>💡 Tip 4:</strong> Set preferred channel to ensure you contact people the way they prefer.
+        </div>
+        
+        <div class="tip">
+            <strong>💡 Tip 5:</strong> Track influence scores to prioritize your outreach efforts.
+        </div>
+        
+        <h2>Related Features</h2>
+        <ul>
+            <li><a href="customers.html">Customers:</a> Create accounts before adding contacts</li>
+            <li><a href="deals.html">Deals:</a> Link deals to primary contacts</li>
+            <li><a href="activities.html">Activities:</a> Log interactions with contacts</li>
+        </ul>
+    </div>
+</body>
+</html>
+

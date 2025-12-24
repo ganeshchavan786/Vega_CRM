@@ -1,0 +1,86 @@
+<!-- Dashboard Page -->
+<section id="dashboard" class="section active">
+    <div class="page-header-advanced">
+        <div class="page-header-content">
+            <div class="page-header-icon">📊</div>
+            <div>
+                <h2>Dashboard</h2>
+                <p>Welcome to your CRM dashboard</p>
+            </div>
+        </div>
+    </div>
+    <div class="page-body-advanced">
+        <div class="stats-grid-advanced">
+            <div class="stat-card-advanced">
+                <div class="stat-card-header">
+                    <div class="stat-icon" style="background: #E3FCEF; color: #006644;">👥</div>
+                    <h3>Customers</h3>
+                </div>
+                <p id="statCustomers" class="stat-number-advanced">0</p>
+                <div class="stat-trend">
+                    <span class="trend-up">↗</span>
+                    <span>Total customers</span>
+                </div>
+            </div>
+            <div class="stat-card-advanced">
+                <div class="stat-card-header">
+                    <div class="stat-icon" style="background: #DEEBFF; color: #0052CC;">🎯</div>
+                    <h3>Leads</h3>
+                </div>
+                <p id="statLeads" class="stat-number-advanced">0</p>
+                <div class="stat-trend">
+                    <span class="trend-up">↗</span>
+                    <span>Active leads</span>
+                </div>
+            </div>
+            <div class="stat-card-advanced">
+                <div class="stat-card-header">
+                    <div class="stat-icon" style="background: #FFF4E5; color: #FF8B00;">💰</div>
+                    <h3>Deals</h3>
+                </div>
+                <p id="statDeals" class="stat-number-advanced">0</p>
+                <div class="stat-trend">
+                    <span class="trend-up">↗</span>
+                    <span>In pipeline</span>
+                </div>
+            </div>
+            <div class="stat-card-advanced">
+                <div class="stat-card-header">
+                    <div class="stat-icon" style="background: #EAE6FF; color: #5243AA;">✓</div>
+                    <h3>Tasks</h3>
+                </div>
+                <p id="statTasks" class="stat-number-advanced">0</p>
+                <div class="stat-trend">
+                    <span class="trend-up">↗</span>
+                    <span>Pending tasks</span>
+                </div>
+            </div>
+        </div>
+        <div class="dashboard-content-advanced">
+            <div class="dashboard-section-advanced">
+                <div class="section-header">
+                    <h3>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right: 8px;">
+                            <path d="M8 1L10 6L15 7L10 8L8 13L6 8L1 7L6 6L8 1Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                        </svg>
+                        Recent Activities
+                    </h3>
+                </div>
+                <div id="recentActivities" class="activity-list-advanced"></div>
+            </div>
+            <div class="dashboard-section-advanced">
+                <div class="section-header">
+                    <h3>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right: 8px;">
+                            <path d="M2 2H14V14H2V2Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                            <path d="M2 6H14M6 2V14" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                        Pipeline Overview
+                    </h3>
+                </div>
+                <div id="pipelineChart" class="pipeline-chart-advanced"></div>
+            </div>
+        </div>
+    </div>
+</section>
+

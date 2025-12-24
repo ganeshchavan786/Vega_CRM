@@ -1,0 +1,67 @@
+<!-- Leads Page -->
+<section id="leads" class="section subscription-saas-style">
+    <div class="subscription-saas-container">
+        <h1 class="subscription-saas-heading">Lead Management</h1>
+        <div class="subscription-saas-actions">
+            <button class="btn-reports" onclick="alert('Reports feature coming soon!')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+                Reports
+            </button>
+            <button class="btn-add-primary" onclick="window.showLeadForm && window.showLeadForm()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                + Add Lead
+            </button>
+            <button class="btn-import-csv" onclick="alert('Import CSV feature coming soon!')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Import CSV
+            </button>
+        </div>
+    </div>
+    <div class="page-body-advanced">
+        <div class="filters-advanced">
+            <div class="filter-group">
+                <svg class="filter-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M7 12L11 8L7 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <input type="text" id="leadSearch" class="filter-input" placeholder="Search leads..." onkeyup="loadLeads()">
+            </div>
+            <div class="filter-group">
+                <svg class="filter-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M2 4H14M4 8H12M6 12H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <select id="leadStatusFilter" class="filter-select" onchange="loadLeads()">
+                    <option value="">All Status</option>
+                    <option value="new">New</option>
+                    <option value="contacted">Contacted</option>
+                    <option value="qualified">Qualified</option>
+                    <option value="converted">Converted</option>
+                    <option value="lost">Lost</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <svg class="filter-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M8 2L10 6L14 7L10 8L8 12L6 8L2 7L6 6L8 2Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                </svg>
+                <select id="leadPriorityFilter" class="filter-select" onchange="loadLeads()">
+                    <option value="">All Priorities</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+        </div>
+        <div id="leadsTable" class="table-container-advanced"></div>
+    </div>
+</section>
+
