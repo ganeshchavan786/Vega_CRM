@@ -43,16 +43,17 @@ async def get_contacts(
         end = start + per_page
         paginated_contacts = contacts[start:end]
         
-        return success_response(
-            data=[contact.to_dict(include_relations=True) for contact in paginated_contacts],
-            message=f"Retrieved {len(paginated_contacts)} contacts",
-            meta={
-                "total": total,
+        return {
+            "success": True,
+            "data": [contact.to_dict(include_relations=True) for contact in paginated_contacts],
+            "pagination": {
                 "page": page,
                 "per_page": per_page,
-                "pages": (total + per_page - 1) // per_page
-            }
-        )
+                "total": total,
+                "pages": (total + per_page - 1) // per_page if total > 0 else 1
+            },
+            "message": f"Retrieved {len(paginated_contacts)} contacts"
+        }
     except HTTPException:
         raise
     except Exception as e:

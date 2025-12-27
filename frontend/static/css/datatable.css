@@ -1,0 +1,447 @@
+/**
+ * DataTable Framework Styles
+ * Modern, responsive table styling
+ */
+
+.datatable-wrapper {
+    width: 100%;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Toolbar */
+.datatable-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.datatable-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.datatable-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.datatable-search {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 12px;
+    width: 100%;
+    max-width: 300px;
+    transition: border-color 0.3s;
+}
+
+.datatable-search:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Table Container */
+.datatable-container {
+    overflow-x: auto;
+    overflow-y: visible;
+}
+
+.datatable-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.datatable-table thead {
+    background: #f8f9fa;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.datatable-table th {
+    padding: 6px 4px;
+    text-align: left;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 1px solid #e9ecef;
+    white-space: nowrap;
+    user-select: none;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.datatable-table th.sortable {
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.2s;
+}
+
+.datatable-table th.sortable:hover {
+    background-color: #e9ecef;
+}
+
+.datatable-table th.sort-asc::after {
+    content: ' ↑';
+    color: #667eea;
+    font-weight: bold;
+}
+
+.datatable-table th.sort-desc::after {
+    content: ' ↓';
+    color: #667eea;
+    font-weight: bold;
+}
+
+.datatable-table th.center,
+.datatable-table td.center {
+    text-align: center;
+}
+
+.datatable-table th.right,
+.datatable-table td.right {
+    text-align: right;
+}
+
+.datatable-table tbody tr {
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.2s;
+}
+
+.datatable-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.datatable-table tbody tr.selected {
+    background-color: #e7f3ff;
+}
+
+.datatable-table td {
+    padding: 6px 4px;
+    color: #495057;
+    vertical-align: middle;
+    font-size: 12px;
+}
+
+.datatable-table .datatable-select-all {
+    width: 40px;
+    text-align: center;
+}
+
+.datatable-table .datatable-select-all input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.datatable-empty {
+    text-align: center;
+    padding: 20px !important;
+    color: #6c757d;
+    font-style: italic;
+    font-size: 12px;
+}
+
+.datatable-error {
+    padding: 20px;
+    text-align: center;
+    color: #dc3545;
+    background: #f8d7da;
+    border-radius: 4px;
+    margin: 20px;
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.status-badge.status-active {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.status-cancelled {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-badge.status-expired {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-badge.status-suspended {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-badge.status-pending {
+    background: #ffeaa7;
+    color: #856404;
+}
+
+.status-badge.status-new {
+    background: #cfe2ff;
+    color: #084298;
+}
+
+.status-badge.status-contacted {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-badge.status-qualified {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge.status-converted {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-badge.status-lost {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-badge.status-inactive {
+    background: #e2e3e5;
+    color: #41464b;
+}
+
+.status-badge.status-prospect {
+    background: #fff3cd;
+    color: #856404;
+}
+
+/* Column Menu */
+.datatable-column-menu {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 8px 0;
+    min-width: 200px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.datatable-column-menu-item {
+    padding: 8px 15px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.datatable-column-menu-item:hover {
+    background-color: #f8f9fa;
+}
+
+.datatable-column-menu-item label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    width: 100%;
+    margin: 0;
+}
+
+.datatable-column-menu-item input[type="checkbox"] {
+    cursor: pointer;
+}
+
+/* Export Menu */
+.datatable-export-menu {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 8px 0;
+    min-width: 150px;
+}
+
+.datatable-export-menu a {
+    display: block;
+    padding: 8px 15px;
+    color: #495057;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.datatable-export-menu a:hover {
+    background-color: #f8f9fa;
+    color: #667eea;
+}
+
+/* Pagination */
+.datatable-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.datatable-pagination-info {
+    color: #6c757d;
+    font-size: 12px;
+}
+
+.datatable-page-size {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.datatable-pagination-nav {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.datatable-pagination-nav button {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    transition: all 0.2s;
+}
+
+.datatable-pagination-nav button:hover:not(:disabled) {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+.datatable-pagination-nav button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.datatable-page-info {
+    padding: 0 10px;
+    color: #6c757d;
+    font-size: 12px;
+}
+
+/* Buttons */
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .datatable-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .datatable-toolbar-left,
+    .datatable-toolbar-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .datatable-search {
+        max-width: 100%;
+    }
+    
+    .datatable-table {
+        font-size: 12px;
+    }
+    
+    .datatable-table th,
+    .datatable-table td {
+        padding: 8px 10px;
+    }
+    
+    .datatable-pagination {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .datatable-pagination-nav {
+        justify-content: center;
+    }
+}
+
+/* Loading State */
+.datatable-loading {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+}
+
+.datatable-loading::after {
+    content: '...';
+    animation: dots 1.5s steps(4, end) infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
+}
+

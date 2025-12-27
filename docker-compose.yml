@@ -1,0 +1,25 @@
+services:
+  web:
+    build: .
+    container_name: crm-saas
+    ports:
+      - "8016:8000"
+    volumes:
+      # Mount database file for persistence
+      - ./data/crm.db:/app/data/crm.db
+      # Mount frontend files for hot-reload (no rebuild needed for JS/CSS changes)
+      - ./frontend:/app/frontend
+    environment:
+      - DATABASE_URL=sqlite:///./data/crm.db
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-change-in-production}
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - DEBUG=${DEBUG:-false}
+    restart: unless-stopped
+    networks:
+      - crm-network
+
+networks:
+  crm-network:
+    driver: bridge
+
