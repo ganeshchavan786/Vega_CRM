@@ -33,4 +33,4 @@ slowapi==0.1.9
 redis==5.2.1
 
 # Encryption
-cryptography==44.0.0
+cryptography==44.0.1
