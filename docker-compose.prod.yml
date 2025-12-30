@@ -1,0 +1,27 @@
+version: '3.8'
+
+# VEGA CRM - Production Docker Compose
+# Simple deployment for any VPS
+
+services:
+  vega-crm:
+    image: ghcr.io/ganeshchavan786/vega_crm:latest
+    container_name: vega-crm
+    restart: always
+    ports:
+      - "${PORT:-8000}:8000"
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-change-this}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///./data/crm.db}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  data:
