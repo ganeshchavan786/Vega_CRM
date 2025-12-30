@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers Management - CRM SAAS मार्गदर्शक</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; line-height: 1.6; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; min-height: 100vh; }
+        
+        .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 40px; }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 14px; opacity: 0.9; margin-bottom: 20px; }
+        .breadcrumb a { color: white; text-decoration: none; }
+        .header h1 { font-size: 2.2em; margin-bottom: 10px; }
+        .header p { font-size: 1.1em; opacity: 0.9; }
+        .header-meta { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
+        .meta-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 0.85em; }
+        
+        .progress-section { background: linear-gradient(145deg, #ecfdf5 0%, #d1fae5 100%); padding: 25px 40px; border-bottom: 1px solid #a7f3d0; }
+        .progress-title { font-size: 0.9em; color: #065f46; margin-bottom: 15px; }
+        .progress-steps { display: flex; justify-content: space-between; position: relative; }
+        .progress-steps::before { content: ''; position: absolute; top: 20px; left: 40px; right: 40px; height: 3px; background: #a7f3d0; }
+        .progress-step { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
+        .progress-circle { width: 40px; height: 40px; border-radius: 50%; background: white; border: 3px solid #a7f3d0; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #94a3b8; margin-bottom: 8px; }
+        .progress-step.completed .progress-circle { background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-color: #10b981; color: white; }
+        .progress-step.active .progress-circle { background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-color: #10b981; color: white; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2); }
+        .progress-label { font-size: 0.75em; color: #065f46; text-align: center; max-width: 70px; }
+        .progress-step.active .progress-label, .progress-step.completed .progress-label { font-weight: 600; }
+        
+        .content { padding: 40px; }
+        
+        .toc { background: linear-gradient(145deg, #ecfdf5 0%, #d1fae5 100%); border: 2px solid #10b981; border-radius: 16px; padding: 25px; margin-bottom: 40px; }
+        .toc h3 { color: #065f46; margin-bottom: 15px; }
+        .toc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+        .toc-item { background: white; padding: 10px 15px; border-radius: 8px; font-size: 0.9em; color: #1e293b; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .toc-item:hover { background: #d1fae5; transform: translateX(5px); }
+        
+        .section { margin-bottom: 50px; scroll-margin-top: 20px; }
+        .section-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 3px solid #10b981; }
+        .section-icon { width: 50px; height: 50px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5em; }
+        .section-header h2 { color: #1e293b; font-size: 1.5em; }
+        .section-intro { color: #64748b; margin-bottom: 25px; }
+        
+        .step-card { background: white; border: 2px solid #e5e7eb; border-radius: 16px; margin: 20px 0; overflow: hidden; transition: all 0.3s; }
+        .step-card:hover { border-color: #10b981; box-shadow: 0 5px 20px rgba(16, 185, 129, 0.15); }
+        .step-header { background: linear-gradient(145deg, #ecfdf5 0%, #d1fae5 100%); padding: 18px 25px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #a7f3d0; }
+        .step-number { width: 36px; height: 36px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+        .step-title { font-size: 1.1em; color: #1e293b; font-weight: 600; }
+        .step-body { padding: 25px; }
+        
+        .form-preview { background: #f8fafc; border: 2px dashed #d1d5db; border-radius: 12px; padding: 25px; margin: 20px 0; }
+        .form-preview-title { font-size: 0.85em; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
+        .preview-field { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+        .preview-field-icon { color: #10b981; }
+        .preview-field-label { color: #374151; font-size: 0.95em; }
+        .preview-field.required .preview-field-label::after { content: ' *'; color: #ef4444; }
+        .preview-btn { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-size: 1em; font-weight: 600; width: 100%; margin-top: 10px; }
+        
+        .info-box { border-radius: 12px; padding: 18px; margin: 20px 0; display: flex; gap: 15px; }
+        .info-box.tip { background: #ecfdf5; border-left: 4px solid #10b981; }
+        .info-box.warning { background: #fffbeb; border-left: 4px solid #f59e0b; }
+        .info-box.important { background: #fef2f2; border-left: 4px solid #ef4444; }
+        .info-box.info { background: #eff6ff; border-left: 4px solid #3b82f6; }
+        .info-icon { font-size: 1.3em; }
+        .info-content h4 { color: #1e293b; margin-bottom: 4px; font-size: 0.95em; }
+        .info-content p { color: #64748b; font-size: 0.9em; }
+        
+        .feature-list { list-style: none; margin: 15px 0; }
+        .feature-list li { padding: 10px 0 10px 30px; position: relative; border-bottom: 1px solid #f1f5f9; }
+        .feature-list li::before { content: '✓'; position: absolute; left: 0; color: #10b981; font-weight: bold; }
+        .feature-list li:last-child { border-bottom: none; }
+        
+        .data-table { width: 100%; border-collapse: collapse; margin: 20px 0; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .data-table th { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 12px 15px; text-align: left; font-weight: 600; font-size: 0.9em; }
+        .data-table td { padding: 12px 15px; border-bottom: 1px solid #e5e7eb; background: white; font-size: 0.9em; }
+        .data-table tr:hover td { background: #ecfdf5; }
+        
+        .health-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 600; }
+        .health-excellent { background: #10b981; color: white; }
+        .health-good { background: #3b82f6; color: white; }
+        .health-average { background: #f59e0b; color: white; }
+        .health-poor { background: #ef4444; color: white; }
+        
+        .lifecycle-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 600; }
+        .lifecycle-new { background: #dbeafe; color: #1d4ed8; }
+        .lifecycle-active { background: #d1fae5; color: #065f46; }
+        .lifecycle-growing { background: #fef3c7; color: #92400e; }
+        .lifecycle-mature { background: #e0e7ff; color: #4338ca; }
+        .lifecycle-churned { background: #fee2e2; color: #991b1b; }
+        
+        .customer-card { background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 15px 0; display: flex; align-items: center; gap: 15px; }
+        .customer-avatar { width: 60px; height: 60px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5em; font-weight: 700; }
+        .customer-info h4 { color: #1e293b; margin-bottom: 4px; }
+        .customer-info p { color: #64748b; font-size: 0.9em; }
+        .customer-stats { margin-left: auto; text-align: right; }
+        .customer-stats .value { font-size: 1.2em; font-weight: 700; color: #10b981; }
+        .customer-stats .label { font-size: 0.8em; color: #64748b; }
+        
+        .footer { background: #f8f9fa; padding: 30px 40px; border-top: 1px solid #e9ecef; }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .footer-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; text-decoration: none; border-radius: 10px; font-weight: 500; transition: all 0.3s; }
+        .footer-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4); }
+        .footer-btn.secondary { background: white; color: #10b981; border: 2px solid #10b981; }
+        
+        @media (max-width: 768px) {
+            .header, .content, .footer, .progress-section { padding: 20px; }
+            .header h1 { font-size: 1.6em; }
+            .progress-steps { flex-wrap: wrap; gap: 10px; justify-content: center; }
+            .progress-steps::before { display: none; }
+            .customer-card { flex-direction: column; text-align: center; }
+            .customer-stats { margin-left: 0; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="breadcrumb">
+                <a href="index.html">🏠 मुख्य पृष्ठ</a> <span>›</span>
+                <a href="lead-management-guide.html">Leads</a> <span>›</span>
+                <span>Customers</span>
+            </div>
+            <h1>👥 Customers Management</h1>
+            <p>ग्राहक व्यवस्थापन - संपूर्ण मार्गदर्शक</p>
+            <div class="header-meta">
+                <span class="meta-badge">📖 Step 4 of 8</span>
+                <span class="meta-badge">⏱️ 10-15 मिनिटे</span>
+            </div>
+        </div>
+        
+        <div class="progress-section">
+            <div class="progress-title">📍 CRM Setup Journey</div>
+            <div class="progress-steps">
+                <div class="progress-step completed"><div class="progress-circle">✓</div><span class="progress-label">Login</span></div>
+                <div class="progress-step completed"><div class="progress-circle">✓</div><span class="progress-label">Company</span></div>
+                <div class="progress-step completed"><div class="progress-circle">✓</div><span class="progress-label">Leads</span></div>
+                <div class="progress-step active"><div class="progress-circle">4</div><span class="progress-label">Customers</span></div>
+                <div class="progress-step"><div class="progress-circle">5</div><span class="progress-label">Contacts</span></div>
+                <div class="progress-step"><div class="progress-circle">6</div><span class="progress-label">Deals</span></div>
+                <div class="progress-step"><div class="progress-circle">7</div><span class="progress-label">Tasks</span></div>
+                <div class="progress-step"><div class="progress-circle">8</div><span class="progress-label">Reports</span></div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="toc">
+                <h3>📑 या मार्गदर्शकात</h3>
+                <div class="toc-grid">
+                    <a href="#what-is-customer" class="toc-item">❓ Customer म्हणजे काय</a>
+                    <a href="#create-customer" class="toc-item">➕ Customer तयार करा</a>
+                    <a href="#customer-details" class="toc-item">📋 Customer Details</a>
+                    <a href="#health-score" class="toc-item">💚 Health Score</a>
+                    <a href="#lifecycle" class="toc-item">🔄 Lifecycle Stages</a>
+                    <a href="#activities" class="toc-item">📝 Activities</a>
+                </div>
+            </div>
+            
+            <div class="section" id="what-is-customer">
+                <div class="section-header">
+                    <div class="section-icon">❓</div>
+                    <h2>Customer म्हणजे काय?</h2>
+                </div>
+                <p class="section-intro">
+                    <strong>Customer</strong> (ग्राहक) म्हणजे जो तुमच्याकडून खरेदी करतो किंवा सेवा घेतो. Lead convert झाल्यावर तो Customer बनतो.
+                </p>
+                
+                <div class="info-box info">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <h4>Customer = Account</h4>
+                        <p>CRM मध्ये Customer ला "Account" असेही म्हणतात. हे एक business entity आहे ज्याच्याशी तुमचे व्यावसायिक संबंध आहेत.</p>
+                    </div>
+                </div>
+                
+                <div class="customer-card">
+                    <div class="customer-avatar">A</div>
+                    <div class="customer-info">
+                        <h4>ABC Technologies Pvt Ltd</h4>
+                        <p>📧 contact@abctech.com | 📞 +91 98765 43210</p>
+                    </div>
+                    <div class="customer-stats">
+                        <div class="value">₹5,00,000</div>
+                        <div class="label">Total Revenue</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section" id="create-customer">
+                <div class="section-header">
+                    <div class="section-icon">➕</div>
+                    <h2>Customer कसा तयार करायचा</h2>
+                </div>
+                <p class="section-intro">Customer तयार करण्याच्या दोन पद्धती:</p>
+                
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">A</span>
+                        <span class="step-title">Lead Convert करून (Recommended)</span>
+                    </div>
+                    <div class="step-body">
+                        <p>Lead Won झाल्यावर "Convert to Customer" वापरा - सर्व data automatically येतो.</p>
+                        <div class="info-box tip">
+                            <span class="info-icon">✅</span>
+                            <div class="info-content">
+                                <h4>Best Practice</h4>
+                                <p>शक्यतो Lead conversion वापरा - history आणि activities preserve होतात.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">B</span>
+                        <span class="step-title">Direct Customer Add करा</span>
+                    </div>
+                    <div class="step-body">
+                        <p>Existing customers साठी direct add करा:</p>
+                        <ol style="margin: 15px 0; padding-left: 20px;">
+                            <li>Customers page वर जा</li>
+                            <li><strong>+ Add Customer</strong> दाबा</li>
+                            <li>Details भरा</li>
+                        </ol>
+                        
+                        <div class="form-preview">
+                            <div class="form-preview-title">👥 Add Customer Form</div>
+                            <div class="preview-field required"><span class="preview-field-icon">🏢</span><span class="preview-field-label">Company Name</span></div>
+                            <div class="preview-field required"><span class="preview-field-icon">📧</span><span class="preview-field-label">Email</span></div>
+                            <div class="preview-field"><span class="preview-field-icon">📞</span><span class="preview-field-label">Phone</span></div>
+                            <div class="preview-field"><span class="preview-field-icon">🌐</span><span class="preview-field-label">Website</span></div>
+                            <div class="preview-field"><span class="preview-field-icon">🏭</span><span class="preview-field-label">Industry</span></div>
+                            <div class="preview-field"><span class="preview-field-icon">📍</span><span class="preview-field-label">Address</span></div>
+                            <button class="preview-btn">💾 Save Customer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section" id="customer-details">
+                <div class="section-header">
+                    <div class="section-icon">📋</div>
+                    <h2>Customer Details</h2>
+                </div>
+                <p class="section-intro">Customer profile मध्ये खालील माहिती असते:</p>
+                
+                <table class="data-table">
+                    <thead><tr><th>Field</th><th>वर्णन</th><th>उदाहरण</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>Company Name</strong></td><td>कंपनीचे नाव</td><td>ABC Technologies</td></tr>
+                        <tr><td><strong>Email</strong></td><td>Primary email</td><td>info@abc.com</td></tr>
+                        <tr><td><strong>Phone</strong></td><td>Contact number</td><td>+91 98765 43210</td></tr>
+                        <tr><td><strong>Website</strong></td><td>Company website</td><td>www.abc.com</td></tr>
+                        <tr><td><strong>Industry</strong></td><td>Business type</td><td>IT Services</td></tr>
+                        <tr><td><strong>Address</strong></td><td>Office address</td><td>Pune, Maharashtra</td></tr>
+                        <tr><td><strong>Annual Revenue</strong></td><td>वार्षिक उत्पन्न</td><td>₹1 Crore</td></tr>
+                        <tr><td><strong>Employee Count</strong></td><td>कर्मचारी संख्या</td><td>50-100</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="section" id="health-score">
+                <div class="section-header">
+                    <div class="section-icon">💚</div>
+                    <h2>Customer Health Score</h2>
+                </div>
+                <p class="section-intro">Health Score दाखवतो की customer relationship किती मजबूत आहे.</p>
+                
+                <table class="data-table">
+                    <thead><tr><th>Score</th><th>Status</th><th>अर्थ</th><th>Action</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td>80-100</td>
+                            <td><span class="health-badge health-excellent">Excellent</span></td>
+                            <td>उत्तम संबंध</td>
+                            <td>Upsell opportunity शोधा</td>
+                        </tr>
+                        <tr>
+                            <td>60-79</td>
+                            <td><span class="health-badge health-good">Good</span></td>
+                            <td>चांगले संबंध</td>
+                            <td>Maintain करा</td>
+                        </tr>
+                        <tr>
+                            <td>40-59</td>
+                            <td><span class="health-badge health-average">Average</span></td>
+                            <td>सुधारणा आवश्यक</td>
+                            <td>Engagement वाढवा</td>
+                        </tr>
+                        <tr>
+                            <td>0-39</td>
+                            <td><span class="health-badge health-poor">Poor</span></td>
+                            <td>धोक्याची चिन्हे</td>
+                            <td>तातडीने संपर्क करा</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="info-box warning">
+                    <span class="info-icon">⚠️</span>
+                    <div class="info-content">
+                        <h4>Poor Health Score?</h4>
+                        <p>Health score कमी असल्यास तातडीने customer शी संपर्क करा - churn टाळण्यासाठी.</p>
+                    </div>
+                </div>
+                
+                <div class="info-box tip">
+                    <span class="info-icon">📊</span>
+                    <div class="info-content">
+                        <h4>Visual Health Meter</h4>
+                        <p>Customer list मध्ये प्रत्येक customer च्या बाजूला visual health meter दिसतो - progress bar आणि icon सह:</p>
+                        <div style="display: flex; gap: 15px; margin-top: 10px; flex-wrap: wrap;">
+                            <span style="color: #10b981;">💚 Excellent</span>
+                            <span style="color: #3b82f6;">💙 Good</span>
+                            <span style="color: #f59e0b;">💛 Average</span>
+                            <span style="color: #ef4444;">🧡 Poor</span>
+                            <span style="color: #dc2626;">❤️ At Risk</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section" id="lifecycle">
+                <div class="section-header">
+                    <div class="section-icon">🔄</div>
+                    <h2>Customer Lifecycle Stages</h2>
+                </div>
+                <p class="section-intro">Customer कोणत्या stage मध्ये आहे ते track करा:</p>
+                
+                <table class="data-table">
+                    <thead><tr><th>Stage</th><th>वर्णन</th><th>Focus</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="lifecycle-badge lifecycle-new">New</span></td>
+                            <td>नवीन customer</td>
+                            <td>Onboarding, Training</td>
+                        </tr>
+                        <tr>
+                            <td><span class="lifecycle-badge lifecycle-active">Active</span></td>
+                            <td>सक्रिय वापर करतो</td>
+                            <td>Support, Satisfaction</td>
+                        </tr>
+                        <tr>
+                            <td><span class="lifecycle-badge lifecycle-growing">Growing</span></td>
+                            <td>वाढत आहे</td>
+                            <td>Upsell, Cross-sell</td>
+                        </tr>
+                        <tr>
+                            <td><span class="lifecycle-badge lifecycle-mature">Mature</span></td>
+                            <td>स्थिर customer</td>
+                            <td>Retention, Loyalty</td>
+                        </tr>
+                        <tr>
+                            <td><span class="lifecycle-badge lifecycle-churned">Churned</span></td>
+                            <td>सोडून गेला</td>
+                            <td>Win-back campaign</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="section" id="activities">
+                <div class="section-header">
+                    <div class="section-icon">📝</div>
+                    <h2>Customer Activities</h2>
+                </div>
+                <p class="section-intro">Customer शी झालेल्या सर्व interactions record करा:</p>
+                
+                <ul class="feature-list">
+                    <li><strong>📞 Calls:</strong> फोन कॉल्स log करा</li>
+                    <li><strong>📧 Emails:</strong> ईमेल communication</li>
+                    <li><strong>📅 Meetings:</strong> भेटी आणि demos</li>
+                    <li><strong>📝 Notes:</strong> महत्त्वाच्या नोंदी</li>
+                    <li><strong>💰 Deals:</strong> सर्व व्यवहार</li>
+                    <li><strong>🎫 Support Tickets:</strong> Support requests</li>
+                </ul>
+                
+                <div class="info-box tip">
+                    <span class="info-icon">📊</span>
+                    <div class="info-content">
+                        <h4>360° Customer View</h4>
+                        <p>Customer profile मध्ये सर्व activities, deals, contacts एकत्र दिसतात - complete picture मिळतो.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">🏆</div>
+                    <h2>Best Practices</h2>
+                </div>
+                
+                <ul class="feature-list">
+                    <li><strong>Complete Profile:</strong> सर्व details भरा</li>
+                    <li><strong>Regular Updates:</strong> माहिती updated ठेवा</li>
+                    <li><strong>Log Activities:</strong> प्रत्येक interaction नोंदवा</li>
+                    <li><strong>Monitor Health:</strong> Health score track करा</li>
+                    <li><strong>Segment Customers:</strong> Industry, size नुसार group करा</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-nav">
+                <a href="lead-management-guide.html" class="footer-btn secondary">← मागे: Leads</a>
+                <a href="contacts-guide.html" class="footer-btn">पुढे: Contacts →</a>
+            </div>
+            <p style="margin-top: 20px; color: #64748b; font-size: 0.9em;">CRM SAAS मराठी मार्गदर्शक | Version 2.0 | December 2025</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -8,7 +8,8 @@ from typing import Optional
 from app.database import get_db
 from app.schemas.company import CompanyCreate, CompanyUpdate
 from app.controllers.company_controller import CompanyController
-from app.utils.dependencies import get_current_active_user, require_role
+from app.utils.dependencies import get_current_active_user
+from app.utils.permissions import require_super_admin, check_company_admin
 from app.utils.helpers import success_response, paginate
 from app.models.user import User
 
@@ -136,6 +137,13 @@ async def update_company(
     
     Requires: JWT token, Admin role in company
     """
+    # Check if user is admin in company or super_admin
+    if current_user.role != "super_admin" and not check_company_admin(current_user.id, company_id, db):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required for this company"
+        )
+    
     try:
         company = CompanyController.update_company(company_id, company_data, current_user, db)
         return success_response(
@@ -154,7 +162,7 @@ async def update_company(
 @router.delete("/{company_id}")
 async def delete_company(
     company_id: int,
-    current_user: User = Depends(require_role(["super_admin"])),
+    current_user: User = Depends(require_super_admin),
     db: Session = Depends(get_db)
 ):
     """

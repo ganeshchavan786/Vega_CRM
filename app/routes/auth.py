@@ -5,7 +5,7 @@ Authentication Routes
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.schemas.auth import UserRegister, UserLogin, ChangePassword
+from app.schemas.auth import UserRegister, UserLogin, ChangePassword, ForgotPasswordRequest, ResetPasswordRequest, VerifyResetTokenRequest
 from app.controllers.auth_controller import AuthController
 from app.utils.dependencies import get_current_active_user
 from app.utils.helpers import success_response, error_response
@@ -117,6 +117,79 @@ async def change_password(
         return success_response(
             data={},
             message="Password changed successfully"
+        )
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
+
+@router.post("/forgot-password")
+async def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    """
+    Request password reset
+    
+    - **email**: User email address
+    
+    Sends password reset link to email (if email exists)
+    """
+    try:
+        result = AuthController.create_password_reset_token(request.email, db)
+        return success_response(
+            data=result,
+            message="Password reset request processed"
+        )
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
+
+@router.post("/verify-reset-token")
+async def verify_reset_token(request: VerifyResetTokenRequest, db: Session = Depends(get_db)):
+    """
+    Verify if reset token is valid
+    
+    - **token**: Reset token from email
+    
+    Returns token validity status
+    """
+    try:
+        result = AuthController.verify_reset_token(request.token, db)
+        return success_response(
+            data=result,
+            message="Token verification complete"
+        )
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
+
+@router.post("/reset-password")
+async def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db)):
+    """
+    Reset password using token
+    
+    - **token**: Reset token from email
+    - **new_password**: New password (min 8 chars, 1 upper, 1 lower, 1 digit)
+    
+    Resets password and invalidates token
+    """
+    try:
+        result = AuthController.reset_password(request.token, request.new_password, db)
+        return success_response(
+            data=result,
+            message="Password reset successful"
         )
     except HTTPException as e:
         raise e

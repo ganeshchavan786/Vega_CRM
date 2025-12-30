@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacts Management - CRM SAAS मार्गदर्शक</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; line-height: 1.6; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; min-height: 100vh; }
+        
+        .header { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: white; padding: 40px; }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 14px; opacity: 0.9; margin-bottom: 20px; }
+        .breadcrumb a { color: white; text-decoration: none; }
+        .header h1 { font-size: 2.2em; margin-bottom: 10px; }
+        .header p { font-size: 1.1em; opacity: 0.9; }
+        .header-meta { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
+        .meta-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 0.85em; }
+        
+        .progress-section { background: linear-gradient(145deg, #f5f3ff 0%, #ede9fe 100%); padding: 25px 40px; border-bottom: 1px solid #c4b5fd; }
+        .progress-title { font-size: 0.9em; color: #5b21b6; margin-bottom: 15px; }
+        .progress-steps { display: flex; justify-content: space-between; position: relative; }
+        .progress-steps::before { content: ''; position: absolute; top: 20px; left: 40px; right: 40px; height: 3px; background: #c4b5fd; }
+        .progress-step { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
+        .progress-circle { width: 40px; height: 40px; border-radius: 50%; background: white; border: 3px solid #c4b5fd; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #94a3b8; margin-bottom: 8px; }
+        .progress-step.completed .progress-circle { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); border-color: #8b5cf6; color: white; }
+        .progress-step.active .progress-circle { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); border-color: #8b5cf6; color: white; box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2); }
+        .progress-label { font-size: 0.75em; color: #5b21b6; text-align: center; max-width: 70px; }
+        .progress-step.active .progress-label, .progress-step.completed .progress-label { font-weight: 600; }
+        
+        .content { padding: 40px; }
+        
+        .section { margin-bottom: 50px; }
+        .section-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 3px solid #8b5cf6; }
+        .section-icon { width: 50px; height: 50px; background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5em; }
+        .section-header h2 { color: #1e293b; font-size: 1.5em; }
+        .section-intro { color: #64748b; margin-bottom: 25px; }
+        
+        .step-card { background: white; border: 2px solid #e5e7eb; border-radius: 16px; margin: 20px 0; overflow: hidden; transition: all 0.3s; }
+        .step-card:hover { border-color: #8b5cf6; box-shadow: 0 5px 20px rgba(139, 92, 246, 0.15); }
+        .step-header { background: linear-gradient(145deg, #f5f3ff 0%, #ede9fe 100%); padding: 18px 25px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #c4b5fd; }
+        .step-number { width: 36px; height: 36px; background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+        .step-title { font-size: 1.1em; color: #1e293b; font-weight: 600; }
+        .step-body { padding: 25px; }
+        
+        .form-preview { background: #f8fafc; border: 2px dashed #d1d5db; border-radius: 12px; padding: 25px; margin: 20px 0; }
+        .form-preview-title { font-size: 0.85em; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
+        .preview-field { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+        .preview-field-icon { color: #8b5cf6; }
+        .preview-field-label { color: #374151; font-size: 0.95em; }
+        .preview-field.required .preview-field-label::after { content: ' *'; color: #ef4444; }
+        .preview-btn { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-size: 1em; font-weight: 600; width: 100%; margin-top: 10px; }
+        
+        .info-box { border-radius: 12px; padding: 18px; margin: 20px 0; display: flex; gap: 15px; }
+        .info-box.tip { background: #ecfdf5; border-left: 4px solid #10b981; }
+        .info-box.warning { background: #fffbeb; border-left: 4px solid #f59e0b; }
+        .info-box.info { background: #eff6ff; border-left: 4px solid #3b82f6; }
+        .info-icon { font-size: 1.3em; }
+        .info-content h4 { color: #1e293b; margin-bottom: 4px; font-size: 0.95em; }
+        .info-content p { color: #64748b; font-size: 0.9em; }
+        
+        .feature-list { list-style: none; margin: 15px 0; }
+        .feature-list li { padding: 10px 0 10px 30px; position: relative; border-bottom: 1px solid #f1f5f9; }
+        .feature-list li::before { content: '✓'; position: absolute; left: 0; color: #8b5cf6; font-weight: bold; }
+        .feature-list li:last-child { border-bottom: none; }
+        
+        .data-table { width: 100%; border-collapse: collapse; margin: 20px 0; border-radius: 12px; overflow: hidden; }
+        .data-table th { background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: white; padding: 12px 15px; text-align: left; font-weight: 600; font-size: 0.9em; }
+        .data-table td { padding: 12px 15px; border-bottom: 1px solid #e5e7eb; background: white; font-size: 0.9em; }
+        .data-table tr:hover td { background: #f5f3ff; }
+        
+        .role-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 600; }
+        .role-decision { background: #fef3c7; color: #92400e; }
+        .role-technical { background: #dbeafe; color: #1d4ed8; }
+        .role-finance { background: #d1fae5; color: #065f46; }
+        .role-user { background: #e0e7ff; color: #4338ca; }
+        
+        .contact-card { background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 20px; margin: 15px 0; display: flex; align-items: center; gap: 15px; }
+        .contact-avatar { width: 50px; height: 50px; background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2em; font-weight: 700; }
+        .contact-info h4 { color: #1e293b; margin-bottom: 2px; font-size: 1em; }
+        .contact-info p { color: #64748b; font-size: 0.85em; }
+        .contact-role { margin-left: auto; }
+        
+        .footer { background: #f8f9fa; padding: 30px 40px; border-top: 1px solid #e9ecef; }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .footer-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); color: white; text-decoration: none; border-radius: 10px; font-weight: 500; transition: all 0.3s; }
+        .footer-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(139, 92, 246, 0.4); }
+        .footer-btn.secondary { background: white; color: #8b5cf6; border: 2px solid #8b5cf6; }
+        
+        @media (max-width: 768px) {
+            .header, .content, .footer, .progress-section { padding: 20px; }
+            .progress-steps { flex-wrap: wrap; gap: 10px; justify-content: center; }
+            .progress-steps::before { display: none; }
+            .contact-card { flex-direction: column; text-align: center; }
+            .contact-role { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="breadcrumb">
+                <a href="index.html">🏠 मुख्य पृष्ठ</a> <span>›</span>
+                <a href="customers-guide.html">Customers</a> <span>›</span>
+                <span>Contacts</span>
+            </div>
+            <h1>📇 Contacts Management</h1>
+            <p>संपर्क व्यक्ती व्यवस्थापन - संपूर्ण मार्गदर्शक</p>
+            <div class="header-meta">
+                <span class="meta-badge">📖 Step 5 of 8</span>
+                <span class="meta-badge">⏱️ 8-10 मिनिटे</span>
+            </div>
+        </div>
+        
+        <div class="progress-section">
+            <div class="progress-title">📍 CRM Setup Journey</div>
+            <div class="progress-steps">
+                <div class="progress-step completed"><div class="progress-circle">✓</div><span class="progress-label">Login</span></div>
+                <div class="progress-step completed"><div class="progress-circle">✓</div><span class="progress-label">Company</span></div>
+                <div class="progress-step completed"><div class="progress-circle">✓</div><span class="progress-label">Leads</span></div>
+                <div class="progress-step completed"><div class="progress-circle">✓</div><span class="progress-label">Customers</span></div>
+                <div class="progress-step active"><div class="progress-circle">5</div><span class="progress-label">Contacts</span></div>
+                <div class="progress-step"><div class="progress-circle">6</div><span class="progress-label">Deals</span></div>
+                <div class="progress-step"><div class="progress-circle">7</div><span class="progress-label">Tasks</span></div>
+                <div class="progress-step"><div class="progress-circle">8</div><span class="progress-label">Reports</span></div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">❓</div>
+                    <h2>Contact म्हणजे काय?</h2>
+                </div>
+                <p class="section-intro">
+                    <strong>Contact</strong> म्हणजे Customer company मधील व्यक्ती. एका Customer ला अनेक Contacts असू शकतात - CEO, Manager, Technical Head इत्यादी.
+                </p>
+                
+                <div class="info-box info">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <h4>Customer vs Contact</h4>
+                        <p><strong>Customer</strong> = Company/Organization | <strong>Contact</strong> = त्या company मधील व्यक्ती</p>
+                    </div>
+                </div>
+                
+                <div class="contact-card">
+                    <div class="contact-avatar">RS</div>
+                    <div class="contact-info">
+                        <h4>राहुल शर्मा</h4>
+                        <p>📧 rahul@abctech.com | 📞 +91 98765 43210</p>
+                        <p style="font-size: 0.8em; color: #94a3b8;">ABC Technologies Pvt Ltd</p>
+                    </div>
+                    <div class="contact-role">
+                        <span class="role-badge role-decision">Decision Maker</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">➕</div>
+                    <h2>Contact कसा Add करायचा</h2>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">1</span>
+                        <span class="step-title">Contacts Page वर जा</span>
+                    </div>
+                    <div class="step-body">
+                        <p>Sidebar मधून <strong>📇 Contacts</strong> वर क्लिक करा.</p>
+                    </div>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">2</span>
+                        <span class="step-title">"+ Add Contact" दाबा</span>
+                    </div>
+                    <div class="step-body">
+                        <div class="form-preview">
+                            <div class="form-preview-title">📇 Add Contact Form</div>
+                            <div class="preview-field required"><span class="preview-field-icon">👤</span><span class="preview-field-label">First Name</span></div>
+                            <div class="preview-field required"><span class="preview-field-icon">👤</span><span class="preview-field-label">Last Name</span></div>
+                            <div class="preview-field required"><span class="preview-field-icon">📧</span><span class="preview-field-label">Email</span></div>
+                            <div class="preview-field"><span class="preview-field-icon">📞</span><span class="preview-field-label">Phone</span></div>
+                            <div class="preview-field"><span class="preview-field-icon">💼</span><span class="preview-field-label">Job Title</span></div>
+                            <div class="preview-field"><span class="preview-field-icon">🏢</span><span class="preview-field-label">Customer (Link to)</span></div>
+                            <div class="preview-field"><span class="preview-field-icon">🎭</span><span class="preview-field-label">Role</span></div>
+                            <button class="preview-btn">💾 Save Contact</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">🎭</div>
+                    <h2>Contact Roles</h2>
+                </div>
+                <p class="section-intro">Contact चा role ओळखणे महत्त्वाचे - योग्य व्यक्तीशी योग्य संवाद करण्यासाठी.</p>
+                
+                <table class="data-table">
+                    <thead><tr><th>Role</th><th>वर्णन</th><th>Communication</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="role-badge role-decision">Decision Maker</span></td>
+                            <td>निर्णय घेणारा - CEO, MD, Director</td>
+                            <td>Final approval, Pricing discussion</td>
+                        </tr>
+                        <tr>
+                            <td><span class="role-badge role-technical">Technical</span></td>
+                            <td>Technical evaluation - CTO, IT Head</td>
+                            <td>Product demo, Technical queries</td>
+                        </tr>
+                        <tr>
+                            <td><span class="role-badge role-finance">Finance</span></td>
+                            <td>Budget holder - CFO, Finance Manager</td>
+                            <td>Pricing, Payment terms</td>
+                        </tr>
+                        <tr>
+                            <td><span class="role-badge role-user">End User</span></td>
+                            <td>प्रत्यक्ष वापरकर्ता</td>
+                            <td>Training, Support</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="info-box tip">
+                    <span class="info-icon">🎯</span>
+                    <div class="info-content">
+                        <h4>Multiple Contacts ठेवा</h4>
+                        <p>एका customer साठी सर्व key contacts add करा - Decision Maker, Technical, Finance सर्वांशी संबंध ठेवा.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">🔗</div>
+                    <h2>Contact-Customer Link</h2>
+                </div>
+                <p class="section-intro">प्रत्येक Contact एका Customer शी link असतो:</p>
+                
+                <ul class="feature-list">
+                    <li><strong>One Customer, Many Contacts:</strong> एका company मध्ये अनेक contacts</li>
+                    <li><strong>Primary Contact:</strong> मुख्य संपर्क व्यक्ती mark करा</li>
+                    <li><strong>Activity Tracking:</strong> Contact wise activities track होतात</li>
+                    <li><strong>Communication History:</strong> सर्व emails, calls record</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">🏆</div>
+                    <h2>Best Practices</h2>
+                </div>
+                
+                <ul class="feature-list">
+                    <li><strong>Complete Information:</strong> Email, Phone, Job Title भरा</li>
+                    <li><strong>Correct Role:</strong> योग्य role assign करा</li>
+                    <li><strong>Link to Customer:</strong> Customer शी link करा</li>
+                    <li><strong>Update Regularly:</strong> Job change झाल्यास update करा</li>
+                    <li><strong>Primary Contact:</strong> मुख्य contact mark करा</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-nav">
+                <a href="customers-guide.html" class="footer-btn secondary">← मागे: Customers</a>
+                <a href="deals-guide.html" class="footer-btn">पुढे: Deals →</a>
+            </div>
+            <p style="margin-top: 20px; color: #64748b; font-size: 0.9em;">CRM SAAS मराठी मार्गदर्शक | Version 2.0 | December 2025</p>
+        </div>
+    </div>
+</body>
+</html>

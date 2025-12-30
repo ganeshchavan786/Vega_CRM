@@ -446,6 +446,7 @@ window.openActivityModal = function(activity = null) {
         </form>
     `;
     
+    modal.style.display = 'flex';
     modal.classList.add('active');
     console.log('Modal opened successfully');
 }
@@ -538,40 +539,40 @@ window.handleActivitySubmit = async function(e) {
 };
 
 window.deleteActivity = async function(id) {
-    if (!confirm('Are you sure you want to delete this activity? This action cannot be undone.')) {
-        return;
-    }
-    
-    try {
-        const response = await fetch(`${API_BASE}/companies/${companyId}/activities/${id}`, {
-            method: 'DELETE',
-            headers: getHeaders()
-        });
-        
-        if (response.status === 401) {
-            if (typeof handle401Error === 'function') {
-                handle401Error();
+    showDeleteConfirmModal(
+        'Delete Activity',
+        'Are you sure you want to delete this activity? This action cannot be undone.',
+        async () => {
+            try {
+                const response = await fetch(`${API_BASE}/companies/${companyId}/activities/${id}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+                
+                if (response.status === 401) {
+                    if (typeof handle401Error === 'function') {
+                        handle401Error();
+                    }
+                    return;
+                }
+                
+                if (response.ok) {
+                    if (window.activitiesTable && typeof window.activitiesTable.refresh === 'function') {
+                        window.activitiesTable.refresh();
+                    } else {
+                        loadActivities();
+                    }
+                    showToast('Activity deleted successfully!', 'success');
+                } else {
+                    const result = await response.json();
+                    showToast(result.detail || 'Failed to delete activity', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting activity:', error);
+                showToast('Connection error. Please try again.', 'error');
             }
-            return;
         }
-        
-        if (response.ok) {
-            if (window.activitiesTable && typeof window.activitiesTable.refresh === 'function') {
-                window.activitiesTable.refresh();
-            } else {
-                loadActivities();
-            }
-            if (typeof showNotification === 'function') {
-                showNotification('Activity deleted successfully!', 'success');
-            }
-        } else {
-            const result = await response.json();
-            alert(result.detail || 'Failed to delete activity');
-        }
-    } catch (error) {
-        console.error('Error deleting activity:', error);
-        alert('Connection error. Please try again.');
-    }
+    );
 };
 
 // closeFormModal is now defined globally in navigation.js

@@ -430,18 +430,329 @@
 /* Loading State */
 .datatable-loading {
     text-align: center;
-    padding: 40px;
+    padding: 40px !important;
     color: #6c757d;
 }
 
-.datatable-loading::after {
-    content: '...';
-    animation: dots 1.5s steps(4, end) infinite;
+.datatable-loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
 }
 
-@keyframes dots {
-    0%, 20% { content: '.'; }
-    40% { content: '..'; }
-    60%, 100% { content: '...'; }
+.datatable-loading-spinner .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.datatable-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 30px;
+}
+
+.datatable-empty-state svg {
+    opacity: 0.5;
+}
+
+.datatable-empty-state p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+/* Table Variants */
+.datatable-striped tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.datatable-hover tbody tr:hover {
+    background-color: #e9ecef !important;
+}
+
+.datatable-bordered {
+    border: 1px solid #dee2e6;
+}
+
+.datatable-bordered th,
+.datatable-bordered td {
+    border: 1px solid #dee2e6;
+}
+
+.datatable-compact th,
+.datatable-compact td {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+}
+
+/* Sticky Header */
+.datatable-sticky-header thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Row Actions */
+.datatable-row-actions {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: transparent;
+    color: #6c757d;
+}
+
+.btn-icon:hover {
+    background: #e9ecef;
+}
+
+.btn-icon.btn-edit:hover {
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.btn-icon.btn-delete:hover {
+    color: #dc3545;
+    background: rgba(220, 53, 69, 0.1);
+}
+
+.btn-icon.btn-view:hover {
+    color: #17a2b8;
+    background: rgba(23, 162, 184, 0.1);
+}
+
+/* Bulk Actions Bar */
+.datatable-bulk-actions {
+    display: none;
+    padding: 10px 15px;
+    background: #667eea;
+    color: white;
+    align-items: center;
+    gap: 15px;
+}
+
+.datatable-bulk-actions.show {
+    display: flex;
+}
+
+.datatable-bulk-actions .selected-count {
+    font-weight: 500;
+}
+
+.datatable-bulk-actions .btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 5px 12px;
+    font-size: 12px;
+}
+
+.datatable-bulk-actions .btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+/* Column Filter */
+.datatable-column-filter {
+    padding: 4px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 11px;
+    width: 100%;
+    margin-top: 5px;
+}
+
+/* Inline Edit */
+.datatable-inline-edit {
+    padding: 4px 8px;
+    border: 1px solid #667eea;
+    border-radius: 3px;
+    font-size: 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.datatable-inline-edit:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+/* Resizable Columns */
+.datatable-table th.resizable {
+    position: relative;
+}
+
+.datatable-table th .resize-handle {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    cursor: col-resize;
+    background: transparent;
+}
+
+.datatable-table th .resize-handle:hover {
+    background: #667eea;
+}
+
+/* Status Badge Additional Colors */
+.status-badge.status-open {
+    background: #cfe2ff;
+    color: #084298;
+}
+
+.status-badge.status-closed_won {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-badge.status-closed_lost {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-badge.status-in_progress,
+.status-badge.status-in-progress {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-badge.status-completed {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-badge.status-overdue {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-badge.status-high {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-badge.status-medium {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-badge.status-low {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-badge.status-individual {
+    background: #e2e3e5;
+    color: #41464b;
+}
+
+.status-badge.status-business {
+    background: #cfe2ff;
+    color: #084298;
+}
+
+.status-badge.status-green {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-badge.status-yellow {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-badge.status-red {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-badge.status-black {
+    background: #212529;
+    color: #fff;
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .datatable-wrapper {
+        background: #1e1e1e;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    .datatable-toolbar,
+    .datatable-pagination {
+        background: #2d2d2d;
+        border-color: #404040;
+    }
+    
+    .datatable-table thead {
+        background: #2d2d2d;
+    }
+    
+    .datatable-table th {
+        color: #e0e0e0;
+        border-color: #404040;
+    }
+    
+    .datatable-table td {
+        color: #e0e0e0;
+    }
+    
+    .datatable-table tbody tr {
+        border-color: #404040;
+    }
+    
+    .datatable-table tbody tr:hover {
+        background-color: #333;
+    }
+    
+    .datatable-search,
+    .datatable-page-size {
+        background: #333;
+        border-color: #404040;
+        color: #e0e0e0;
+    }
+    
+    .datatable-column-menu,
+    .datatable-export-menu {
+        background: #2d2d2d;
+        border-color: #404040;
+    }
+    
+    .datatable-column-menu-item:hover,
+    .datatable-export-menu a:hover {
+        background-color: #333;
+    }
+    
+    .datatable-export-menu a {
+        color: #e0e0e0;
+    }
 }
 

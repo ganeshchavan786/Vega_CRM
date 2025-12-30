@@ -50,7 +50,6 @@ logs/
 *.md
 !README.md
 Requirements/
-guides/
 
 # Test files
 test_*.py

@@ -13,13 +13,45 @@ function initRegister() {
     setupInputValidation('registerPasswordConfirm', 'password');
 }
 
-// Setup Input Validation (from login.js)
+// Setup Input Validation
 function setupInputValidation(inputId, type) {
     const input = document.getElementById(inputId);
     if (!input) return;
     
     input.addEventListener('blur', () => validateInput(input, type));
     input.addEventListener('input', () => clearInputError(input));
+}
+
+// Validate Input
+function validateInput(input, type) {
+    if (!input) return false;
+    
+    const value = input.value.trim();
+    let isValid = true;
+    
+    if (type === 'email') {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        isValid = emailRegex.test(value);
+    } else if (type === 'password') {
+        isValid = value.length >= 8;
+    } else if (type === 'text') {
+        isValid = value.length >= 2;
+    }
+    
+    if (!isValid && value.length > 0) {
+        input.classList.add('input-error');
+    } else {
+        input.classList.remove('input-error');
+    }
+    
+    return isValid || value.length === 0;
+}
+
+// Clear Input Error
+function clearInputError(input) {
+    if (input) {
+        input.classList.remove('input-error');
+    }
 }
 
 // Check Password Strength
@@ -145,14 +177,19 @@ async function handleRegister(e) {
     }
 
     try {
+        // Split name into first_name and last_name
+        const nameParts = name.trim().split(' ');
+        const first_name = nameParts[0] || name;
+        const last_name = nameParts.slice(1).join(' ') || 'User';
+        
         const response = await fetch(`${API_BASE}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
-                name, 
+                first_name,
+                last_name,
                 email, 
-                password,
-                role: 'user' // Default role
+                password
             })
         });
 

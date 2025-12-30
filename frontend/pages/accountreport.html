@@ -1,0 +1,567 @@
+<!-- Account Report Page - VEGA CRM Theme -->
+<!-- Author: CRM SAAS Team -->
+<style>
+    .vega-reports-page { min-height: calc(100vh - 60px); background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 24px; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    .vega-reports-header { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border-radius: 20px; padding: 32px; margin-bottom: 24px; color: white; box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3); }
+    .vega-reports-header-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+    .vega-reports-title-section { display: flex; align-items: center; gap: 16px; }
+    .vega-reports-icon { width: 56px; height: 56px; background: rgba(255,255,255,0.2); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+    .vega-reports-title { font-size: 1.8rem; font-weight: 800; margin: 0; }
+    .vega-reports-subtitle { font-size: 0.95rem; opacity: 0.9; margin-top: 4px; }
+    .vega-reports-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .vega-reports-select { padding: 12px 20px; border: none; border-radius: 10px; background: rgba(255,255,255,0.2); color: white; font-size: 0.9rem; font-weight: 500; cursor: pointer; backdrop-filter: blur(10px); }
+    .vega-reports-select option { color: #1e293b; background: white; }
+    .vega-reports-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 12px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s; border: none; background: white; color: #6366f1; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .vega-reports-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+    .vega-report-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; background: white; padding: 8px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+    .vega-report-tab { display: flex; align-items: center; gap: 8px; padding: 12px 20px; border: none; background: transparent; border-radius: 10px; font-size: 0.9rem; font-weight: 600; color: #64748b; cursor: pointer; transition: all 0.2s; }
+    .vega-report-tab:hover { background: #f1f5f9; color: #6366f1; }
+    .vega-report-tab.active { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
+    .vega-report-tab svg { width: 18px; height: 18px; }
+    @media (max-width: 768px) { .vega-reports-header-content { flex-direction: column; align-items: flex-start; } .vega-report-tabs { overflow-x: auto; flex-wrap: nowrap; } }
+</style>
+
+<section id="accountreport" class="section vega-reports-page">
+    <!-- Page Header -->
+    <div class="vega-reports-header">
+        <div class="vega-reports-header-content">
+            <div class="vega-reports-title-section">
+                <div class="vega-reports-icon">📊</div>
+                <div>
+                    <h1 class="vega-reports-title">Reports & Analytics</h1>
+                    <p class="vega-reports-subtitle">Comprehensive business intelligence reports</p>
+                </div>
+            </div>
+            <div class="vega-reports-actions">
+                <select id="reportDateRange" class="vega-reports-select">
+                    <option value="7">📅 Last 7 Days</option>
+                    <option value="30" selected>📅 Last 30 Days</option>
+                    <option value="90">📅 Last 90 Days</option>
+                    <option value="365">📅 Last Year</option>
+                </select>
+                <button class="vega-reports-btn" onclick="exportReport()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Tabs -->
+    <div class="vega-report-tabs">
+        <button class="vega-report-tab active" onclick="switchReportTab('areawise')" data-tab="areawise">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            Area Wise
+        </button>
+        <button class="vega-report-tab" onclick="switchReportTab('accounts')" data-tab="accounts">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 7v1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7m0 1a3 3 0 0 0 6 0V7H3l2-4h14l2 4M5 21V10.85M19 21V10.85"></path></svg>
+            Accounts
+        </button>
+        <button class="vega-report-tab" onclick="switchReportTab('sales')" data-tab="sales">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+            Sales
+        </button>
+        <button class="vega-report-tab" onclick="switchReportTab('leads')" data-tab="leads">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+            Leads
+        </button>
+        <button class="vega-report-tab" onclick="switchReportTab('activities')" data-tab="activities">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            Activities
+        </button>
+    </div>
+
+    <!-- Area Wise Customer Tab (First Tab) -->
+    <div id="areawiseReportView" class="report-view active">
+        <div class="report-summary-cards">
+            <div class="report-card">
+                <div class="report-card-icon states">
+                    <i data-lucide="map"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="totalStates">0</span>
+                    <span class="report-card-label">States Covered</span>
+                </div>
+            </div>
+            <div class="report-card">
+                <div class="report-card-icon cities">
+                    <i data-lucide="building-2"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="totalCities">0</span>
+                    <span class="report-card-label">Cities</span>
+                </div>
+            </div>
+            <div class="report-card">
+                <div class="report-card-icon pincodes">
+                    <i data-lucide="map-pin"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="totalPinCodes">0</span>
+                    <span class="report-card-label">Pin Codes</span>
+                </div>
+            </div>
+            <div class="report-card">
+                <div class="report-card-icon accounts">
+                    <i data-lucide="users"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="totalAreaCustomers">0</span>
+                    <span class="report-card-label">Total Customers</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Section -->
+        <div class="report-charts-row">
+            <div class="report-chart-card wide">
+                <div class="report-chart-header">
+                    <h3><i data-lucide="map-pin" style="width:18px;height:18px;margin-right:8px;"></i>Customer Locations by Pin Code</h3>
+                </div>
+                <div class="report-map-body">
+                    <div class="map-container" id="accountMapContainer">
+                        <div class="leaflet-map-wrapper">
+                            <div id="indiaLeafletMap" class="leaflet-map"></div>
+                        </div>
+                        <div class="map-legend">
+                            <h4>Customers by City</h4>
+                            <div class="legend-items" id="stateLegend">
+                                <!-- Legend items will be populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customers by City Table -->
+        <div class="report-table-section">
+            <div class="report-table-header">
+                <h3><i data-lucide="building" style="width:18px;height:18px;margin-right:8px;"></i>Customers by City</h3>
+            </div>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>City</th>
+                        <th>State</th>
+                        <th>Pin Code</th>
+                        <th>Customers</th>
+                        <th>Total Revenue</th>
+                    </tr>
+                </thead>
+                <tbody id="accountsByCityTable">
+                    <tr><td colspan="5" class="loading">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Customers by State Table -->
+        <div class="report-table-section">
+            <div class="report-table-header">
+                <h3><i data-lucide="map" style="width:18px;height:18px;margin-right:8px;"></i>Customers by State</h3>
+            </div>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>State</th>
+                        <th>Customers</th>
+                        <th>Cities</th>
+                        <th>Pin Codes</th>
+                        <th>Total Revenue</th>
+                    </tr>
+                </thead>
+                <tbody id="customersByStateTable">
+                    <tr><td colspan="5" class="loading">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Account Reports Tab -->
+    <div id="accountsReportView" class="report-view">
+        <div class="report-summary-cards">
+            <div class="report-card">
+                <div class="report-card-icon accounts">
+                    <i data-lucide="building-2"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="totalAccounts">0</span>
+                    <span class="report-card-label">Total Accounts</span>
+                </div>
+            </div>
+            <div class="report-card">
+                <div class="report-card-icon active">
+                    <i data-lucide="check-circle"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="activeAccounts">0</span>
+                    <span class="report-card-label">Active Accounts</span>
+                </div>
+            </div>
+            <div class="report-card">
+                <div class="report-card-icon new">
+                    <i data-lucide="plus-circle"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="newAccounts">0</span>
+                    <span class="report-card-label">New This Month</span>
+                </div>
+            </div>
+            <div class="report-card">
+                <div class="report-card-icon health">
+                    <i data-lucide="heart-pulse"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="avgHealthScore">0%</span>
+                    <span class="report-card-label">Avg Health Score</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-charts-row">
+            <div class="report-chart-card">
+                <div class="report-chart-header">
+                    <h3>Accounts by Type</h3>
+                </div>
+                <div class="report-chart-body">
+                    <canvas id="accountsByTypeChart"></canvas>
+                </div>
+            </div>
+            <div class="report-chart-card">
+                <div class="report-chart-header">
+                    <h3>Accounts by Lifecycle Stage</h3>
+                </div>
+                <div class="report-chart-body">
+                    <canvas id="accountsByLifecycleChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-charts-row">
+            <div class="report-chart-card wide">
+                <div class="report-chart-header">
+                    <h3>Account Growth Trend</h3>
+                </div>
+                <div class="report-chart-body">
+                    <canvas id="accountGrowthChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-table-section">
+            <div class="report-table-header">
+                <h3>Account Health Distribution</h3>
+            </div>
+            <div class="report-health-grid" id="accountHealthGrid">
+                <div class="health-item green">
+                    <div class="health-bar" style="width: 0%"></div>
+                    <span class="health-label">Healthy</span>
+                    <span class="health-count" id="healthGreen">0</span>
+                </div>
+                <div class="health-item yellow">
+                    <div class="health-bar" style="width: 0%"></div>
+                    <span class="health-label">At Risk</span>
+                    <span class="health-count" id="healthYellow">0</span>
+                </div>
+                <div class="health-item red">
+                    <div class="health-bar" style="width: 0%"></div>
+                    <span class="health-label">Critical</span>
+                    <span class="health-count" id="healthRed">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-table-section">
+            <div class="report-table-header">
+                <h3>Top Accounts by Revenue</h3>
+            </div>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Account Name</th>
+                        <th>Type</th>
+                        <th>Lifecycle Stage</th>
+                        <th>Health Score</th>
+                        <th>Total Revenue</th>
+                        <th>Contacts</th>
+                    </tr>
+                </thead>
+                <tbody id="topAccountsTable">
+                    <tr><td colspan="6" class="loading">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Sales Reports Tab -->
+    <div id="salesReportView" class="report-view">
+        <div class="report-summary-cards">
+            <div class="report-card">
+                <div class="report-card-icon revenue">
+                    <i data-lucide="indian-rupee"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="totalRevenue">₹0</span>
+                    <span class="report-card-label">Total Revenue</span>
+                </div>
+            </div>
+            <div class="report-card">
+                <div class="report-card-icon deals">
+                    <i data-lucide="briefcase"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="totalDeals">0</span>
+                    <span class="report-card-label">Total Deals</span>
+                </div>
+            </div>
+            <div class="report-card">
+                <div class="report-card-icon won">
+                    <i data-lucide="trophy"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="wonDeals">0</span>
+                    <span class="report-card-label">Deals Won</span>
+                </div>
+            </div>
+            <div class="report-card">
+                <div class="report-card-icon avgdeal">
+                    <i data-lucide="calculator"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="avgDealSize">₹0</span>
+                    <span class="report-card-label">Avg Deal Size</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-charts-row">
+            <div class="report-chart-card wide">
+                <div class="report-chart-header">
+                    <h3>Monthly Revenue Trend</h3>
+                </div>
+                <div class="report-chart-body">
+                    <canvas id="revenueReportChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-charts-row">
+            <div class="report-chart-card">
+                <div class="report-chart-header">
+                    <h3>Deals by Stage</h3>
+                </div>
+                <div class="report-chart-body">
+                    <canvas id="dealsByStageChart"></canvas>
+                </div>
+            </div>
+            <div class="report-chart-card">
+                <div class="report-chart-header">
+                    <h3>Win/Loss Ratio</h3>
+                </div>
+                <div class="report-chart-body">
+                    <canvas id="winLossChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-table-section">
+            <div class="report-table-header">
+                <h3>Top Performing Deals</h3>
+            </div>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Deal Name</th>
+                        <th>Account</th>
+                        <th>Stage</th>
+                        <th>Value</th>
+                        <th>Probability</th>
+                        <th>Close Date</th>
+                    </tr>
+                </thead>
+                <tbody id="topDealsReportTable">
+                    <tr><td colspan="6" class="loading">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Lead Reports Tab -->
+    <div id="leadsReportView" class="report-view">
+        <div class="report-summary-cards">
+            <div class="report-card">
+                <div class="report-card-icon leads">
+                    <i data-lucide="target"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="totalLeadsReport">0</span>
+                    <span class="report-card-label">Total Leads</span>
+                </div>
+            </div>
+            <div class="report-card">
+                <div class="report-card-icon qualified">
+                    <i data-lucide="user-check"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="qualifiedLeads">0</span>
+                    <span class="report-card-label">Qualified Leads</span>
+                </div>
+            </div>
+            <div class="report-card">
+                <div class="report-card-icon converted">
+                    <i data-lucide="arrow-right-circle"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="convertedLeads">0</span>
+                    <span class="report-card-label">Converted</span>
+                </div>
+            </div>
+            <div class="report-card">
+                <div class="report-card-icon rate">
+                    <i data-lucide="percent"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="conversionRateReport">0%</span>
+                    <span class="report-card-label">Conversion Rate</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-charts-row">
+            <div class="report-chart-card">
+                <div class="report-chart-header">
+                    <h3>Leads by Source</h3>
+                </div>
+                <div class="report-chart-body">
+                    <canvas id="leadsBySourceChart"></canvas>
+                </div>
+            </div>
+            <div class="report-chart-card">
+                <div class="report-chart-header">
+                    <h3>Leads by Status</h3>
+                </div>
+                <div class="report-chart-body">
+                    <canvas id="leadsByStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-charts-row">
+            <div class="report-chart-card wide">
+                <div class="report-chart-header">
+                    <h3>Lead Score Distribution</h3>
+                </div>
+                <div class="report-chart-body">
+                    <canvas id="leadScoreChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-table-section">
+            <div class="report-table-header">
+                <h3>Top Leads by Score</h3>
+            </div>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Lead Name</th>
+                        <th>Company</th>
+                        <th>Source</th>
+                        <th>Status</th>
+                        <th>Score</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody id="topLeadsTable">
+                    <tr><td colspan="6" class="loading">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Activity Reports Tab -->
+    <div id="activitiesReportView" class="report-view">
+        <div class="report-summary-cards">
+            <div class="report-card">
+                <div class="report-card-icon activities">
+                    <i data-lucide="activity"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="totalActivities">0</span>
+                    <span class="report-card-label">Total Activities</span>
+                </div>
+            </div>
+            <div class="report-card">
+                <div class="report-card-icon calls">
+                    <i data-lucide="phone"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="totalCalls">0</span>
+                    <span class="report-card-label">Calls Made</span>
+                </div>
+            </div>
+            <div class="report-card">
+                <div class="report-card-icon emails">
+                    <i data-lucide="mail"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="totalEmails">0</span>
+                    <span class="report-card-label">Emails Sent</span>
+                </div>
+            </div>
+            <div class="report-card">
+                <div class="report-card-icon meetings">
+                    <i data-lucide="calendar"></i>
+                </div>
+                <div class="report-card-content">
+                    <span class="report-card-value" id="totalMeetings">0</span>
+                    <span class="report-card-label">Meetings</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-charts-row">
+            <div class="report-chart-card">
+                <div class="report-chart-header">
+                    <h3>Activities by Type</h3>
+                </div>
+                <div class="report-chart-body">
+                    <canvas id="activitiesByTypeChart"></canvas>
+                </div>
+            </div>
+            <div class="report-chart-card">
+                <div class="report-chart-header">
+                    <h3>Daily Activity Trend</h3>
+                </div>
+                <div class="report-chart-body">
+                    <canvas id="dailyActivityChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-table-section">
+            <div class="report-table-header">
+                <h3>Team Activity Summary</h3>
+            </div>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Team Member</th>
+                        <th>Calls</th>
+                        <th>Emails</th>
+                        <th>Meetings</th>
+                        <th>Notes</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="teamActivityTable">
+                    <tr><td colspan="6" class="loading">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>

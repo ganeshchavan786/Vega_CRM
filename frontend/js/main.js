@@ -43,27 +43,32 @@ function initializeApp() {
     // Check if page-content is empty, if so load home page
     const pageContent = document.getElementById('page-content');
     
-    // Only load navigation if user is authenticated and has company selected
-    if (authToken && companyId) {
-        loadNavigation();
-    } else {
-        // Hide navbar on home page
+    // IMPORTANT: If not logged in (no authToken), redirect to website login page
+    if (!authToken) {
+        // Clear any stale data
+        localStorage.removeItem('currentPage');
+        localStorage.removeItem('companyId');
+        window.location.hash = '';
+        
+        // Redirect to VEGA CRM website login page
+        window.location.href = '/website/login.html';
+        return;
+    }
+    
+    // User has authToken - check if company is selected
+    if (!companyId) {
+        // Show company selection page WITHOUT app navbar
+        // Hide the CRM app navbar container
         const navbarContainer = document.getElementById('navbar-container');
         if (navbarContainer) {
             navbarContainer.style.display = 'none';
         }
+        loadPage('company-selection');
+        return;
     }
     
-    // Check auth and load appropriate page
-    // If no auth token, home page is already shown in HTML
-    if (authToken) {
-        checkAuth();
-    } else {
-        // Home page is already in HTML, just ensure it's visible
-        const homeSection = document.getElementById('home');
-        if (homeSection) {
-            homeSection.classList.add('active');
-        }
-    }
+    // User is fully authenticated - load navigation and dashboard
+    loadNavigation();
+    checkAuth();
 }
 

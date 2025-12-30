@@ -115,12 +115,28 @@ window.loadCustomers = async function() {
                         }
                     },
                     {
+                        key: 'lifecycle_stage',
+                        label: 'Lifecycle',
+                        sortable: true,
+                        align: 'center',
+                        render: (value) => {
+                            const stage = value || 'prospect';
+                            const icons = {
+                                prospect: 'target',
+                                customer: 'check-circle',
+                                churned: 'x-circle',
+                                inactive: 'pause-circle'
+                            };
+                            return `<span class="lifecycle-badge ${stage}"><i data-lucide="${icons[stage] || 'circle'}" style="width:12px;height:12px;"></i> ${stage}</span>`;
+                        }
+                    },
+                    {
                         key: 'health_score',
                         label: 'Health',
                         sortable: true,
                         align: 'center',
                         render: (value) => {
-                            return value ? `<span class="status-badge status-${value}">${escapeHtml(value)}</span>` : '-';
+                            return renderHealthScoreMeter(value);
                         }
                     },
                     {
@@ -414,6 +430,7 @@ window.openCustomerModal = function(customer = null) {
         </form>
     `;
     
+    modal.style.display = 'flex';
     modal.classList.add('active');
     console.log('Modal opened successfully');
 }
@@ -514,48 +531,51 @@ window.handleCustomerSubmit = async function(e) {
 }
 
 window.deleteCustomer = async function(id) {
-    if (!confirm('Are you sure you want to delete this customer? This action cannot be undone.')) {
-        return;
-    }
-    
-    try {
-        const response = await fetch(`${API_BASE}/companies/${companyId}/customers/${id}`, {
-            method: 'DELETE',
-            headers: getHeaders()
-        });
-        
-        if (response.status === 401) {
-            if (typeof handle401Error === 'function') {
-                handle401Error();
+    // Show modern confirmation modal
+    showDeleteConfirmModal(
+        'Delete Customer',
+        'Are you sure you want to delete this customer? This action cannot be undone.',
+        async () => {
+            try {
+                const response = await fetch(`${API_BASE}/companies/${companyId}/customers/${id}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+                
+                if (response.status === 401) {
+                    if (typeof handle401Error === 'function') {
+                        handle401Error();
+                    }
+                    return;
+                }
+                
+                if (response.ok) {
+                    if (window.customersTable && typeof window.customersTable.refresh === 'function') {
+                        window.customersTable.refresh();
+                    } else {
+                        loadCustomers();
+                    }
+                    showToast('Customer deleted successfully!', 'success');
+                } else {
+                    const result = await response.json();
+                    showToast(result.detail || 'Failed to delete customer', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting customer:', error);
+                showToast('Connection error. Please try again.', 'error');
             }
-            return;
         }
-        
-        if (response.ok) {
-            if (window.customersTable && typeof window.customersTable.refresh === 'function') {
-                window.customersTable.refresh();
-            } else {
-                loadCustomers();
-            }
-            if (typeof showNotification === 'function') {
-                showNotification('Customer deleted successfully!', 'success');
-            }
-        } else {
-            const result = await response.json();
-            alert(result.detail || 'Failed to delete customer');
-        }
-    } catch (error) {
-        console.error('Error deleting customer:', error);
-        alert('Connection error. Please try again.');
-    }
+    );
 };
 
 // closeFormModal is now defined globally in navigation.js
+// showDeleteConfirmModal and showToast are also in navigation.js
 // This is kept for backward compatibility
 if (typeof window.closeFormModal === 'undefined') {
     window.closeFormModal = function() {
         const modal = document.getElementById('formModal');
         if (modal) {
+            modal.style.display = 'none';
             modal.classList.remove('active');
         }
         window.currentEditingCustomerId = null;
@@ -568,4 +588,101 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// ============================================
+// Customer Health Score Visual Meter
+// ============================================
+
+function renderHealthScoreMeter(value) {
+    if (!value) return '<span style="color: #94a3b8;">-</span>';
+    
+    // Health score can be: excellent, good, average, poor, at_risk
+    // Or numeric value 0-100
+    let score, label, color, bgColor, icon;
+    
+    // Handle string values
+    if (typeof value === 'string') {
+        const healthMap = {
+            'excellent': { score: 90, label: 'Excellent', color: '#10b981', icon: '💚' },
+            'good': { score: 70, label: 'Good', color: '#3b82f6', icon: '💙' },
+            'average': { score: 50, label: 'Average', color: '#f59e0b', icon: '💛' },
+            'poor': { score: 30, label: 'Poor', color: '#ef4444', icon: '🧡' },
+            'at_risk': { score: 15, label: 'At Risk', color: '#dc2626', icon: '❤️' }
+        };
+        
+        const health = healthMap[value.toLowerCase()] || healthMap['average'];
+        score = health.score;
+        label = health.label;
+        color = health.color;
+        icon = health.icon;
+    } else {
+        // Handle numeric values
+        score = parseInt(value) || 0;
+        
+        if (score >= 80) {
+            label = 'Excellent';
+            color = '#10b981';
+            icon = '💚';
+        } else if (score >= 60) {
+            label = 'Good';
+            color = '#3b82f6';
+            icon = '💙';
+        } else if (score >= 40) {
+            label = 'Average';
+            color = '#f59e0b';
+            icon = '💛';
+        } else if (score >= 20) {
+            label = 'Poor';
+            color = '#ef4444';
+            icon = '🧡';
+        } else {
+            label = 'At Risk';
+            color = '#dc2626';
+            icon = '❤️';
+        }
+    }
+    
+    return `
+        <div class="health-score-meter" title="${label} - Health Score: ${score}%" style="
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            min-width: 65px;
+        ">
+            <div style="
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                font-size: 0.8em;
+                color: ${color};
+                font-weight: 600;
+            ">
+                <span>${icon}</span>
+                <span>${score}%</span>
+            </div>
+            <div style="
+                width: 50px;
+                height: 6px;
+                background: #e5e7eb;
+                border-radius: 3px;
+                overflow: hidden;
+            ">
+                <div style="
+                    width: ${score}%;
+                    height: 100%;
+                    background: ${color};
+                    border-radius: 3px;
+                    transition: width 0.3s ease;
+                "></div>
+            </div>
+            <span style="
+                font-size: 0.6em;
+                color: ${color};
+                text-transform: uppercase;
+                letter-spacing: 0.3px;
+            ">${label}</span>
+        </div>
+    `;
 }

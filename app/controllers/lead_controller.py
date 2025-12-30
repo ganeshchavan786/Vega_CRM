@@ -14,6 +14,7 @@ from app.utils.lead_scoring import LeadScoringAlgorithm
 from app.utils.duplicate_detection import DuplicateDetectionEngine
 from app.utils.assignment_rules import AssignmentRulesEngine, AssignmentRuleType
 from app.utils.nurturing_automation import NurturingAutomation
+from app.services import audit_service, log_service
 
 
 class LeadController:
@@ -151,6 +152,26 @@ class LeadController:
                 import traceback
                 traceback.print_exc()
         
+        # Log audit trail
+        try:
+            audit_service.log_create(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="Lead",
+                resource_id=new_lead.id,
+                new_values={"lead_name": new_lead.lead_name, "email": new_lead.email, "company_id": company_id}
+            )
+            log_service.log_info(
+                db=db,
+                category="USER_ACTIVITY",
+                action="CREATE_LEAD",
+                message=f"Lead '{new_lead.lead_name}' created",
+                user_id=current_user.id
+            )
+        except Exception:
+            pass
+        
         return new_lead
     
     @staticmethod
@@ -185,8 +206,13 @@ class LeadController:
         """Update lead"""
         lead = LeadController.get_lead(lead_id, company_id, current_user, db)
         
-        # Check for duplicates if email/phone/company changed
+        # Store old values for audit before update
         update_data = lead_data.model_dump(exclude_unset=True)
+        old_values = {}
+        for key in update_data.keys():
+            old_values[key] = getattr(lead, key, None)
+        
+        # Check for duplicates if email/phone/company changed
         duplicate_check_fields = ['email', 'phone', 'company_name']
         
         if any(field in update_data for field in duplicate_check_fields):
@@ -215,6 +241,27 @@ class LeadController:
         
         db.commit()
         db.refresh(lead)
+        
+        # Log audit trail for update
+        try:
+            audit_service.log_update(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="Lead",
+                resource_id=lead.id,
+                old_values=old_values,
+                new_values=update_data
+            )
+            log_service.log_info(
+                db=db,
+                category="USER_ACTIVITY",
+                action="UPDATE_LEAD",
+                message=f"Lead '{lead.lead_name}' updated",
+                user_id=current_user.id
+            )
+        except Exception:
+            pass
         
         return lead
     
@@ -249,8 +296,29 @@ class LeadController:
                 detail="Lead not found"
             )
         
+        lead_name = lead.lead_name
         db.delete(lead)
         db.commit()
+        
+        # Log audit trail for delete
+        try:
+            audit_service.log_delete(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="Lead",
+                resource_id=lead_id,
+                old_values={"lead_name": lead_name, "company_id": company_id}
+            )
+            log_service.log_info(
+                db=db,
+                category="USER_ACTIVITY",
+                action="DELETE_LEAD",
+                message=f"Lead '{lead_name}' deleted",
+                user_id=current_user.id
+            )
+        except Exception:
+            pass
     
     @staticmethod
     def get_lead_stats(company_id: int, db: Session) -> dict:

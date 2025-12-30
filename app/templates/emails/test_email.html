@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Email - Vega CRM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            background: #f9f9f9;
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+        }
+        .success-icon {
+            font-size: 48px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .info-box {
+            background: #e8f4fd;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📧 Vega CRM</h1>
+        <p>Email Configuration Test</p>
+    </div>
+    <div class="content">
+        <div class="success-icon">✅</div>
+        <h2 style="text-align: center;">Email Configuration Successful!</h2>
+        <p>Hello {{ user_name }},</p>
+        <p>This is a test email from your Vega CRM system. If you're reading this, your email configuration is working correctly!</p>
+        
+        <div class="info-box">
+            <strong>Test Details:</strong><br>
+            Sent at: {{ timestamp }}<br>
+            System: Vega CRM Email Service
+        </div>
+        
+        <p>Your SMTP settings are properly configured and emails can be sent from your CRM system.</p>
+        
+        <p>Best regards,<br>Vega CRM System</p>
+    </div>
+    <div class="footer">
+        <p>This is an automated test email from Vega CRM.</p>
+        <p>© 2025 Vega CRM. All rights reserved.</p>
+    </div>
+</body>
+</html>

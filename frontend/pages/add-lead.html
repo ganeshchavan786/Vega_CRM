@@ -1,0 +1,183 @@
+<!-- Add Lead Full Page - VEGA CRM Theme -->
+<style>
+    .vega-form-page { min-height: calc(100vh - 60px); background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 40px 20px; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    .vega-form-container { max-width: 900px; margin: 0 auto; }
+    .vega-form-header { text-align: center; margin-bottom: 40px; }
+    .vega-form-badge { display: inline-block; padding: 8px 16px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%); color: #6366f1; border-radius: 50px; font-size: 0.85rem; font-weight: 600; margin-bottom: 16px; }
+    .vega-form-title { font-size: 2rem; font-weight: 800; color: #1e293b; margin-bottom: 8px; }
+    .vega-form-subtitle { color: #64748b; font-size: 1rem; }
+    .vega-form-card { background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; }
+    .vega-form-card-header { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 24px 32px; color: white; }
+    .vega-form-card-header h2 { margin: 0; font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+    .vega-form-card-body { padding: 32px; }
+    .vega-form-section { margin-bottom: 32px; }
+    .vega-form-section-title { font-size: 0.9rem; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb; display: flex; align-items: center; gap: 8px; }
+    .vega-form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .vega-form-group { display: flex; flex-direction: column; }
+    .vega-form-group.full-width { grid-column: 1 / -1; }
+    .vega-form-label { font-size: 0.85rem; font-weight: 600; color: #374151; margin-bottom: 8px; }
+    .vega-form-label .required { color: #ef4444; }
+    .vega-form-input, .vega-form-select, .vega-form-textarea { padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.95rem; font-family: inherit; transition: all 0.3s; background: #f8fafc; }
+    .vega-form-input:focus, .vega-form-select:focus, .vega-form-textarea:focus { outline: none; border-color: #6366f1; background: white; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+    .vega-form-textarea { min-height: 100px; resize: vertical; }
+    .vega-form-actions { display: flex; justify-content: flex-end; gap: 16px; padding-top: 24px; border-top: 2px solid #e5e7eb; margin-top: 32px; }
+    .vega-btn { padding: 14px 28px; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+    .vega-btn-primary { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
+    .vega-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5); }
+    .vega-btn-secondary { background: white; color: #64748b; border: 2px solid #e5e7eb; }
+    .vega-btn-secondary:hover { background: #f8fafc; border-color: #cbd5e1; }
+    .vega-back-link { display: inline-flex; align-items: center; gap: 8px; color: #6366f1; text-decoration: none; font-weight: 500; margin-bottom: 24px; }
+    @media (max-width: 768px) { .vega-form-grid { grid-template-columns: 1fr; } }
+</style>
+
+<section id="add-lead" class="section vega-form-page">
+    <div class="vega-form-container">
+        <a href="#" class="vega-back-link" onclick="loadPage('leads'); return false;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 10H5M5 10L10 5M5 10L10 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Back to Leads
+        </a>
+
+        <div class="vega-form-header">
+            <span class="vega-form-badge">⭐ Lead Management</span>
+            <h1 class="vega-form-title">Add New Lead</h1>
+            <p class="vega-form-subtitle">Capture a new potential customer</p>
+        </div>
+
+        <div class="vega-form-card">
+            <div class="vega-form-card-header">
+                <h2>⭐ Lead Information</h2>
+            </div>
+            <div class="vega-form-card-body">
+                <form id="leadFormPage" onsubmit="handleLeadPageSubmit(event)">
+                    <div class="vega-form-section">
+                        <h3 class="vega-form-section-title">👤 Contact Details</h3>
+                        <div class="vega-form-grid">
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">First Name <span class="required">*</span></label>
+                                <input type="text" id="fpLeadFirstName" class="vega-form-input" required>
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Last Name <span class="required">*</span></label>
+                                <input type="text" id="fpLeadLastName" class="vega-form-input" required>
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Email <span class="required">*</span></label>
+                                <input type="email" id="fpLeadEmail" class="vega-form-input" required>
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Phone</label>
+                                <input type="tel" id="fpLeadPhone" class="vega-form-input">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Company</label>
+                                <input type="text" id="fpLeadCompany" class="vega-form-input">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Job Title</label>
+                                <input type="text" id="fpLeadTitle" class="vega-form-input">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vega-form-section">
+                        <h3 class="vega-form-section-title">📊 Lead Details</h3>
+                        <div class="vega-form-grid">
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Lead Source</label>
+                                <select id="fpLeadSource" class="vega-form-select">
+                                    <option value="website">Website</option>
+                                    <option value="referral">Referral</option>
+                                    <option value="social_media">Social Media</option>
+                                    <option value="advertisement">Advertisement</option>
+                                    <option value="cold_call">Cold Call</option>
+                                    <option value="trade_show">Trade Show</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Lead Status</label>
+                                <select id="fpLeadStatus" class="vega-form-select">
+                                    <option value="new">New</option>
+                                    <option value="contacted">Contacted</option>
+                                    <option value="qualified">Qualified</option>
+                                    <option value="unqualified">Unqualified</option>
+                                </select>
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Industry</label>
+                                <input type="text" id="fpLeadIndustry" class="vega-form-input">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Estimated Value (₹)</label>
+                                <input type="number" id="fpLeadValue" class="vega-form-input">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Assigned To</label>
+                                <select id="fpLeadAssigned" class="vega-form-select">
+                                    <option value="">Select User</option>
+                                </select>
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Rating</label>
+                                <select id="fpLeadRating" class="vega-form-select">
+                                    <option value="hot">🔥 Hot</option>
+                                    <option value="warm">🌡️ Warm</option>
+                                    <option value="cold">❄️ Cold</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vega-form-section">
+                        <h3 class="vega-form-section-title">📝 Additional Info</h3>
+                        <div class="vega-form-group full-width">
+                            <label class="vega-form-label">Description</label>
+                            <textarea id="fpLeadDescription" class="vega-form-textarea" placeholder="Lead details and notes..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="vega-form-actions">
+                        <button type="button" class="vega-btn vega-btn-secondary" onclick="loadPage('leads')">Cancel</button>
+                        <button type="submit" class="vega-btn vega-btn-primary" id="fpLeadSubmitBtn">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 4.5L6.75 12.75L3 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Save Lead
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+window.handleLeadPageSubmit = async function(e) {
+    e.preventDefault();
+    const submitBtn = document.getElementById('fpLeadSubmitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span>Saving...</span>';
+    
+    const leadData = {
+        first_name: document.getElementById('fpLeadFirstName').value,
+        last_name: document.getElementById('fpLeadLastName').value,
+        email: document.getElementById('fpLeadEmail').value,
+        phone: document.getElementById('fpLeadPhone').value || null,
+        company: document.getElementById('fpLeadCompany').value || null,
+        title: document.getElementById('fpLeadTitle').value || null,
+        source: document.getElementById('fpLeadSource').value,
+        status: document.getElementById('fpLeadStatus').value,
+        industry: document.getElementById('fpLeadIndustry').value || null,
+        estimated_value: document.getElementById('fpLeadValue').value ? parseFloat(document.getElementById('fpLeadValue').value) : null,
+        assigned_to: document.getElementById('fpLeadAssigned').value || null,
+        rating: document.getElementById('fpLeadRating').value,
+        description: document.getElementById('fpLeadDescription').value || null
+    };
+    
+    try {
+        const response = await fetch(`${API_BASE}/companies/${companyId}/leads`, {
+            method: 'POST', headers: getHeaders(), body: JSON.stringify(leadData)
+        });
+        if (response.ok) { alert('Lead created successfully!'); loadPage('leads'); }
+        else { const error = await response.json(); alert('Error: ' + (error.detail || 'Failed')); submitBtn.disabled = false; submitBtn.innerHTML = 'Save Lead'; }
+    } catch (error) { alert('Error: ' + error.message); submitBtn.disabled = false; submitBtn.innerHTML = 'Save Lead'; }
+};
+</script>

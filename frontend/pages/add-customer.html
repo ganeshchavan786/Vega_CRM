@@ -1,0 +1,430 @@
+<!-- Add Customer Full Page - VEGA CRM Theme -->
+<style>
+    .vega-form-page {
+        min-height: calc(100vh - 60px);
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        padding: 40px 20px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .vega-form-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .vega-form-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    .vega-form-badge {
+        display: inline-block;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+        color: #6366f1;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+    .vega-form-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 8px;
+    }
+    .vega-form-subtitle {
+        color: #64748b;
+        font-size: 1rem;
+    }
+    .vega-form-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    .vega-form-card-header {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        padding: 24px 32px;
+        color: white;
+    }
+    .vega-form-card-header h2 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .vega-form-card-body {
+        padding: 32px;
+    }
+    .vega-form-section {
+        margin-bottom: 32px;
+    }
+    .vega-form-section:last-child {
+        margin-bottom: 0;
+    }
+    .vega-form-section-title {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #6366f1;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .vega-form-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+    .vega-form-grid-2 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .vega-form-group {
+        display: flex;
+        flex-direction: column;
+    }
+    .vega-form-group.full-width {
+        grid-column: 1 / -1;
+    }
+    .vega-form-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+    .vega-form-label .required {
+        color: #ef4444;
+        margin-left: 2px;
+    }
+    .vega-form-input,
+    .vega-form-select,
+    .vega-form-textarea {
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-family: inherit;
+        transition: all 0.3s;
+        background: #f8fafc;
+    }
+    .vega-form-input:focus,
+    .vega-form-select:focus,
+    .vega-form-textarea:focus {
+        outline: none;
+        border-color: #6366f1;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    .vega-form-textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+    .vega-form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 16px;
+        padding-top: 24px;
+        border-top: 2px solid #e5e7eb;
+        margin-top: 32px;
+    }
+    .vega-btn {
+        padding: 14px 28px;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .vega-btn-primary {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        border: none;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    }
+    .vega-btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+    }
+    .vega-btn-secondary {
+        background: white;
+        color: #64748b;
+        border: 2px solid #e5e7eb;
+    }
+    .vega-btn-secondary:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        color: #475569;
+    }
+    .vega-back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #6366f1;
+        text-decoration: none;
+        font-weight: 500;
+        margin-bottom: 24px;
+        transition: all 0.3s;
+    }
+    .vega-back-link:hover {
+        color: #4f46e5;
+    }
+    @media (max-width: 768px) {
+        .vega-form-grid {
+            grid-template-columns: 1fr;
+        }
+        .vega-form-grid-2 {
+            grid-template-columns: 1fr;
+        }
+        .vega-form-actions {
+            flex-direction: column;
+        }
+        .vega-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<section id="add-customer" class="section vega-form-page">
+    <div class="vega-form-container">
+        <a href="#" class="vega-back-link" onclick="loadPage('customers'); return false;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M15 10H5M5 10L10 5M5 10L10 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Back to Accounts
+        </a>
+
+        <div class="vega-form-header">
+            <span class="vega-form-badge">👥 Account Management</span>
+            <h1 class="vega-form-title" id="formPageTitle">Add New Account</h1>
+            <p class="vega-form-subtitle">Fill in the details to create a new customer account</p>
+        </div>
+
+        <div class="vega-form-card">
+            <div class="vega-form-card-header">
+                <h2>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Account Information
+                </h2>
+            </div>
+            <div class="vega-form-card-body">
+                <form id="customerFormPage" onsubmit="handleCustomerPageSubmit(event)">
+                    <!-- Basic Information -->
+                    <div class="vega-form-section">
+                        <h3 class="vega-form-section-title">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                <path d="M9 9C10.6569 9 12 7.65685 12 6C12 4.34315 10.6569 3 9 3C7.34315 3 6 4.34315 6 6C6 7.65685 7.34315 9 9 9Z" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M3 15C3 12.7909 5.68629 11 9 11C12.3137 11 15 12.7909 15 15" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                            Basic Information
+                        </h3>
+                        <div class="vega-form-grid">
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Customer Name <span class="required">*</span></label>
+                                <input type="text" id="fpCustomerName" class="vega-form-input" placeholder="Enter customer name" required>
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Email Address</label>
+                                <input type="email" id="fpCustomerEmail" class="vega-form-input" placeholder="email@example.com">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Phone Number</label>
+                                <input type="tel" id="fpCustomerPhone" class="vega-form-input" placeholder="+91 98765 43210">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Secondary Phone</label>
+                                <input type="tel" id="fpCustomerSecondaryPhone" class="vega-form-input" placeholder="+91 98765 43210">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Customer Type <span class="required">*</span></label>
+                                <select id="fpCustomerType" class="vega-form-select" required>
+                                    <option value="business">Business</option>
+                                    <option value="individual">Individual</option>
+                                </select>
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Status <span class="required">*</span></label>
+                                <select id="fpCustomerStatus" class="vega-form-select" required>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                    <option value="prospect">Prospect</option>
+                                    <option value="lost">Lost</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Business Details -->
+                    <div class="vega-form-section">
+                        <h3 class="vega-form-section-title">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                <rect x="2" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M6 4V2H12V4" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                            Business & Account Details
+                        </h3>
+                        <div class="vega-form-grid">
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Company Name</label>
+                                <input type="text" id="fpCompanyName" class="vega-form-input" placeholder="Company Ltd.">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Industry</label>
+                                <input type="text" id="fpIndustry" class="vega-form-input" placeholder="IT Services">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Company Size</label>
+                                <select id="fpCompanySize" class="vega-form-select">
+                                    <option value="">Select</option>
+                                    <option value="1-10">1-10 employees</option>
+                                    <option value="11-50">11-50 employees</option>
+                                    <option value="51-200">51-200 employees</option>
+                                    <option value="201-500">201-500 employees</option>
+                                    <option value="500+">500+ employees</option>
+                                </select>
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Annual Revenue (₹)</label>
+                                <input type="number" id="fpAnnualRevenue" class="vega-form-input" placeholder="10000000">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">GSTIN</label>
+                                <input type="text" id="fpGstin" class="vega-form-input" placeholder="27ABCDE1234F1Z5">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Website</label>
+                                <input type="url" id="fpWebsite" class="vega-form-input" placeholder="https://example.com">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="vega-form-section">
+                        <h3 class="vega-form-section-title">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                <path d="M9 9.75C10.2426 9.75 11.25 8.74264 11.25 7.5C11.25 6.25736 10.2426 5.25 9 5.25C7.75736 5.25 6.75 6.25736 6.75 7.5C6.75 8.74264 7.75736 9.75 9 9.75Z" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M9 16.5C9 16.5 15 12 15 7.5C15 4.18629 12.3137 1.5 9 1.5C5.68629 1.5 3 4.18629 3 7.5C3 12 9 16.5 9 16.5Z" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                            Address Information
+                        </h3>
+                        <div class="vega-form-grid vega-form-grid-2">
+                            <div class="vega-form-group full-width">
+                                <label class="vega-form-label">Street Address</label>
+                                <input type="text" id="fpAddress" class="vega-form-input" placeholder="123 Main Street">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">City</label>
+                                <input type="text" id="fpCity" class="vega-form-input" placeholder="Mumbai">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">State</label>
+                                <input type="text" id="fpState" class="vega-form-input" placeholder="Maharashtra">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Country</label>
+                                <input type="text" id="fpCountry" class="vega-form-input" placeholder="India" value="India">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">PIN Code</label>
+                                <input type="text" id="fpPincode" class="vega-form-input" placeholder="400001">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="vega-form-section">
+                        <h3 class="vega-form-section-title">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                <path d="M14.25 2.25H3.75C2.92157 2.25 2.25 2.92157 2.25 3.75V14.25C2.25 15.0784 2.92157 15.75 3.75 15.75H14.25C15.0784 15.75 15.75 15.0784 15.75 14.25V3.75C15.75 2.92157 15.0784 2.25 14.25 2.25Z" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M5.25 6.75H12.75M5.25 9.75H12.75M5.25 12.75H9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                            Additional Notes
+                        </h3>
+                        <div class="vega-form-group">
+                            <label class="vega-form-label">Notes</label>
+                            <textarea id="fpNotes" class="vega-form-textarea" placeholder="Any additional information about this customer..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="vega-form-actions">
+                        <button type="button" class="vega-btn vega-btn-secondary" onclick="loadPage('customers')">
+                            Cancel
+                        </button>
+                        <button type="submit" class="vega-btn vega-btn-primary" id="fpSubmitBtn">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                <path d="M15 4.5L6.75 12.75L3 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Save Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Full Page Customer Form Submit Handler
+window.handleCustomerPageSubmit = async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('fpSubmitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span>Saving...</span>';
+    
+    const customerData = {
+        name: document.getElementById('fpCustomerName').value,
+        email: document.getElementById('fpCustomerEmail').value || null,
+        phone: document.getElementById('fpCustomerPhone').value || null,
+        secondary_phone: document.getElementById('fpCustomerSecondaryPhone').value || null,
+        customer_type: document.getElementById('fpCustomerType').value,
+        status: document.getElementById('fpCustomerStatus').value,
+        company_name: document.getElementById('fpCompanyName').value || null,
+        industry: document.getElementById('fpIndustry').value || null,
+        company_size: document.getElementById('fpCompanySize').value || null,
+        annual_revenue: document.getElementById('fpAnnualRevenue').value ? parseFloat(document.getElementById('fpAnnualRevenue').value) : null,
+        gstin: document.getElementById('fpGstin').value || null,
+        website: document.getElementById('fpWebsite').value || null,
+        address: document.getElementById('fpAddress').value || null,
+        city: document.getElementById('fpCity').value || null,
+        state: document.getElementById('fpState').value || null,
+        country: document.getElementById('fpCountry').value || 'India',
+        pincode: document.getElementById('fpPincode').value || null,
+        notes: document.getElementById('fpNotes').value || null
+    };
+    
+    try {
+        const response = await fetch(`${API_BASE}/companies/${companyId}/customers`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(customerData)
+        });
+        
+        if (response.ok) {
+            alert('Account created successfully!');
+            loadPage('customers');
+        } else {
+            const error = await response.json();
+            alert('Error: ' + (error.detail || 'Failed to create account'));
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 4.5L6.75 12.75L3 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Save Account';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error creating account: ' + error.message);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 4.5L6.75 12.75L3 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Save Account';
+    }
+};
+</script>

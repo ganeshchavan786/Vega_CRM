@@ -10,6 +10,7 @@ from app.schemas.customer import CustomerCreate, CustomerUpdate
 from app.controllers.customer_controller import CustomerController
 from app.utils.dependencies import get_current_active_user
 from app.utils.helpers import success_response
+from app.utils.permissions import check_company_admin, has_permission, check_permission
 from app.models.user import User
 
 router = APIRouter()
@@ -90,8 +91,15 @@ async def create_customer(
     Required fields:
     - **name**: Customer name
     
-    Requires: JWT token
+    Requires: JWT token, Permission to create customers
     """
+    # Check permission to create customer
+    if not has_permission(current_user, "customer", "create", company_id, db):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied: create customer"
+        )
+    
     try:
         customer = CustomerController.create_customer(company_id, customer_data, current_user, db)
         return success_response(
@@ -153,8 +161,30 @@ async def update_customer(
     - **company_id**: Company ID
     - **customer_id**: Customer ID
     
-    Requires: JWT token
+    Requires: JWT token, Permission to update customers
     """
+    # Check permission to update customer
+    if not has_permission(current_user, "customer", "update", company_id, db):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied: update customer"
+        )
+    """
+    Update customer
+    
+    Path Parameters:
+    - **company_id**: Company ID
+    - **customer_id**: Customer ID
+    
+    Requires: JWT token, Permission to update customers
+    """
+    # Check permission to update customer
+    if not has_permission(current_user, "customer", "update", company_id, db):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied: update customer"
+        )
+    
     try:
         customer = CustomerController.update_customer(
             customer_id, company_id, customer_data, current_user, db
@@ -186,8 +216,15 @@ async def delete_customer(
     - **company_id**: Company ID
     - **customer_id**: Customer ID
     
-    Requires: JWT token, Admin/Manager role
+    Requires: JWT token, Permission to delete customers
     """
+    # Check permission to delete customer (admin/manager/sales_rep allowed)
+    if not has_permission(current_user, "customer", "delete", company_id, db):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied: delete customer"
+        )
+    
     try:
         CustomerController.delete_customer(customer_id, company_id, current_user, db)
         return success_response(
@@ -415,5 +452,101 @@ async def get_customer_stats(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
+        )
+
+
+@router.get("/{company_id}/customers/lifecycle-analytics")
+async def get_lifecycle_analytics(
+    company_id: int = Path(..., description="Company ID"),
+    days: int = Query(30, ge=1, le=365, description="Number of days to analyze"),
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get lifecycle stage analytics for accounts
+    
+    Path Parameters:
+    - **company_id**: Company ID
+    
+    Query Parameters:
+    - **days**: Number of days to analyze (default: 30)
+    
+    Returns:
+    - Accounts by lifecycle stage
+    - Stage transition rates
+    - Average time in each stage
+    """
+    try:
+        from sqlalchemy import func
+        from datetime import datetime, timedelta
+        from app.models.activity import Activity
+        
+        start_date = datetime.utcnow() - timedelta(days=days)
+        
+        # Accounts by lifecycle stage
+        stage_counts = {}
+        stages = ["MQA", "SQA", "Customer", "Churned"]
+        for stage in stages:
+            count = db.query(func.count(Customer.id)).filter(
+                Customer.company_id == company_id,
+                Customer.lifecycle_stage == stage
+            ).scalar() or 0
+            stage_counts[stage] = count
+        
+        # Total accounts
+        total_accounts = db.query(func.count(Customer.id)).filter(
+            Customer.company_id == company_id
+        ).scalar() or 0
+        
+        # Accounts by health score
+        health_counts = {}
+        health_scores = ["green", "yellow", "red", "black"]
+        for score in health_scores:
+            count = db.query(func.count(Customer.id)).filter(
+                Customer.company_id == company_id,
+                Customer.health_score == score
+            ).scalar() or 0
+            health_counts[score] = count
+        
+        # Stage transitions (from activity logs)
+        transitions = db.query(Activity).filter(
+            Activity.company_id == company_id,
+            Activity.activity_type == "status_change",
+            Activity.title.like("%Lifecycle Stage Changed%"),
+            Activity.activity_date >= start_date
+        ).count()
+        
+        # New customers in period
+        new_customers = db.query(func.count(Customer.id)).filter(
+            Customer.company_id == company_id,
+            Customer.lifecycle_stage == "Customer",
+            Customer.created_at >= start_date
+        ).scalar() or 0
+        
+        # Churned in period
+        churned = db.query(func.count(Customer.id)).filter(
+            Customer.company_id == company_id,
+            Customer.lifecycle_stage == "Churned",
+            Customer.updated_at >= start_date
+        ).scalar() or 0
+        
+        return success_response(
+            data={
+                "period_days": days,
+                "total_accounts": total_accounts,
+                "by_lifecycle_stage": stage_counts,
+                "by_health_score": health_counts,
+                "stage_transitions": transitions,
+                "new_customers": new_customers,
+                "churned": churned,
+                "conversion_rate": round((stage_counts.get("Customer", 0) / total_accounts * 100), 2) if total_accounts > 0 else 0,
+                "churn_rate": round((stage_counts.get("Churned", 0) / total_accounts * 100), 2) if total_accounts > 0 else 0
+            },
+            message="Lifecycle analytics fetched successfully"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching lifecycle analytics: {str(e)}"
         )
 

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help & User Guide - VEGA CRM</title>
+    <link rel="stylesheet" href="/website/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .guide-section {
+            padding: 60px 20px;
+        }
+        .guide-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .guide-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+        }
+        .guide-card:hover {
+            border-color: #6366f1;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.15);
+        }
+        .guide-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            display: block;
+        }
+        .guide-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        .guide-card p {
+            color: #64748b;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .language-section {
+            padding: 40px 20px 80px;
+            background: #f8fafc;
+        }
+        .language-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .language-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        .language-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+        .lang-tab {
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid #e2e8f0;
+            background: white;
+            color: #64748b;
+            text-decoration: none;
+        }
+        .lang-tab:hover, .lang-tab.active {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border-color: transparent;
+        }
+        .guide-list {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .guide-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: white;
+            padding: 20px 24px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            text-decoration: none;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+        .guide-item:hover {
+            border-color: #6366f1;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.1);
+        }
+        .guide-item-icon {
+            font-size: 2rem;
+            width: 50px;
+            text-align: center;
+        }
+        .guide-item-content {
+            flex: 1;
+        }
+        .guide-item-title {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+        .guide-item-desc {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        .guide-item-arrow {
+            color: #6366f1;
+            font-size: 1.5rem;
+        }
+        .video-section {
+            padding: 60px 20px;
+            background: white;
+        }
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .video-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .video-thumbnail {
+            height: 180px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 4rem;
+        }
+        .video-info {
+            padding: 20px;
+        }
+        .video-info h4 {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        .video-info p {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        @media (max-width: 768px) {
+            .guide-grid {
+                grid-template-columns: 1fr;
+            }
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+            .language-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">VEGA<span class="logo-highlight">CRM</span></span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/website/features.html" class="nav-link">Features</a></li>
+                <li><a href="/website/pricing.html" class="nav-link">Pricing</a></li>
+                <li><a href="/website/about.html" class="nav-link">About</a></li>
+                <li><a href="/website/contact.html" class="nav-link">Contact</a></li>
+                <li><a href="/website/help.html" class="nav-link active">Help</a></li>
+            </ul>
+            <div class="nav-buttons">
+                <a href="/website/login.html" class="btn-login">Login</a>
+                <a href="/website/register.html" class="btn-signup">Start Free Trial</a>
+            </div>
+            <button class="nav-toggle" id="navToggle">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <span class="section-badge">Help Center</span>
+            <h1>User Guide & Documentation</h1>
+            <p>Everything you need to get started and master VEGA CRM</p>
+        </div>
+    </section>
+
+    <!-- Quick Start Guides -->
+    <section class="guide-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Quick Start Guides</h2>
+                <p class="section-subtitle">Get up and running in minutes</p>
+            </div>
+            <div class="guide-grid">
+                <a href="/guides/marathi/suruvat-kara.html" class="guide-card">
+                    <span class="guide-icon">🚀</span>
+                    <h3>Getting Started</h3>
+                    <p>Login, Registration, Company Setup - सुरुवात कशी करायची</p>
+                </a>
+                <a href="/guides/marathi/lead-management-guide.html" class="guide-card">
+                    <span class="guide-icon">🎯</span>
+                    <h3>Lead Management</h3>
+                    <p>Capture, track & convert leads - लीड व्यवस्थापन</p>
+                </a>
+                <a href="/guides/marathi/customers-guide.html" class="guide-card">
+                    <span class="guide-icon">👥</span>
+                    <h3>Customer Management</h3>
+                    <p>Manage customer relationships - ग्राहक व्यवस्थापन</p>
+                </a>
+                <a href="/guides/marathi/deals-guide.html" class="guide-card">
+                    <span class="guide-icon">💰</span>
+                    <h3>Deals & Pipeline</h3>
+                    <p>Track deals & close sales - व्यवहार व्यवस्थापन</p>
+                </a>
+                <a href="/guides/marathi/reports-guide.html" class="guide-card">
+                    <span class="guide-icon">📊</span>
+                    <h3>Reports & Analytics</h3>
+                    <p>Analyze your performance - अहवाल आणि विश्लेषण</p>
+                </a>
+                <a href="/guides/marathi/tasks-guide.html" class="guide-card">
+                    <span class="guide-icon">✅</span>
+                    <h3>Tasks & Activities</h3>
+                    <p>Manage tasks & follow-ups - कार्य व्यवस्थापन</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Complete User Guide -->
+    <section class="language-section">
+        <div class="container">
+            <div class="language-header">
+                <h2>📚 Complete User Guide / संपूर्ण मार्गदर्शक</h2>
+                <p style="color: #64748b;">Select your preferred language</p>
+            </div>
+            
+            <div class="language-tabs">
+                <a href="/guides/marathi/index.html" class="lang-tab active">🇮🇳 मराठी (Marathi)</a>
+                <a href="/guides/english/index.html" class="lang-tab">🇬🇧 English</a>
+            </div>
+            
+            <div class="guide-list">
+                <a href="/guides/marathi/suruvat-kara.html" class="guide-item">
+                    <span class="guide-item-icon">🚀</span>
+                    <div class="guide-item-content">
+                        <div class="guide-item-title">सुरुवात करा (Getting Started)</div>
+                        <div class="guide-item-desc">Login, Registration, Forgot Password, Company Setup</div>
+                    </div>
+                    <span class="guide-item-arrow">→</span>
+                </a>
+                
+                <a href="/guides/marathi/company-setup.html" class="guide-item">
+                    <span class="guide-item-icon">🏢</span>
+                    <div class="guide-item-content">
+                        <div class="guide-item-title">Company Setup</div>
+                        <div class="guide-item-desc">कंपनी तयार करणे आणि सेटिंग्ज</div>
+                    </div>
+                    <span class="guide-item-arrow">→</span>
+                </a>
+                
+                <a href="/guides/marathi/lead-management-guide.html" class="guide-item">
+                    <span class="guide-item-icon">🎯</span>
+                    <div class="guide-item-content">
+                        <div class="guide-item-title">Lead Management</div>
+                        <div class="guide-item-desc">लीड्स, CSV Import, Bulk Actions, Lead Scoring</div>
+                    </div>
+                    <span class="guide-item-arrow">→</span>
+                </a>
+                
+                <a href="/guides/marathi/customers-guide.html" class="guide-item">
+                    <span class="guide-item-icon">👥</span>
+                    <div class="guide-item-content">
+                        <div class="guide-item-title">Customers Guide</div>
+                        <div class="guide-item-desc">ग्राहक व्यवस्थापन, Health Score, Lifecycle</div>
+                    </div>
+                    <span class="guide-item-arrow">→</span>
+                </a>
+                
+                <a href="/guides/marathi/contacts-guide.html" class="guide-item">
+                    <span class="guide-item-icon">📇</span>
+                    <div class="guide-item-content">
+                        <div class="guide-item-title">Contacts Guide</div>
+                        <div class="guide-item-desc">संपर्क व्यवस्थापन</div>
+                    </div>
+                    <span class="guide-item-arrow">→</span>
+                </a>
+                
+                <a href="/guides/marathi/deals-guide.html" class="guide-item">
+                    <span class="guide-item-icon">💰</span>
+                    <div class="guide-item-content">
+                        <div class="guide-item-title">Deals Guide</div>
+                        <div class="guide-item-desc">व्यवहार, Pipeline, Win/Loss</div>
+                    </div>
+                    <span class="guide-item-arrow">→</span>
+                </a>
+                
+                <a href="/guides/marathi/tasks-guide.html" class="guide-item">
+                    <span class="guide-item-icon">✅</span>
+                    <div class="guide-item-content">
+                        <div class="guide-item-title">Tasks Guide</div>
+                        <div class="guide-item-desc">कार्य, Activities, Follow-ups</div>
+                    </div>
+                    <span class="guide-item-arrow">→</span>
+                </a>
+                
+                <a href="/guides/marathi/reports-guide.html" class="guide-item">
+                    <span class="guide-item-icon">📊</span>
+                    <div class="guide-item-content">
+                        <div class="guide-item-title">Reports Guide</div>
+                        <div class="guide-item-desc">अहवाल, Analytics, Export to Excel</div>
+                    </div>
+                    <span class="guide-item-arrow">→</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Tutorials -->
+    <section class="video-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-badge">Video Tutorials</span>
+                <h2 class="section-title">Watch & Learn</h2>
+                <p class="section-subtitle">Step-by-step video guides (Coming Soon)</p>
+            </div>
+            <div class="video-grid">
+                <div class="video-card">
+                    <div class="video-thumbnail">▶️</div>
+                    <div class="video-info">
+                        <h4>Quick Start Tutorial</h4>
+                        <p>5 min • Get started with VEGA CRM</p>
+                    </div>
+                </div>
+                <div class="video-card">
+                    <div class="video-thumbnail">▶️</div>
+                    <div class="video-info">
+                        <h4>Lead Management Basics</h4>
+                        <p>8 min • Master lead tracking</p>
+                    </div>
+                </div>
+                <div class="video-card">
+                    <div class="video-thumbnail">▶️</div>
+                    <div class="video-info">
+                        <h4>Reports & Analytics</h4>
+                        <p>6 min • Data-driven decisions</p>
+                    </div>
+                </div>
+                <div class="video-card">
+                    <div class="video-thumbnail">▶️</div>
+                    <div class="video-info">
+                        <h4>CSV Import Guide</h4>
+                        <p>4 min • Bulk data import</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Need More Help -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Need More Help?</h2>
+                <p>Our support team is here to assist you</p>
+                <div class="cta-buttons">
+                    <a href="contact.html" class="btn-primary btn-large">Contact Support</a>
+                    <a href="mailto:support@vegacrm.com" class="btn-white">Email Us</a>
+                </div>
+                <p class="cta-note">📧 support@vegacrm.com &nbsp; 📞 +91 98765 43210</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="footer-logo">
+                        <span class="logo-icon">⚡</span>
+                        <span class="logo-text">VEGA<span class="logo-highlight">CRM</span></span>
+                    </a>
+                    <p>The all-in-one CRM platform for modern businesses.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="features.html">Features</a></li>
+                        <li><a href="pricing.html">Pricing</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="help.html">Help Center</a></li>
+                        <li><a href="help.html">User Guide</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 VEGA CRM. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/website/js/main.js"></script>
+</body>
+</html>

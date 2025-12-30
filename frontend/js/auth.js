@@ -19,9 +19,12 @@ function checkAuth() {
     // Priority: URL hash > saved page > dashboard
     let targetPage = 'dashboard';
     
-    if (hash && ['dashboard', 'customers', 'leads', 'deals', 'tasks', 'activities'].includes(hash)) {
+    // All valid pages that should persist on refresh
+    const validPages = ['dashboard', 'customers', 'contacts', 'leads', 'deals', 'tasks', 'activities', 'admin', 'permissions', 'accountreport'];
+    
+    if (hash && validPages.includes(hash)) {
         targetPage = hash;
-    } else if (savedPage && ['dashboard', 'customers', 'leads', 'deals', 'tasks', 'activities'].includes(savedPage)) {
+    } else if (savedPage && validPages.includes(savedPage)) {
         targetPage = savedPage;
     }
     
@@ -87,12 +90,16 @@ window.loadCompanies = async function() {
         const data = await response.json();
 
         if (response.ok) {
-            const companyList = document.getElementById('companyListPage');
-            if (!companyList) return;
+            // Support both element IDs
+            const companyList = document.getElementById('companyListPage') || document.getElementById('companyList');
+            if (!companyList) {
+                console.error('Company list element not found');
+                return;
+            }
             
             companyList.innerHTML = '';
 
-            if (data.data.length === 0) {
+            if (!data.data || data.data.length === 0) {
                 companyList.innerHTML = '<p>No companies found. Please create one via API.</p>';
                 return;
             }
@@ -102,7 +109,7 @@ window.loadCompanies = async function() {
                 div.className = 'company-item';
                 div.innerHTML = `
                     <h3>${company.name}</h3>
-                    <p>${company.email}</p>
+                    <p>${company.email || 'No email'}</p>
                 `;
                 div.onclick = () => selectCompany(company.id);
                 companyList.appendChild(div);
@@ -124,73 +131,66 @@ window.selectCompany = function(id) {
     loadPage('dashboard');
 };
 
-// Logout - Make sure it's globally accessible
-window.handleLogout = function() {
-    console.log('handleLogout called');
-    
-    // Clear auth token
-    if (typeof setAuthToken === 'function') {
-        setAuthToken(null);
-    } else {
-        if (typeof window.authToken !== 'undefined') {
-            window.authToken = null;
-        }
-        localStorage.removeItem('authToken');
-    }
-    
-    // Clear company ID
-    if (typeof setCompanyId === 'function') {
-        setCompanyId(null);
-    } else {
-        if (typeof window.companyId !== 'undefined') {
-            window.companyId = null;
-        }
-        localStorage.removeItem('companyId');
-    }
-    
-    // Clear user data
-    if (typeof window.currentUser !== 'undefined') {
-        window.currentUser = null;
-    }
+// Logout Handler
+window.logout = function() {
+    // Clear ALL localStorage items related to auth
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('companyId');
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('currentPage');
     
-    // Hide navigation
-    const navbarContainer = document.getElementById('navbar-container');
-    if (navbarContainer) {
-        navbarContainer.style.display = 'none';
-    }
+    // Clear session storage too
+    sessionStorage.clear();
     
-    // Close sidebar if open
-    const sidebarMenu = document.getElementById('sidebarMenu');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-    if (sidebarMenu) sidebarMenu.classList.remove('active');
-    if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+    // Clear global variables
+    if (typeof window.authToken !== 'undefined') window.authToken = null;
+    if (typeof window.companyId !== 'undefined') window.companyId = null;
+    if (typeof window.currentUser !== 'undefined') window.currentUser = null;
     
-    // Load home page
-    if (typeof loadPage === 'function') {
-        loadPage('home');
-    } else if (typeof window.loadPage === 'function') {
-        window.loadPage('home');
-    } else {
-        window.location.href = 'index.html';
-    }
+    // Use setters if available
+    if (typeof setAuthToken === 'function') setAuthToken(null);
+    if (typeof setCompanyId === 'function') setCompanyId(null);
+    
+    // Clear URL hash
+    window.location.hash = '';
+    
+    // Redirect to VEGA CRM website login page (not app)
+    window.location.href = '/website/login.html';
 };
 
 // Show/Hide Modals
 function showLoginModal() {
-    document.getElementById('loginModal').classList.add('active');
+    const modal = document.getElementById('loginModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('active');
+    }
 }
 
 function hideLoginModal() {
-    document.getElementById('loginModal').classList.remove('active');
+    const modal = document.getElementById('loginModal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.remove('active');
+    }
 }
 
 function showCompanyModal() {
-    document.getElementById('companyModal').classList.add('active');
+    const modal = document.getElementById('companyModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('active');
+        // Load companies when modal is shown
+        loadCompanies();
+    }
 }
 
 function hideCompanyModal() {
-    document.getElementById('companyModal').classList.remove('active');
+    const modal = document.getElementById('companyModal');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.classList.remove('active');
+    }
 }
 
 function hideModals() {

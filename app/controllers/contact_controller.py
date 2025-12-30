@@ -11,6 +11,7 @@ from app.models.customer import Customer
 from app.models.user import User
 from app.models.user_company import UserCompany
 from app.schemas.contact import ContactCreate, ContactUpdate
+from app.services import audit_service
 
 
 class ContactController:
@@ -137,6 +138,19 @@ class ContactController:
         db.commit()
         db.refresh(contact)
         
+        # Log audit trail
+        try:
+            audit_service.log_create(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="Contact",
+                resource_id=contact.id,
+                new_values={"name": contact.name, "email": contact.email, "account_id": contact.account_id}
+            )
+        except Exception:
+            pass
+        
         return contact
     
     @staticmethod
@@ -249,13 +263,32 @@ class ContactController:
                 Contact.is_primary_contact == True
             ).update({"is_primary_contact": False})
         
-        # Update fields
+        # Store old values for audit
         update_data = contact_data.model_dump(exclude_unset=True)
+        old_values = {}
+        for key in update_data.keys():
+            old_values[key] = getattr(contact, key, None)
+        
+        # Update fields
         for field, value in update_data.items():
             setattr(contact, field, value)
         
         db.commit()
         db.refresh(contact)
+        
+        # Log audit trail
+        try:
+            audit_service.log_update(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="Contact",
+                resource_id=contact.id,
+                old_values=old_values,
+                new_values=update_data
+            )
+        except Exception:
+            pass
         
         return contact
     
@@ -303,6 +336,19 @@ class ContactController:
         
         db.delete(contact)
         db.commit()
+        
+        # Log audit trail
+        try:
+            audit_service.log_delete(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="Contact",
+                resource_id=contact_id,
+                old_values={"name": contact.name, "email": contact.email}
+            )
+        except Exception:
+            pass
         
         return True
 

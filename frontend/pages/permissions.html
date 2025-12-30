@@ -1,0 +1,161 @@
+<!-- Permissions Management Page -->
+<div class="page-container">
+    <div class="page-header">
+        <h1>Permissions Management</h1>
+        <div class="page-actions">
+            <button id="permissionsSaveBtn" class="btn btn-primary" style="display: none;">
+                <i class="icon">💾</i> Save Changes
+            </button>
+            <button id="permissionsResetBtn" class="btn btn-secondary">
+                <i class="icon">↻</i> Reset to Defaults
+            </button>
+            <button class="btn btn-icon" onclick="loadPage('dashboard')" title="Back">
+                <i class="icon">←</i> Back
+            </button>
+        </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="list">All Permissions</button>
+        <button class="tab-btn" data-tab="roles">Role Permissions</button>
+        <button class="tab-btn" data-tab="company">Company Permissions</button>
+    </div>
+
+    <!-- Tab 1: All Permissions List -->
+    <div id="permissionsListTab" class="tab-content active">
+        <div class="page-toolbar">
+            <div class="search-box">
+                <input type="text" id="permissionSearch" placeholder="Search permissions..." />
+                <i class="icon">🔍</i>
+            </div>
+            <select id="permissionResourceFilter" class="filter-select">
+                <option value="">All Resources</option>
+                <option value="customer">Customer</option>
+                <option value="lead">Lead</option>
+                <option value="deal">Deal</option>
+                <option value="task">Task</option>
+                <option value="activity">Activity</option>
+                <option value="user">User</option>
+                <option value="company">Company</option>
+            </select>
+            <select id="permissionActionFilter" class="filter-select">
+                <option value="">All Actions</option>
+                <option value="create">Create</option>
+                <option value="read">Read</option>
+                <option value="update">Update</option>
+                <option value="delete">Delete</option>
+                <option value="convert">Convert</option>
+            </select>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table" id="permissionsTable">
+                <thead>
+                    <tr>
+                        <th>Resource</th>
+                        <th>Action</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="permissionsTableBody">
+                    <tr>
+                        <td colspan="4" class="loading-state">
+                            <div class="spinner"></div>
+                            Loading permissions...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tab 2: Role Permissions Matrix -->
+    <div id="permissionsRolesTab" class="tab-content">
+        <div class="permissions-matrix-header">
+            <p class="info-text">Toggle checkboxes to grant or revoke permissions for each role.</p>
+            <div class="matrix-actions">
+                <button id="rolesExportCsvBtn" class="btn btn-secondary btn-sm">
+                    <i class="icon">📥</i> Export CSV
+                </button>
+                <button id="rolesExportJsonBtn" class="btn btn-secondary btn-sm">
+                    <i class="icon">📥</i> Export JSON
+                </button>
+            </div>
+        </div>
+
+        <div class="matrix-container">
+            <table class="permission-matrix" id="rolesMatrix">
+                <thead>
+                    <tr>
+                        <th class="matrix-permission-col">Permission</th>
+                        <th class="matrix-role-col">Admin</th>
+                        <th class="matrix-role-col">Manager</th>
+                        <th class="matrix-role-col">Sales Rep</th>
+                        <th class="matrix-role-col">User</th>
+                    </tr>
+                </thead>
+                <tbody id="rolesMatrixBody">
+                    <tr>
+                        <td colspan="5" class="loading-state">
+                            <div class="spinner"></div>
+                            Loading role permissions...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Tab 3: Company Permissions -->
+    <div id="permissionsCompanyTab" class="tab-content">
+        <div class="company-selector-container">
+            <label>Select Company:</label>
+            <select id="companyPermissionsSelect" class="company-select">
+                <option value="">-- Select Company --</option>
+            </select>
+            <button id="copyFromGlobalBtn" class="btn btn-secondary btn-sm" style="display: none;">
+                <i class="icon">📋</i> Copy from Global
+            </button>
+            <button id="resetCompanyPermsBtn" class="btn btn-secondary btn-sm" style="display: none;">
+                <i class="icon">↻</i> Reset Company Permissions
+            </button>
+        </div>
+
+        <div id="companyPermissionsMatrixContainer" style="display: none;">
+            <div class="permissions-matrix-header">
+                <p class="info-text">
+                    <i class="icon">ℹ️</i> Company-specific permissions override global permissions.
+                </p>
+            </div>
+
+            <div class="matrix-container">
+                <table class="permission-matrix" id="companyMatrix">
+                    <thead>
+                        <tr>
+                            <th class="matrix-permission-col">Permission</th>
+                            <th class="matrix-role-col">Admin</th>
+                            <th class="matrix-role-col">Manager</th>
+                            <th class="matrix-role-col">Sales Rep</th>
+                            <th class="matrix-role-col">User</th>
+                        </tr>
+                    </thead>
+                    <tbody id="companyMatrixBody">
+                        <tr>
+                            <td colspan="5" class="loading-state">
+                                <div class="spinner"></div>
+                                Loading company permissions...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="companyPermissionsEmpty" class="empty-state" style="display: none;">
+            <p>Please select a company to view permissions</p>
+        </div>
+    </div>
+</div>
+

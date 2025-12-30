@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Management - CRM SAAS मार्गदर्शक</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; min-height: 100vh; line-height: 1.6; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; min-height: 100vh; }
+        
+        /* Header */
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 14px; opacity: 0.9; margin-bottom: 20px; }
+        .breadcrumb a { color: white; text-decoration: none; }
+        .header h1 { font-size: 2.2em; margin-bottom: 10px; }
+        .header p { font-size: 1.1em; opacity: 0.9; }
+        .header-meta { display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
+        .meta-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.2); padding: 6px 14px; border-radius: 20px; font-size: 0.85em; }
+        
+        /* Progress */
+        .progress-section { background: linear-gradient(145deg, #f8f9ff 0%, #eef1ff 100%); padding: 25px 40px; border-bottom: 1px solid #e5e7eb; }
+        .progress-title { font-size: 0.9em; color: #64748b; margin-bottom: 15px; }
+        .progress-steps { display: flex; justify-content: space-between; position: relative; }
+        .progress-steps::before { content: ''; position: absolute; top: 20px; left: 40px; right: 40px; height: 3px; background: #e5e7eb; }
+        .progress-step { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
+        .progress-circle { width: 40px; height: 40px; border-radius: 50%; background: white; border: 3px solid #e5e7eb; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #94a3b8; margin-bottom: 8px; }
+        .progress-step.completed .progress-circle { background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-color: #10b981; color: white; }
+        .progress-step.active .progress-circle { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-color: #667eea; color: white; box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2); }
+        .progress-label { font-size: 0.75em; color: #64748b; text-align: center; max-width: 70px; }
+        .progress-step.active .progress-label, .progress-step.completed .progress-label { color: #1e293b; font-weight: 500; }
+        
+        /* Content */
+        .content { padding: 40px; }
+        
+        /* TOC */
+        .toc { background: linear-gradient(145deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; border-radius: 16px; padding: 25px; margin-bottom: 40px; }
+        .toc h3 { color: #92400e; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .toc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+        .toc-item { background: white; padding: 10px 15px; border-radius: 8px; font-size: 0.9em; color: #1e293b; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .toc-item:hover { background: #fef3c7; transform: translateX(5px); }
+        
+        /* Section */
+        .section { margin-bottom: 50px; scroll-margin-top: 20px; }
+        .section-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 3px solid #667eea; }
+        .section-icon { width: 50px; height: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5em; }
+        .section-header h2 { color: #1e293b; font-size: 1.5em; }
+        .section-intro { color: #64748b; margin-bottom: 25px; }
+        
+        /* Step Card */
+        .step-card { background: white; border: 2px solid #e5e7eb; border-radius: 16px; margin: 20px 0; overflow: hidden; transition: all 0.3s; }
+        .step-card:hover { border-color: #667eea; box-shadow: 0 5px 20px rgba(102, 126, 234, 0.15); }
+        .step-header { background: linear-gradient(145deg, #f8f9ff 0%, #eef1ff 100%); padding: 18px 25px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e5e7eb; }
+        .step-number { width: 36px; height: 36px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+        .step-title { font-size: 1.1em; color: #1e293b; font-weight: 600; }
+        .step-body { padding: 25px; }
+        
+        /* Form Preview */
+        .form-preview { background: #f8fafc; border: 2px dashed #d1d5db; border-radius: 12px; padding: 25px; margin: 20px 0; }
+        .form-preview-title { font-size: 0.85em; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
+        .preview-field { background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+        .preview-field-icon { color: #667eea; }
+        .preview-field-label { color: #374151; font-size: 0.95em; }
+        .preview-field.required .preview-field-label::after { content: ' *'; color: #ef4444; }
+        .preview-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-size: 1em; font-weight: 600; width: 100%; margin-top: 10px; }
+        
+        /* Info Box */
+        .info-box { border-radius: 12px; padding: 18px; margin: 20px 0; display: flex; gap: 15px; }
+        .info-box.tip { background: #ecfdf5; border-left: 4px solid #10b981; }
+        .info-box.warning { background: #fffbeb; border-left: 4px solid #f59e0b; }
+        .info-box.important { background: #fef2f2; border-left: 4px solid #ef4444; }
+        .info-box.info { background: #eff6ff; border-left: 4px solid #3b82f6; }
+        .info-icon { font-size: 1.3em; }
+        .info-content h4 { color: #1e293b; margin-bottom: 4px; font-size: 0.95em; }
+        .info-content p { color: #64748b; font-size: 0.9em; }
+        
+        /* Feature List */
+        .feature-list { list-style: none; margin: 15px 0; }
+        .feature-list li { padding: 10px 0 10px 30px; position: relative; border-bottom: 1px solid #f1f5f9; }
+        .feature-list li::before { content: '✓'; position: absolute; left: 0; color: #10b981; font-weight: bold; }
+        .feature-list li:last-child { border-bottom: none; }
+        
+        /* Table */
+        .data-table { width: 100%; border-collapse: collapse; margin: 20px 0; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .data-table th { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 15px; text-align: left; font-weight: 600; font-size: 0.9em; }
+        .data-table td { padding: 12px 15px; border-bottom: 1px solid #e5e7eb; background: white; font-size: 0.9em; }
+        .data-table tr:hover td { background: #f8fafc; }
+        
+        /* Status Badge */
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8em; font-weight: 600; }
+        .status-new { background: #dbeafe; color: #1d4ed8; }
+        .status-contacted { background: #fef3c7; color: #92400e; }
+        .status-qualified { background: #d1fae5; color: #065f46; }
+        .status-won { background: #10b981; color: white; }
+        .status-lost { background: #fee2e2; color: #991b1b; }
+        
+        /* Flow Diagram */
+        .flow-diagram { background: #f8fafc; border-radius: 12px; padding: 25px; margin: 20px 0; overflow-x: auto; }
+        .flow-horizontal { display: flex; align-items: center; justify-content: center; gap: 5px; flex-wrap: wrap; }
+        .flow-box { background: white; border: 2px solid #e5e7eb; border-radius: 10px; padding: 12px 18px; text-align: center; min-width: 100px; }
+        .flow-box.active { border-color: #667eea; background: linear-gradient(145deg, #f8f9ff 0%, #eef1ff 100%); }
+        .flow-arrow { color: #667eea; font-size: 1.2em; }
+        
+        /* Score Meter */
+        .score-meter { margin: 20px 0; }
+        .score-bar { height: 12px; background: #e5e7eb; border-radius: 6px; overflow: hidden; margin: 10px 0; }
+        .score-fill { height: 100%; border-radius: 6px; transition: width 0.3s; }
+        .score-cold { width: 25%; background: linear-gradient(90deg, #94a3b8, #64748b); }
+        .score-warm { width: 50%; background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+        .score-hot { width: 75%; background: linear-gradient(90deg, #f97316, #ea580c); }
+        .score-very-hot { width: 100%; background: linear-gradient(90deg, #ef4444, #dc2626); }
+        .score-labels { display: flex; justify-content: space-between; font-size: 0.8em; color: #64748b; }
+        
+        /* Footer */
+        .footer { background: #f8f9fa; padding: 30px 40px; border-top: 1px solid #e9ecef; }
+        .footer-nav { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .footer-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 10px; font-weight: 500; transition: all 0.3s; }
+        .footer-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4); }
+        .footer-btn.secondary { background: white; color: #667eea; border: 2px solid #667eea; }
+        
+        @media (max-width: 768px) {
+            .header, .content, .footer, .progress-section { padding: 20px; }
+            .header h1 { font-size: 1.6em; }
+            .progress-steps { flex-wrap: wrap; gap: 10px; justify-content: center; }
+            .progress-steps::before { display: none; }
+            .flow-horizontal { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="breadcrumb">
+                <a href="index.html">🏠 मुख्य पृष्ठ</a> <span>›</span>
+                <a href="company-setup.html">Company Setup</a> <span>›</span>
+                <span>Lead Management</span>
+            </div>
+            <h1>🎯 Lead Management</h1>
+            <p>Leads कसे manage करायचे - संपूर्ण मार्गदर्शक</p>
+            <div class="header-meta">
+                <span class="meta-badge">📖 Step 3 of 8</span>
+                <span class="meta-badge">⏱️ 15-20 मिनिटे</span>
+                <span class="meta-badge">⭐ महत्त्वाचे</span>
+            </div>
+        </div>
+        
+        <!-- Progress -->
+        <div class="progress-section">
+            <div class="progress-title">📍 CRM Setup Journey</div>
+            <div class="progress-steps">
+                <div class="progress-step completed"><div class="progress-circle">✓</div><span class="progress-label">Login</span></div>
+                <div class="progress-step completed"><div class="progress-circle">✓</div><span class="progress-label">Company</span></div>
+                <div class="progress-step active"><div class="progress-circle">3</div><span class="progress-label">Leads</span></div>
+                <div class="progress-step"><div class="progress-circle">4</div><span class="progress-label">Customers</span></div>
+                <div class="progress-step"><div class="progress-circle">5</div><span class="progress-label">Contacts</span></div>
+                <div class="progress-step"><div class="progress-circle">6</div><span class="progress-label">Deals</span></div>
+                <div class="progress-step"><div class="progress-circle">7</div><span class="progress-label">Tasks</span></div>
+                <div class="progress-step"><div class="progress-circle">8</div><span class="progress-label">Reports</span></div>
+            </div>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <!-- TOC -->
+            <div class="toc">
+                <h3>📑 या मार्गदर्शकात</h3>
+                <div class="toc-grid">
+                    <a href="#what-is-lead" class="toc-item">❓ Lead म्हणजे काय</a>
+                    <a href="#create-lead" class="toc-item">➕ Lead तयार करा</a>
+                    <a href="#lead-sources" class="toc-item">📍 Lead Sources</a>
+                    <a href="#lead-status" class="toc-item">🔄 Lead Status</a>
+                    <a href="#lead-scoring" class="toc-item">⭐ Lead Scoring</a>
+                    <a href="#follow-up" class="toc-item">📞 Follow-up</a>
+                    <a href="#convert-lead" class="toc-item">🔄 Lead Convert</a>
+                    <a href="#reports" class="toc-item">📊 Reports</a>
+                </div>
+            </div>
+            
+            <!-- Section 1: What is Lead -->
+            <div class="section" id="what-is-lead">
+                <div class="section-header">
+                    <div class="section-icon">❓</div>
+                    <h2>Lead म्हणजे काय?</h2>
+                </div>
+                <p class="section-intro">
+                    <strong>Lead</strong> म्हणजे एक संभाव्य ग्राहक जो तुमच्या उत्पादन किंवा सेवेमध्ये रस दाखवतो. Lead हा CRM मधील पहिला टप्पा आहे - येथूनच ग्राहक प्रवास सुरू होतो.
+                </p>
+                
+                <div class="flow-diagram">
+                    <div class="flow-horizontal">
+                        <div class="flow-box active"><strong>🎯 Lead</strong><br><small>संभाव्य ग्राहक</small></div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-box"><strong>👥 Customer</strong><br><small>प्रत्यक्ष ग्राहक</small></div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-box"><strong>💰 Deal</strong><br><small>व्यवहार</small></div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-box"><strong>💵 Revenue</strong><br><small>उत्पन्न</small></div>
+                    </div>
+                </div>
+                
+                <div class="info-box info">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <h4>Lead vs Customer</h4>
+                        <p><strong>Lead</strong> = अजून खरेदी केली नाही | <strong>Customer</strong> = खरेदी केली</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section 2: Create Lead -->
+            <div class="section" id="create-lead">
+                <div class="section-header">
+                    <div class="section-icon">➕</div>
+                    <h2>नवीन Lead तयार करा</h2>
+                </div>
+                <p class="section-intro">Lead तयार करण्याच्या दोन पद्धती आहेत:</p>
+                
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">1</span>
+                        <span class="step-title">Leads Page वर जा</span>
+                    </div>
+                    <div class="step-body">
+                        <p>Left sidebar मधून <strong>🎯 Leads</strong> वर क्लिक करा.</p>
+                    </div>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">2</span>
+                        <span class="step-title">"+ Add Lead" बटण दाबा</span>
+                    </div>
+                    <div class="step-body">
+                        <p>Page च्या वरच्या बाजूला <strong>+ Add Lead</strong> बटण दिसेल.</p>
+                        <div style="text-align: center; margin: 15px 0;">
+                            <button style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 10px; font-weight: 600;">➕ Add Lead</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">3</span>
+                        <span class="step-title">Lead Details भरा</span>
+                    </div>
+                    <div class="step-body">
+                        <div class="form-preview">
+                            <div class="form-preview-title">🎯 Add New Lead Form</div>
+                            <div class="preview-field required"><span class="preview-field-icon">👤</span><span class="preview-field-label">Name (नाव)</span></div>
+                            <div class="preview-field required"><span class="preview-field-icon">📧</span><span class="preview-field-label">Email</span></div>
+                            <div class="preview-field"><span class="preview-field-icon">📞</span><span class="preview-field-label">Phone</span></div>
+                            <div class="preview-field"><span class="preview-field-icon">🏢</span><span class="preview-field-label">Company</span></div>
+                            <div class="preview-field required"><span class="preview-field-icon">📍</span><span class="preview-field-label">Source (स्रोत)</span></div>
+                            <div class="preview-field required"><span class="preview-field-icon">🔄</span><span class="preview-field-label">Status (स्थिती)</span></div>
+                            <button class="preview-btn">💾 Save Lead</button>
+                        </div>
+                        
+                        <table class="data-table">
+                            <thead><tr><th>Field</th><th>आवश्यक</th><th>उदाहरण</th></tr></thead>
+                            <tbody>
+                                <tr><td><strong>Name</strong></td><td style="color: #ef4444;">✓ हो</td><td>राहुल शर्मा</td></tr>
+                                <tr><td><strong>Email</strong></td><td style="color: #ef4444;">✓ हो</td><td>rahul@example.com</td></tr>
+                                <tr><td><strong>Phone</strong></td><td style="color: #94a3b8;">नाही</td><td>+91 98765 43210</td></tr>
+                                <tr><td><strong>Company</strong></td><td style="color: #94a3b8;">नाही</td><td>ABC Corp</td></tr>
+                                <tr><td><strong>Source</strong></td><td style="color: #ef4444;">✓ हो</td><td>Website, Referral</td></tr>
+                                <tr><td><strong>Status</strong></td><td style="color: #ef4444;">✓ हो</td><td>New, Contacted</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="info-box tip">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <h4>CSV Import</h4>
+                        <p>बरेच leads असल्यास <strong>Import CSV</strong> feature वापरा - एकाच वेळी अनेक leads add करा.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section 3: Lead Sources -->
+            <div class="section" id="lead-sources">
+                <div class="section-header">
+                    <div class="section-icon">📍</div>
+                    <h2>Lead Sources (स्रोत)</h2>
+                </div>
+                <p class="section-intro">Lead कुठून आला हे track करणे महत्त्वाचे आहे - Marketing ROI साठी उपयुक्त.</p>
+                
+                <table class="data-table">
+                    <thead><tr><th>Source</th><th>वर्णन</th><th>उदाहरण</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>🌐 Website</strong></td><td>वेबसाइट फॉर्म द्वारे</td><td>Contact form भरला</td></tr>
+                        <tr><td><strong>👥 Referral</strong></td><td>कोणाच्या शिफारसीने</td><td>मित्राने सांगितले</td></tr>
+                        <tr><td><strong>📱 Social Media</strong></td><td>Facebook, Instagram, LinkedIn</td><td>FB ad वरून आला</td></tr>
+                        <tr><td><strong>📞 Cold Call</strong></td><td>थेट फोन कॉल</td><td>Telecalling</td></tr>
+                        <tr><td><strong>📧 Email Campaign</strong></td><td>ईमेल मार्केटिंग</td><td>Newsletter reply</td></tr>
+                        <tr><td><strong>🎪 Trade Show</strong></td><td>प्रदर्शन/इव्हेंट</td><td>Exhibition मध्ये भेटले</td></tr>
+                        <tr><td><strong>📺 Advertisement</strong></td><td>जाहिरात</td><td>Google Ads</td></tr>
+                    </tbody>
+                </table>
+                
+                <div class="info-box warning">
+                    <span class="info-icon">⚠️</span>
+                    <div class="info-content">
+                        <h4>Source नेहमी भरा!</h4>
+                        <p>कोणता marketing channel काम करतो हे समजण्यासाठी Source अचूक भरणे गरजेचे आहे.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section 4: Lead Status -->
+            <div class="section" id="lead-status">
+                <div class="section-header">
+                    <div class="section-icon">🔄</div>
+                    <h2>Lead Status (स्थिती)</h2>
+                </div>
+                <p class="section-intro">Lead ची प्रगती track करण्यासाठी Status वापरा:</p>
+                
+                <div class="flow-diagram">
+                    <div class="flow-horizontal">
+                        <div class="flow-box"><span class="status-badge status-new">New</span></div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-box"><span class="status-badge status-contacted">Contacted</span></div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-box"><span class="status-badge status-qualified">Qualified</span></div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-box"><span class="status-badge status-won">Won</span> / <span class="status-badge status-lost">Lost</span></div>
+                    </div>
+                </div>
+                
+                <table class="data-table">
+                    <thead><tr><th>Status</th><th>अर्थ</th><th>पुढची कृती</th></tr></thead>
+                    <tbody>
+                        <tr><td><span class="status-badge status-new">New</span></td><td>नवीन Lead, अजून संपर्क नाही</td><td>24 तासात संपर्क करा</td></tr>
+                        <tr><td><span class="status-badge status-contacted">Contacted</span></td><td>पहिला संपर्क झाला</td><td>Follow-up शेड्यूल करा</td></tr>
+                        <tr><td><span class="status-badge status-qualified">Qualified</span></td><td>योग्य Lead, खरेदी करू शकतो</td><td>Proposal/Demo द्या</td></tr>
+                        <tr><td><span class="status-badge status-won">Won</span></td><td>यशस्वी - Customer बनला</td><td>Customer मध्ये Convert करा</td></tr>
+                        <tr><td><span class="status-badge status-lost">Lost</span></td><td>गमावला</td><td>कारण नोंदवा</td></tr>
+                    </tbody>
+                </table>
+                
+                <div class="info-box tip">
+                    <span class="info-icon">✅</span>
+                    <div class="info-content">
+                        <h4>Status नियमित Update करा</h4>
+                        <p>प्रत्येक interaction नंतर status update करा - Pipeline accurate राहील.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section 5: Lead Scoring -->
+            <div class="section" id="lead-scoring">
+                <div class="section-header">
+                    <div class="section-icon">⭐</div>
+                    <h2>Lead Scoring (गुण)</h2>
+                </div>
+                <p class="section-intro">Lead ला 0-100 गुण दिले जातात - जास्त गुण म्हणजे जास्त संभावना.</p>
+                
+                <div class="score-meter">
+                    <p style="font-weight: 600; margin-bottom: 15px;">Score Categories:</p>
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9em;"><span>🥶 Cold (0-25)</span><span>कमी संभावना</span></div>
+                        <div class="score-bar"><div class="score-fill score-cold"></div></div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9em;"><span>🌤️ Warm (26-50)</span><span>मध्यम संभावना</span></div>
+                        <div class="score-bar"><div class="score-fill score-warm"></div></div>
+                    </div>
+                    <div style="margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9em;"><span>🔥 Hot (51-75)</span><span>चांगली संभावना</span></div>
+                        <div class="score-bar"><div class="score-fill score-hot"></div></div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.9em;"><span>🔥🔥 Very Hot (76-100)</span><span>उत्तम संभावना</span></div>
+                        <div class="score-bar"><div class="score-fill score-very-hot"></div></div>
+                    </div>
+                </div>
+                
+                <table class="data-table">
+                    <thead><tr><th>क्रिया</th><th>गुण</th></tr></thead>
+                    <tbody>
+                        <tr><td>Email उघडला</td><td>+5</td></tr>
+                        <tr><td>Website भेट दिली</td><td>+10</td></tr>
+                        <tr><td>Demo विनंती केली</td><td>+25</td></tr>
+                        <tr><td>Pricing पाहिले</td><td>+15</td></tr>
+                        <tr><td>Meeting शेड्यूल केली</td><td>+30</td></tr>
+                        <tr><td>Proposal मागितला</td><td>+40</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Section 6: Follow-up -->
+            <div class="section" id="follow-up">
+                <div class="section-header">
+                    <div class="section-icon">📞</div>
+                    <h2>Follow-up कसा करायचा</h2>
+                </div>
+                <p class="section-intro">नियमित follow-up हे lead conversion साठी सर्वात महत्त्वाचे आहे.</p>
+                
+                <table class="data-table">
+                    <thead><tr><th>Status</th><th>Follow-up Timeline</th></tr></thead>
+                    <tbody>
+                        <tr><td><span class="status-badge status-new">New</span></td><td>24 तासात पहिला संपर्क</td></tr>
+                        <tr><td><span class="status-badge status-contacted">Contacted</span></td><td>3-5 दिवसात follow-up</td></tr>
+                        <tr><td><span class="status-badge status-qualified">Qualified</span></td><td>आठवड्यातून एकदा</td></tr>
+                    </tbody>
+                </table>
+                
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">→</span>
+                        <span class="step-title">Activity Log करा</span>
+                    </div>
+                    <div class="step-body">
+                        <p>प्रत्येक संपर्कानंतर Activity log करा:</p>
+                        <ul class="feature-list">
+                            <li><strong>📞 Call:</strong> फोन कॉल केला</li>
+                            <li><strong>📧 Email:</strong> ईमेल पाठवला</li>
+                            <li><strong>📅 Meeting:</strong> भेट घेतली</li>
+                            <li><strong>📝 Note:</strong> महत्त्वाची नोंद</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="info-box important">
+                    <span class="info-icon">⏰</span>
+                    <div class="info-content">
+                        <h4>Follow-up Miss करू नका!</h4>
+                        <p>80% sales 5-12 follow-ups नंतर होतात. धीर धरा आणि नियमित संपर्क ठेवा.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section 7: Convert Lead -->
+            <div class="section" id="convert-lead">
+                <div class="section-header">
+                    <div class="section-icon">🔄</div>
+                    <h2>Lead to Customer Conversion</h2>
+                </div>
+                <p class="section-intro">Lead यशस्वी झाल्यावर (Won) त्याला Customer मध्ये convert करा.</p>
+                
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">1</span>
+                        <span class="step-title">Lead Status "Won" करा</span>
+                    </div>
+                    <div class="step-body"><p>Lead edit करून status <span class="status-badge status-won">Won</span> निवडा.</p></div>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">2</span>
+                        <span class="step-title">"Convert to Customer" दाबा</span>
+                    </div>
+                    <div class="step-body"><p>Lead details page वर <strong>Convert to Customer</strong> बटण दिसेल.</p></div>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">3</span>
+                        <span class="step-title">Customer Details Confirm करा</span>
+                    </div>
+                    <div class="step-body">
+                        <p>Conversion नंतर:</p>
+                        <ul class="feature-list">
+                            <li>नवीन Customer record तयार होतो</li>
+                            <li>Lead automatically archive होतो</li>
+                            <li>सर्व activities history राहते</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section 8: CSV Import -->
+            <div class="section" id="csv-import">
+                <div class="section-header">
+                    <div class="section-icon">📥</div>
+                    <h2>CSV Import - Bulk Lead Upload</h2>
+                </div>
+                <p class="section-intro">एकाच वेळी अनेक leads import करा CSV file द्वारे.</p>
+                
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">1</span>
+                        <span class="step-title">"Import CSV" बटण दाबा</span>
+                    </div>
+                    <div class="step-body">
+                        <p>Leads page वर <strong>Import CSV</strong> बटण दिसेल. त्यावर क्लिक करा.</p>
+                    </div>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">2</span>
+                        <span class="step-title">CSV File तयार करा</span>
+                    </div>
+                    <div class="step-body">
+                        <p>CSV file मध्ये खालील columns असणे आवश्यक:</p>
+                        <table class="data-table">
+                            <thead><tr><th>Column</th><th>Required</th><th>Example</th></tr></thead>
+                            <tbody>
+                                <tr><td><strong>first_name</strong></td><td>✅ हो</td><td>राहुल</td></tr>
+                                <tr><td><strong>last_name</strong></td><td>✅ हो</td><td>शर्मा</td></tr>
+                                <tr><td><strong>email</strong></td><td>✅ हो</td><td>rahul@example.com</td></tr>
+                                <tr><td>phone</td><td>नाही</td><td>+91 98765 43210</td></tr>
+                                <tr><td>company_name</td><td>नाही</td><td>ABC Corp</td></tr>
+                                <tr><td>source</td><td>नाही</td><td>website</td></tr>
+                            </tbody>
+                        </table>
+                        
+                        <div class="info-box tip">
+                            <span class="info-icon">📄</span>
+                            <div class="info-content">
+                                <h4>Sample Template</h4>
+                                <p>"Download Sample CSV" बटण दाबून template download करा.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">3</span>
+                        <span class="step-title">Preview & Import</span>
+                    </div>
+                    <div class="step-body">
+                        <p>File select केल्यावर preview दिसेल. Data check करा आणि <strong>Import</strong> दाबा.</p>
+                        <p style="margin-top: 10px;">Progress bar दाखवेल किती leads import झाले.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section 9: Bulk Actions -->
+            <div class="section" id="bulk-actions">
+                <div class="section-header">
+                    <div class="section-icon">☑️</div>
+                    <h2>Bulk Actions - एकाच वेळी अनेक Leads</h2>
+                </div>
+                <p class="section-intro">Multiple leads select करून एकत्र update किंवा delete करा.</p>
+                
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">1</span>
+                        <span class="step-title">Leads Select करा</span>
+                    </div>
+                    <div class="step-body">
+                        <p>प्रत्येक lead च्या बाजूला checkbox आहे. हवे ते leads select करा.</p>
+                        <p style="margin-top: 10px;"><strong>Tip:</strong> Header मधील checkbox ने सर्व select होतात.</p>
+                    </div>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">2</span>
+                        <span class="step-title">Action निवडा</span>
+                    </div>
+                    <div class="step-body">
+                        <p>Select केल्यावर Bulk Actions bar दिसेल:</p>
+                        <table class="data-table">
+                            <thead><tr><th>Action</th><th>काय होते</th></tr></thead>
+                            <tbody>
+                                <tr><td><strong>📞 Contacted</strong></td><td>सर्व selected leads "Contacted" status मध्ये</td></tr>
+                                <tr><td><strong>✅ Qualified</strong></td><td>सर्व selected leads "Qualified" status मध्ये</td></tr>
+                                <tr><td><strong>🗑️ Delete</strong></td><td>सर्व selected leads delete</td></tr>
+                            </tbody>
+                        </table>
+                        
+                        <div class="info-box warning">
+                            <span class="info-icon">⚠️</span>
+                            <div class="info-content">
+                                <h4>Delete सावधगिरीने!</h4>
+                                <p>Delete केलेले leads परत येत नाहीत. Confirm करण्यापूर्वी विचार करा.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section 10: Reports -->
+            <div class="section" id="reports">
+                <div class="section-header">
+                    <div class="section-icon">📊</div>
+                    <h2>Lead Reports</h2>
+                </div>
+                <p class="section-intro">Reports मधून Lead performance analyze करा.</p>
+                
+                <table class="data-table">
+                    <thead><tr><th>Report</th><th>काय दाखवतो</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>📍 Source Report</strong></td><td>कोणत्या source मधून जास्त leads येतात</td></tr>
+                        <tr><td><strong>🔄 Status Report</strong></td><td>Pipeline मध्ये किती leads आहेत</td></tr>
+                        <tr><td><strong>📈 Conversion Report</strong></td><td>Monthly conversion rate</td></tr>
+                        <tr><td><strong>👤 Performance Report</strong></td><td>Sales rep wise performance</td></tr>
+                    </tbody>
+                </table>
+                
+                <div class="info-box tip">
+                    <span class="info-icon">📊</span>
+                    <div class="info-content">
+                        <h4>Weekly Review करा</h4>
+                        <p>दर आठवड्याला Lead reports पहा - कोणता source चांगला काम करतो ते समजेल.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Best Practices -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">🏆</div>
+                    <h2>Best Practices</h2>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="background: #ecfdf5; border-radius: 12px; padding: 20px;">
+                        <h4 style="color: #065f46; margin-bottom: 10px;">✅ करा</h4>
+                        <ul class="feature-list">
+                            <li>सर्व leads नोंदवा</li>
+                            <li>Source अचूक भरा</li>
+                            <li>नियमित follow-up करा</li>
+                            <li>Notes ठेवा</li>
+                            <li>Status update करा</li>
+                        </ul>
+                    </div>
+                    <div style="background: #fef2f2; border-radius: 12px; padding: 20px;">
+                        <h4 style="color: #991b1b; margin-bottom: 10px;">❌ करू नका</h4>
+                        <ul style="list-style: none;">
+                            <li style="padding: 8px 0; padding-left: 25px; position: relative;">
+                                <span style="position: absolute; left: 0; color: #ef4444;">✗</span>Lead ignore करू नका
+                            </li>
+                            <li style="padding: 8px 0; padding-left: 25px; position: relative;">
+                                <span style="position: absolute; left: 0; color: #ef4444;">✗</span>Duplicate leads टाळा
+                            </li>
+                            <li style="padding: 8px 0; padding-left: 25px; position: relative;">
+                                <span style="position: absolute; left: 0; color: #ef4444;">✗</span>Incomplete data ठेवू नका
+                            </li>
+                            <li style="padding: 8px 0; padding-left: 25px; position: relative;">
+                                <span style="position: absolute; left: 0; color: #ef4444;">✗</span>Late follow-up टाळा
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-nav">
+                <a href="company-setup.html" class="footer-btn secondary">← मागे: Company Setup</a>
+                <a href="customers-guide.html" class="footer-btn">पुढे: Customers →</a>
+            </div>
+            <p style="margin-top: 20px; color: #64748b; font-size: 0.9em;">CRM SAAS मराठी मार्गदर्शक | Version 2.0 | December 2025</p>
+        </div>
+    </div>
+</body>
+</html>

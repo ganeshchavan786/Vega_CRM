@@ -1,84 +1,469 @@
-<!-- Dashboard Page -->
+<!-- Dashboard Page - Ultimate BI-Style -->
 <section id="dashboard" class="section active">
-    <div class="page-header-advanced">
-        <div class="page-header-content">
-            <div class="page-header-icon">📊</div>
-            <div>
-                <h2>Dashboard</h2>
-                <p>Welcome to your CRM dashboard</p>
+    <!-- Header with Date Range Filter -->
+    <div class="bi-dashboard-header">
+        <div class="bi-header-left">
+            <div class="bi-logo">
+                <i data-lucide="layout-dashboard"></i>
+            </div>
+            <div class="bi-title">
+                <h1>Sales Analytics Dashboard</h1>
+                <p id="dashboardGreeting">Welcome back! Here's your business overview</p>
+            </div>
+        </div>
+        <div class="bi-header-right">
+            <div class="bi-date-filter">
+                <button class="bi-filter-btn active" data-range="today">Today</button>
+                <button class="bi-filter-btn" data-range="week">This Week</button>
+                <button class="bi-filter-btn" data-range="month">This Month</button>
+                <button class="bi-filter-btn" data-range="quarter">Quarter</button>
+            </div>
+            <button class="bi-refresh-btn" onclick="refreshDashboard()">
+                <i data-lucide="refresh-cw"></i>
+                Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Row 1: Key Metrics Cards (Big Numbers) -->
+    <div class="bi-kpi-row">
+        <div class="bi-kpi-card revenue">
+            <div class="bi-kpi-icon">
+                <i data-lucide="indian-rupee"></i>
+            </div>
+            <div class="bi-kpi-content">
+                <span class="bi-kpi-label">Total Revenue</span>
+                <span class="bi-kpi-value" id="kpiRevenue">₹0</span>
+                <div class="bi-kpi-trend up">
+                    <i data-lucide="trending-up"></i>
+                    <span id="kpiRevenueTrend">+0%</span>
+                    <span class="bi-kpi-period">vs last month</span>
+                </div>
+            </div>
+            <div class="bi-kpi-sparkline" id="revenueSparkline"></div>
+        </div>
+        
+        <div class="bi-kpi-card pipeline">
+            <div class="bi-kpi-icon">
+                <i data-lucide="git-branch"></i>
+            </div>
+            <div class="bi-kpi-content">
+                <span class="bi-kpi-label">Pipeline Value</span>
+                <span class="bi-kpi-value" id="kpiPipeline">₹0</span>
+                <div class="bi-kpi-trend up">
+                    <i data-lucide="trending-up"></i>
+                    <span id="kpiPipelineTrend">+0%</span>
+                    <span class="bi-kpi-period">weighted</span>
+                </div>
+            </div>
+            <div class="bi-kpi-mini-chart" id="pipelineMiniChart"></div>
+        </div>
+        
+        <div class="bi-kpi-card winrate">
+            <div class="bi-kpi-icon">
+                <i data-lucide="trophy"></i>
+            </div>
+            <div class="bi-kpi-content">
+                <span class="bi-kpi-label">Win Rate</span>
+                <span class="bi-kpi-value" id="kpiWinRate">0%</span>
+                <div class="bi-kpi-trend up">
+                    <i data-lucide="trending-up"></i>
+                    <span id="kpiWinRateTrend">+0%</span>
+                    <span class="bi-kpi-period">this quarter</span>
+                </div>
+            </div>
+            <div class="bi-kpi-gauge" id="winRateGauge">
+                <svg viewBox="0 0 100 50">
+                    <path class="gauge-bg" d="M10,50 A40,40 0 0,1 90,50" />
+                    <path class="gauge-fill" id="winRateGaugeFill" d="M10,50 A40,40 0 0,1 90,50" />
+                </svg>
+            </div>
+        </div>
+        
+        <div class="bi-kpi-card deals">
+            <div class="bi-kpi-icon">
+                <i data-lucide="briefcase"></i>
+            </div>
+            <div class="bi-kpi-content">
+                <span class="bi-kpi-label">Active Deals</span>
+                <span class="bi-kpi-value" id="kpiActiveDeals">0</span>
+                <div class="bi-kpi-breakdown">
+                    <span class="breakdown-item"><span class="dot prospect"></span><span id="dealsProspect">0</span> Prospect</span>
+                    <span class="breakdown-item"><span class="dot negotiation"></span><span id="dealsNegotiation">0</span> Negotiation</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bi-kpi-card conversion">
+            <div class="bi-kpi-icon">
+                <i data-lucide="user-check"></i>
+            </div>
+            <div class="bi-kpi-content">
+                <span class="bi-kpi-label">Conversion Rate</span>
+                <span class="bi-kpi-value" id="kpiConversion">0%</span>
+                <div class="bi-kpi-funnel">
+                    <div class="funnel-step">
+                        <span class="funnel-count" id="funnelLeads">0</span>
+                        <span class="funnel-label">Leads</span>
+                    </div>
+                    <i data-lucide="chevron-right"></i>
+                    <div class="funnel-step">
+                        <span class="funnel-count" id="funnelCustomers">0</span>
+                        <span class="funnel-label">Customers</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="page-body-advanced">
-        <div class="stats-grid-advanced">
-            <div class="stat-card-advanced">
-                <div class="stat-card-header">
-                    <div class="stat-icon" style="background: #E3FCEF; color: #006644;">👥</div>
-                    <h3>Accounts</h3>
+
+    <!-- Row 2: Charts Section -->
+    <div class="bi-charts-row">
+        <!-- Revenue Trend Chart -->
+        <div class="bi-chart-card large">
+            <div class="bi-chart-header">
+                <div class="bi-chart-title">
+                    <i data-lucide="line-chart"></i>
+                    <h3>Revenue Trend</h3>
                 </div>
-                <p id="statCustomers" class="stat-number-advanced">0</p>
-                <div class="stat-trend">
-                    <span class="trend-up">↗</span>
-                    <span>Total accounts</span>
-                </div>
-            </div>
-            <div class="stat-card-advanced">
-                <div class="stat-card-header">
-                    <div class="stat-icon" style="background: #DEEBFF; color: #0052CC;">🎯</div>
-                    <h3>Leads</h3>
-                </div>
-                <p id="statLeads" class="stat-number-advanced">0</p>
-                <div class="stat-trend">
-                    <span class="trend-up">↗</span>
-                    <span>Active leads</span>
+                <div class="bi-chart-actions">
+                    <select id="revenuePeriod" class="bi-select">
+                        <option value="6">Last 6 Months</option>
+                        <option value="12">Last 12 Months</option>
+                        <option value="3">Last 3 Months</option>
+                    </select>
                 </div>
             </div>
-            <div class="stat-card-advanced">
-                <div class="stat-card-header">
-                    <div class="stat-icon" style="background: #FFF4E5; color: #FF8B00;">💰</div>
-                    <h3>Opportunities</h3>
-                </div>
-                <p id="statDeals" class="stat-number-advanced">0</p>
-                <div class="stat-trend">
-                    <span class="trend-up">↗</span>
-                    <span>In pipeline</span>
+            <div class="bi-chart-body">
+                <canvas id="revenueTrendChart"></canvas>
+            </div>
+        </div>
+        
+        <!-- Pipeline Funnel -->
+        <div class="bi-chart-card medium">
+            <div class="bi-chart-header">
+                <div class="bi-chart-title">
+                    <i data-lucide="filter"></i>
+                    <h3>Sales Pipeline</h3>
                 </div>
             </div>
-            <div class="stat-card-advanced">
-                <div class="stat-card-header">
-                    <div class="stat-icon" style="background: #EAE6FF; color: #5243AA;">✓</div>
-                    <h3>Tasks</h3>
-                </div>
-                <p id="statTasks" class="stat-number-advanced">0</p>
-                <div class="stat-trend">
-                    <span class="trend-up">↗</span>
-                    <span>Pending tasks</span>
+            <div class="bi-chart-body">
+                <div class="bi-funnel" id="pipelineFunnel">
+                    <div class="funnel-stage" data-stage="prospect">
+                        <div class="funnel-bar" style="width: 100%">
+                            <span class="funnel-name">Prospect</span>
+                            <span class="funnel-value" id="funnelProspectValue">₹0</span>
+                        </div>
+                        <span class="funnel-count-badge" id="funnelProspectCount">0</span>
+                    </div>
+                    <div class="funnel-stage" data-stage="qualified">
+                        <div class="funnel-bar" style="width: 80%">
+                            <span class="funnel-name">Qualified</span>
+                            <span class="funnel-value" id="funnelQualifiedValue">₹0</span>
+                        </div>
+                        <span class="funnel-count-badge" id="funnelQualifiedCount">0</span>
+                    </div>
+                    <div class="funnel-stage" data-stage="proposal">
+                        <div class="funnel-bar" style="width: 60%">
+                            <span class="funnel-name">Proposal</span>
+                            <span class="funnel-value" id="funnelProposalValue">₹0</span>
+                        </div>
+                        <span class="funnel-count-badge" id="funnelProposalCount">0</span>
+                    </div>
+                    <div class="funnel-stage" data-stage="negotiation">
+                        <div class="funnel-bar" style="width: 40%">
+                            <span class="funnel-name">Negotiation</span>
+                            <span class="funnel-value" id="funnelNegotiationValue">₹0</span>
+                        </div>
+                        <span class="funnel-count-badge" id="funnelNegotiationCount">0</span>
+                    </div>
+                    <div class="funnel-stage" data-stage="won">
+                        <div class="funnel-bar won" style="width: 25%">
+                            <span class="funnel-name">Won</span>
+                            <span class="funnel-value" id="funnelWonValue">₹0</span>
+                        </div>
+                        <span class="funnel-count-badge won" id="funnelWonCount">0</span>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="dashboard-content-advanced">
-            <div class="dashboard-section-advanced">
-                <div class="section-header">
-                    <h3>
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right: 8px;">
-                            <path d="M8 1L10 6L15 7L10 8L8 13L6 8L1 7L6 6L8 1Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                        </svg>
-                        Recent Activities
-                    </h3>
+    </div>
+
+    <!-- Row 3: Lead Sources & Activity -->
+    <div class="bi-charts-row">
+        <!-- Lead Sources Donut -->
+        <div class="bi-chart-card small">
+            <div class="bi-chart-header">
+                <div class="bi-chart-title">
+                    <i data-lucide="pie-chart"></i>
+                    <h3>Lead Sources</h3>
                 </div>
-                <div id="recentActivities" class="activity-list-advanced"></div>
             </div>
-            <div class="dashboard-section-advanced">
-                <div class="section-header">
-                    <h3>
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right: 8px;">
-                            <path d="M2 2H14V14H2V2Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                            <path d="M2 6H14M6 2V14" stroke="currentColor" stroke-width="1.5"/>
-                        </svg>
-                        Pipeline Overview
-                    </h3>
+            <div class="bi-chart-body">
+                <canvas id="leadSourcesChart"></canvas>
+                <div class="bi-chart-legend" id="leadSourcesLegend"></div>
+            </div>
+        </div>
+        
+        <!-- Activity Heatmap -->
+        <div class="bi-chart-card medium">
+            <div class="bi-chart-header">
+                <div class="bi-chart-title">
+                    <i data-lucide="activity"></i>
+                    <h3>Weekly Activity</h3>
                 </div>
-                <div id="pipelineChart" class="pipeline-chart-advanced"></div>
+            </div>
+            <div class="bi-chart-body">
+                <div class="bi-activity-heatmap" id="activityHeatmap">
+                    <div class="heatmap-row">
+                        <span class="heatmap-label">Mon</span>
+                        <div class="heatmap-cells" id="heatmapMon"></div>
+                    </div>
+                    <div class="heatmap-row">
+                        <span class="heatmap-label">Tue</span>
+                        <div class="heatmap-cells" id="heatmapTue"></div>
+                    </div>
+                    <div class="heatmap-row">
+                        <span class="heatmap-label">Wed</span>
+                        <div class="heatmap-cells" id="heatmapWed"></div>
+                    </div>
+                    <div class="heatmap-row">
+                        <span class="heatmap-label">Thu</span>
+                        <div class="heatmap-cells" id="heatmapThu"></div>
+                    </div>
+                    <div class="heatmap-row">
+                        <span class="heatmap-label">Fri</span>
+                        <div class="heatmap-cells" id="heatmapFri"></div>
+                    </div>
+                </div>
+                <div class="heatmap-legend">
+                    <span>Less</span>
+                    <div class="heatmap-scale">
+                        <span class="scale-0"></span>
+                        <span class="scale-1"></span>
+                        <span class="scale-2"></span>
+                        <span class="scale-3"></span>
+                        <span class="scale-4"></span>
+                    </div>
+                    <span>More</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="bi-chart-card small">
+            <div class="bi-chart-header">
+                <div class="bi-chart-title">
+                    <i data-lucide="zap"></i>
+                    <h3>Quick Stats</h3>
+                </div>
+            </div>
+            <div class="bi-quick-stats">
+                <div class="quick-stat-item">
+                    <div class="quick-stat-icon calls">
+                        <i data-lucide="phone"></i>
+                    </div>
+                    <div class="quick-stat-info">
+                        <span class="quick-stat-value" id="statCalls">0</span>
+                        <span class="quick-stat-label">Calls Today</span>
+                    </div>
+                </div>
+                <div class="quick-stat-item">
+                    <div class="quick-stat-icon emails">
+                        <i data-lucide="mail"></i>
+                    </div>
+                    <div class="quick-stat-info">
+                        <span class="quick-stat-value" id="statEmails">0</span>
+                        <span class="quick-stat-label">Emails Sent</span>
+                    </div>
+                </div>
+                <div class="quick-stat-item">
+                    <div class="quick-stat-icon meetings">
+                        <i data-lucide="calendar"></i>
+                    </div>
+                    <div class="quick-stat-info">
+                        <span class="quick-stat-value" id="statMeetings">0</span>
+                        <span class="quick-stat-label">Meetings</span>
+                    </div>
+                </div>
+                <div class="quick-stat-item">
+                    <div class="quick-stat-icon tasks">
+                        <i data-lucide="check-square"></i>
+                    </div>
+                    <div class="quick-stat-info">
+                        <span class="quick-stat-value" id="statTasksCompleted">0</span>
+                        <span class="quick-stat-label">Tasks Done</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 4: Tables Section -->
+    <div class="bi-tables-row">
+        <!-- Top Deals -->
+        <div class="bi-table-card">
+            <div class="bi-table-header">
+                <div class="bi-table-title">
+                    <i data-lucide="star"></i>
+                    <h3>Top Opportunities</h3>
+                </div>
+                <a href="#" onclick="navigateTo('deals')" class="bi-view-all">View All →</a>
+            </div>
+            <div class="bi-table-body">
+                <table class="bi-table">
+                    <thead>
+                        <tr>
+                            <th>Deal Name</th>
+                            <th>Account</th>
+                            <th>Value</th>
+                            <th>Stage</th>
+                            <th>Probability</th>
+                        </tr>
+                    </thead>
+                    <tbody id="topDealsTable">
+                        <tr><td colspan="5" class="loading">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Team Leaderboard -->
+        <div class="bi-table-card">
+            <div class="bi-table-header">
+                <div class="bi-table-title">
+                    <i data-lucide="users"></i>
+                    <h3>Team Leaderboard</h3>
+                </div>
+                <span class="bi-badge">This Month</span>
+            </div>
+            <div class="bi-table-body">
+                <div class="bi-leaderboard" id="teamLeaderboard">
+                    <div class="leaderboard-item loading">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 5: Timeline & Tasks -->
+    <div class="bi-bottom-row">
+        <!-- Recent Activities Timeline -->
+        <div class="bi-timeline-card">
+            <div class="bi-card-header">
+                <div class="bi-card-title">
+                    <i data-lucide="clock"></i>
+                    <h3>Recent Activities</h3>
+                </div>
+            </div>
+            <div class="bi-timeline" id="recentActivitiesTimeline">
+                <div class="timeline-item loading">Loading activities...</div>
+            </div>
+        </div>
+        
+        <!-- Overdue Tasks -->
+        <div class="bi-tasks-card">
+            <div class="bi-card-header">
+                <div class="bi-card-title">
+                    <i data-lucide="alert-triangle"></i>
+                    <h3>Overdue Tasks</h3>
+                </div>
+                <span class="bi-count-badge danger" id="overdueCount">0</span>
+            </div>
+            <div class="bi-tasks-list" id="overdueTasksList">
+                <div class="task-item loading">Loading tasks...</div>
+            </div>
+        </div>
+        
+        <!-- Forecast Gauge -->
+        <div class="bi-forecast-card">
+            <div class="bi-card-header">
+                <div class="bi-card-title">
+                    <i data-lucide="target"></i>
+                    <h3>Monthly Target</h3>
+                </div>
+            </div>
+            <div class="bi-forecast-gauge">
+                <div class="gauge-container">
+                    <svg viewBox="0 0 200 120" class="gauge-svg">
+                        <defs>
+                            <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#ef4444"/>
+                                <stop offset="50%" style="stop-color:#f59e0b"/>
+                                <stop offset="100%" style="stop-color:#22c55e"/>
+                            </linearGradient>
+                        </defs>
+                        <path class="gauge-track" d="M20,100 A80,80 0 0,1 180,100" />
+                        <path class="gauge-progress" id="forecastGaugeProgress" d="M20,100 A80,80 0 0,1 180,100" />
+                        <circle class="gauge-needle" id="gaugeNeedle" cx="100" cy="100" r="8" />
+                    </svg>
+                    <div class="gauge-value">
+                        <span class="gauge-percent" id="forecastPercent">0%</span>
+                        <span class="gauge-label">of target</span>
+                    </div>
+                </div>
+                <div class="forecast-details">
+                    <div class="forecast-item">
+                        <span class="forecast-label">Achieved</span>
+                        <span class="forecast-value achieved" id="forecastAchieved">₹0</span>
+                    </div>
+                    <div class="forecast-item">
+                        <span class="forecast-label">Target</span>
+                        <span class="forecast-value target" id="forecastTarget">₹0</span>
+                    </div>
+                    <div class="forecast-item">
+                        <span class="forecast-label">Remaining</span>
+                        <span class="forecast-value remaining" id="forecastRemaining">₹0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Quality Section -->
+    <div class="bi-quality-section">
+        <div class="bi-card-header">
+            <div class="bi-card-title">
+                <i data-lucide="shield-check"></i>
+                <h3>Data Quality Score</h3>
+            </div>
+        </div>
+        <div class="bi-quality-grid">
+            <div class="quality-card overall">
+                <div class="quality-ring">
+                    <svg viewBox="0 0 100 100">
+                        <circle class="ring-bg" cx="50" cy="50" r="40"/>
+                        <circle class="ring-fill" id="qualityRingOverall" cx="50" cy="50" r="40"/>
+                    </svg>
+                    <span class="ring-value" id="qualityOverall">--</span>
+                </div>
+                <span class="quality-name">Overall Score</span>
+            </div>
+            <div class="quality-card">
+                <div class="quality-bar-vertical">
+                    <div class="bar-fill completeness" id="qualityBarCompleteness"></div>
+                </div>
+                <span class="quality-value" id="qualityCompleteness">--</span>
+                <span class="quality-name">Completeness</span>
+            </div>
+            <div class="quality-card">
+                <div class="quality-bar-vertical">
+                    <div class="bar-fill accuracy" id="qualityBarAccuracy"></div>
+                </div>
+                <span class="quality-value" id="qualityAccuracy">--</span>
+                <span class="quality-name">Accuracy</span>
+            </div>
+            <div class="quality-card">
+                <div class="quality-bar-vertical">
+                    <div class="bar-fill consistency" id="qualityBarConsistency"></div>
+                </div>
+                <span class="quality-value" id="qualityConsistency">--</span>
+                <span class="quality-name">Consistency</span>
+            </div>
+            <div class="quality-card">
+                <div class="quality-bar-vertical">
+                    <div class="bar-fill validity" id="qualityBarValidity"></div>
+                </div>
+                <span class="quality-value" id="qualityValidity">--</span>
+                <span class="quality-name">Validity</span>
             </div>
         </div>
     </div>

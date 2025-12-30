@@ -10,6 +10,7 @@ from app.schemas.activity import ActivityCreate, ActivityUpdate
 from app.controllers.activity_controller import ActivityController
 from app.utils.dependencies import get_current_active_user
 from app.utils.helpers import success_response
+from app.utils.permissions import has_permission
 from app.models.user import User
 
 router = APIRouter()
@@ -67,7 +68,21 @@ async def create_activity(
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
-    """Log new activity"""
+    """
+    Log new activity
+    
+    Path Parameters:
+    - **company_id**: Company ID
+    
+    Requires: JWT token, Permission to create activities
+    """
+    # Check permission to create activity
+    if not has_permission(current_user, "activity", "create", company_id, db):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied: create activity"
+        )
+    
     try:
         activity = ActivityController.create_activity(company_id, activity_data, current_user, db)
         return success_response(
@@ -142,7 +157,22 @@ async def update_activity(
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
-    """Update activity"""
+    """
+    Update activity
+    
+    Path Parameters:
+    - **company_id**: Company ID
+    - **activity_id**: Activity ID
+    
+    Requires: JWT token, Permission to update activities
+    """
+    # Check permission to update activity
+    if not has_permission(current_user, "activity", "update", company_id, db):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied: update activity"
+        )
+    
     try:
         activity = ActivityController.update_activity(
             activity_id, company_id, activity_data, current_user, db
@@ -167,7 +197,22 @@ async def delete_activity(
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
-    """Delete activity"""
+    """
+    Delete activity
+    
+    Path Parameters:
+    - **company_id**: Company ID
+    - **activity_id**: Activity ID
+    
+    Requires: JWT token, Permission to delete activities
+    """
+    # Check permission to delete activity
+    if not has_permission(current_user, "activity", "delete", company_id, db):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied: delete activity"
+        )
+    
     try:
         ActivityController.delete_activity(activity_id, company_id, current_user, db)
         return success_response(

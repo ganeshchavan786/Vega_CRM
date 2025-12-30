@@ -1,51 +1,329 @@
-<!-- Company Selection Page -->
-<section id="company-selection" class="section">
-    <div class="company-selection-wrapper">
-        <div class="company-selection-header">
-            <div class="company-header-content">
-                <h1>📊 CRM SAAS</h1>
-                <h2>Select Your Company</h2>
-                <p class="company-header-description">Choose a company to access your workspace</p>
-            </div>
-        </div>
-        
-        <div class="company-selection-body">
-            <div class="company-search-section">
-                <div class="search-box">
-                    <svg class="search-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M7 12C9.76142 12 12 9.76142 12 7C12 4.23858 9.76142 2 7 2C4.23858 2 2 4.23858 2 7C2 9.76142 4.23858 12 7 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M14 14L10.5 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+<!-- Company Selection Page - VEGA CRM Theme -->
+<style>
+    .vega-company-page {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .vega-navbar {
+        background: white;
+        padding: 16px 0;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+    .vega-nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .vega-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+    .vega-logo-icon {
+        font-size: 1.8rem;
+    }
+    .vega-logo-text {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #1e293b;
+    }
+    .vega-logo-highlight {
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .vega-user-info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    .vega-user-email {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+    .vega-btn-logout {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: transparent;
+        color: #64748b;
+        border: 2px solid #e5e7eb;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+    }
+    .vega-btn-logout:hover {
+        background: #fef2f2;
+        border-color: #fca5a5;
+        color: #dc2626;
+    }
+    .vega-btn-new-company {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    }
+    .vega-btn-new-company:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    }
+    .vega-company-section {
+        padding: 60px 24px;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .vega-section-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    .vega-section-badge {
+        display: inline-block;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+        color: #6366f1;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-bottom: 16px;
+    }
+    .vega-section-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 12px;
+    }
+    .vega-section-subtitle {
+        color: #64748b;
+        font-size: 1.1rem;
+    }
+    .vega-search-box {
+        position: relative;
+        max-width: 400px;
+        margin: 0 auto 30px;
+    }
+    .vega-search-box input {
+        width: 100%;
+        padding: 14px 20px 14px 50px;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s;
+        font-family: inherit;
+    }
+    .vega-search-box input:focus {
+        outline: none;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    .vega-search-box svg {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+    .vega-company-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    .vega-company-card {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 24px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .vega-company-card:hover {
+        border-color: #6366f1;
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(99, 102, 241, 0.15);
+    }
+    .vega-company-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 16px;
+    }
+    .vega-company-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 6px;
+    }
+    .vega-company-email {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+    .vega-btn-create {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 32px;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    }
+    .vega-btn-create:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+    }
+    .vega-loading {
+        text-align: center;
+        padding: 40px;
+        color: #64748b;
+    }
+    .vega-loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #e5e7eb;
+        border-top-color: #6366f1;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 16px;
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    .vega-empty {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 16px;
+        border: 2px dashed #e5e7eb;
+    }
+    .vega-empty-icon {
+        font-size: 4rem;
+        margin-bottom: 16px;
+    }
+    .vega-empty h3 {
+        font-size: 1.3rem;
+        color: #1e293b;
+        margin-bottom: 8px;
+    }
+    .vega-empty p {
+        color: #64748b;
+        margin-bottom: 24px;
+    }
+</style>
+
+<section id="company-selection" class="section vega-company-page">
+    <!-- VEGA CRM Navbar -->
+    <nav class="vega-navbar">
+        <div class="vega-nav-container">
+            <a href="/" class="vega-logo">
+                <span class="vega-logo-icon">⚡</span>
+                <span class="vega-logo-text">VEGA<span class="vega-logo-highlight">CRM</span></span>
+            </a>
+            <div class="vega-user-info">
+                <span class="vega-user-email" id="userEmailDisplay"></span>
+                <button class="vega-btn-new-company" onclick="showCreateCompanyModal()">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M8 3V13M3 8H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     </svg>
-                    <input type="text" id="companySearchInput" placeholder="Search companies..." onkeyup="filterCompanies()">
-                </div>
-            </div>
-            
-            <div id="companyListPage" class="company-list-advanced"></div>
-            
-            <div id="companyErrorPage" class="error-message"></div>
-            
-            <div id="companyLoading" class="company-loading">
-                <div class="loading-spinner"></div>
-                <p>Loading companies...</p>
-            </div>
-            
-            <div id="companyEmpty" class="company-empty" style="display: none;">
-                <div class="empty-icon">🏢</div>
-                <h3>No Companies Found</h3>
-                <p>No companies are available. Please contact your administrator.</p>
+                    New Company
+                </button>
+                <button class="vega-btn-logout" onclick="handleSignOut()">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M6 14H3C2.44772 14 2 13.5523 2 13V3C2 2.44772 2.44772 2 3 2H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M10 11L14 7L10 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M14 7H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Logout
+                </button>
             </div>
         </div>
-        
-        <div class="company-selection-footer">
-            <button class="btn-secondary btn-logout-company" onclick="handleLogout()">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right: 8px;">
-                    <path d="M6 14H3C2.44772 14 2 13.5523 2 13V3C2 2.44772 2.44772 2 3 2H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M10 11L14 7L10 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M14 7H6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </nav>
+
+    <!-- Company Selection Content -->
+    <div class="vega-company-section">
+        <div class="vega-section-header">
+            <span class="vega-section-badge">🏢 Workspace</span>
+            <h1 class="vega-section-title">Select Your Company</h1>
+            <p class="vega-section-subtitle">Choose a company to access your CRM workspace</p>
+        </div>
+
+        <!-- Search Box -->
+        <div class="vega-search-box">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M9 16C12.866 16 16 12.866 16 9C16 5.13401 12.866 2 9 2C5.13401 2 2 5.13401 2 9C2 12.866 5.13401 16 9 16Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M18 18L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <input type="text" id="companySearchInput" placeholder="Search companies..." onkeyup="filterCompanies()">
+        </div>
+
+        <!-- Company List -->
+        <div id="companyListPage" class="vega-company-grid"></div>
+
+        <!-- Loading State -->
+        <div id="companyLoading" class="vega-loading">
+            <div class="vega-loading-spinner"></div>
+            <p>Loading your companies...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="companyEmpty" class="vega-empty" style="display: none;">
+            <div class="vega-empty-icon">🏢</div>
+            <h3>No Companies Found</h3>
+            <p>Create your first company to get started with VEGA CRM</p>
+            <button class="vega-btn-create" onclick="showCreateCompanyModal()">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <path d="M9 3V15M3 9H15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
                 </svg>
-                Logout
+                Create Company
             </button>
         </div>
-    </div>
+
+        <!-- Error Message -->
+        <div id="companyErrorPage" class="error-message"></div>
+
+            </div>
 </section>
+
+<script>
+    // Display user email
+    document.addEventListener('DOMContentLoaded', function() {
+        const userEmail = document.getElementById('userEmailDisplay');
+        const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        if (userEmail && currentUser.email) {
+            userEmail.textContent = currentUser.email;
+        }
+    });
+</script>
 

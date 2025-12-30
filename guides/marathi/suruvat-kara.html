@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>सुरुवात कुठून करायची? - CRM SAAS मार्गदर्शक</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            position: relative;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+            transition: opacity 0.2s;
+        }
+        
+        .back-btn:hover {
+            opacity: 1;
+        }
+        
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .header-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-top: 15px;
+        }
+        
+        /* Content */
+        .content {
+            padding: 40px;
+        }
+        
+        /* Table of Contents */
+        .toc {
+            background: linear-gradient(145deg, #f8f9ff 0%, #eef1ff 100%);
+            border: 2px solid #e0e5ff;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .toc h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+        
+        .toc-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        
+        .toc-list a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #374151;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .toc-list a:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .toc-num {
+            width: 28px;
+            height: 28px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        .toc-list a:hover .toc-num {
+            background: white;
+            color: #667eea;
+        }
+        
+        /* Section */
+        .section {
+            margin-bottom: 50px;
+            scroll-margin-top: 20px;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+        
+        .section-header h2 {
+            color: #1e293b;
+            font-size: 1.6em;
+        }
+        
+        /* Flow Diagram */
+        .flow-diagram {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 30px;
+            margin: 25px 0;
+            overflow-x: auto;
+        }
+        
+        .flow-steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            flex-wrap: wrap;
+        }
+        
+        .flow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .flow-circle {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .flow-label {
+            margin-top: 12px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9em;
+        }
+        
+        .flow-arrow {
+            font-size: 1.5em;
+            color: #667eea;
+            margin: 0 10px;
+        }
+        
+        /* Step Card */
+        .step-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            margin: 20px 0;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .step-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.15);
+        }
+        
+        .step-header {
+            background: linear-gradient(145deg, #f8f9ff 0%, #eef1ff 100%);
+            padding: 20px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+        
+        .step-title {
+            font-size: 1.2em;
+            color: #1e293b;
+            font-weight: 600;
+        }
+        
+        .step-body {
+            padding: 25px;
+        }
+        
+        /* Form Preview */
+        .form-preview {
+            background: #f8fafc;
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .form-preview-title {
+            font-size: 0.85em;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+        
+        .preview-field {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .preview-field-icon {
+            color: #667eea;
+        }
+        
+        .preview-field-label {
+            color: #64748b;
+            font-size: 0.9em;
+        }
+        
+        .preview-field.required::after {
+            content: '*';
+            color: #ef4444;
+            margin-left: auto;
+        }
+        
+        .preview-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 10px;
+            cursor: default;
+        }
+        
+        /* Info Box */
+        .info-box {
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .info-box.tip {
+            background: #ecfdf5;
+            border-left: 4px solid #10b981;
+        }
+        
+        .info-box.warning {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .info-box.important {
+            background: #fef2f2;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .info-box.info {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .info-icon {
+            font-size: 1.5em;
+        }
+        
+        .info-content h4 {
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+        
+        .info-content p {
+            color: #64748b;
+            font-size: 0.95em;
+        }
+        
+        /* List */
+        .feature-list {
+            list-style: none;
+            margin: 15px 0;
+        }
+        
+        .feature-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .feature-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        /* Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .data-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+            background: white;
+        }
+        
+        .data-table tr:hover td {
+            background: #f8fafc;
+        }
+        
+        /* Password Strength */
+        .password-strength {
+            margin: 20px 0;
+        }
+        
+        .strength-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .strength-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .strength-weak { width: 25%; background: #ef4444; }
+        .strength-medium { width: 50%; background: #f59e0b; }
+        .strength-good { width: 75%; background: #3b82f6; }
+        .strength-strong { width: 100%; background: #10b981; }
+        
+        .strength-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8em;
+            color: #64748b;
+        }
+        
+        /* Screenshot placeholder */
+        .screenshot {
+            background: linear-gradient(145deg, #f1f5f9 0%, #e2e8f0 100%);
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .screenshot-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        .screenshot-text {
+            color: #64748b;
+            font-size: 0.9em;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #f8f9fa;
+            padding: 30px 40px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .footer-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .footer-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .footer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .footer-btn.secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header, .content, .footer {
+                padding: 25px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .flow-steps {
+                flex-direction: column;
+            }
+            
+            .flow-arrow {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+            
+            .footer-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <a href="index.html" class="back-btn">
+                ← मुख्य पृष्ठावर परत जा
+            </a>
+            <h1>🔐 सुरुवात कुठून करायची?</h1>
+            <p>Login, Registration आणि Forgot Password - संपूर्ण मार्गदर्शक</p>
+            <span class="header-badge">📖 नवीन वापरकर्त्यांसाठी</span>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <!-- Table of Contents -->
+            <div class="toc">
+                <h2>📑 या मार्गदर्शकात</h2>
+                <ul class="toc-list">
+                    <li><a href="#overview"><span class="toc-num">1</span> Overview - संपूर्ण Flow</a></li>
+                    <li><a href="#registration"><span class="toc-num">2</span> नवीन नोंदणी (Registration)</a></li>
+                    <li><a href="#login"><span class="toc-num">3</span> Login कसे करायचे</a></li>
+                    <li><a href="#forgot-password"><span class="toc-num">4</span> Password विसरलात?</a></li>
+                    <li><a href="#company-select"><span class="toc-num">5</span> Company निवडणे</a></li>
+                    <li><a href="#troubleshooting"><span class="toc-num">6</span> समस्या निवारण</a></li>
+                </ul>
+            </div>
+            
+            <!-- Section 1: Overview -->
+            <div class="section" id="overview">
+                <div class="section-header">
+                    <div class="section-icon">🗺️</div>
+                    <h2>संपूर्ण Application Flow</h2>
+                </div>
+                
+                <p style="color: #64748b; margin-bottom: 20px;">
+                    CRM SAAS वापरण्यासाठी खालील flow follow करा. प्रत्येक step महत्त्वाचा आहे.
+                </p>
+                
+                <div class="flow-diagram">
+                    <div class="flow-steps">
+                        <div class="flow-step">
+                            <div class="flow-circle">📝</div>
+                            <span class="flow-label">Registration</span>
+                        </div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-step">
+                            <div class="flow-circle">🔐</div>
+                            <span class="flow-label">Login</span>
+                        </div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-step">
+                            <div class="flow-circle">🏢</div>
+                            <span class="flow-label">Company निवडा</span>
+                        </div>
+                        <span class="flow-arrow">→</span>
+                        <div class="flow-step">
+                            <div class="flow-circle">📊</div>
+                            <span class="flow-label">Dashboard</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-box info">
+                    <span class="info-icon">💡</span>
+                    <div class="info-content">
+                        <h4>पहिल्यांदा वापरत आहात?</h4>
+                        <p>जर तुम्ही पहिल्यांदा CRM वापरत असाल तर आधी Registration करा, मग Login करा.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section 2: Registration -->
+            <div class="section" id="registration">
+                <div class="section-header">
+                    <div class="section-icon">📝</div>
+                    <h2>नवीन नोंदणी (Registration)</h2>
+                </div>
+                
+                <p style="color: #64748b; margin-bottom: 25px;">
+                    CRM वापरण्यासाठी आधी तुमचे account तयार करणे आवश्यक आहे. खालील steps follow करा:
+                </p>
+                
+                <!-- Step 1 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">1</span>
+                        <span class="step-title">Registration Page उघडा</span>
+                    </div>
+                    <div class="step-body">
+                        <p>CRM application उघडा आणि <strong>"Register"</strong> किंवा <strong>"Create Account"</strong> link वर क्लिक करा.</p>
+                        
+                        <div class="screenshot">
+                            <div class="screenshot-icon">🖥️</div>
+                            <p class="screenshot-text">Login page वर "Don't have an account? Register" link दिसेल</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">2</span>
+                        <span class="step-title">माहिती भरा</span>
+                    </div>
+                    <div class="step-body">
+                        <p>खालील माहिती काळजीपूर्वक भरा:</p>
+                        
+                        <div class="form-preview">
+                            <div class="form-preview-title">Registration Form</div>
+                            <div class="preview-field required">
+                                <span class="preview-field-icon">👤</span>
+                                <span class="preview-field-label">Full Name (पूर्ण नाव)</span>
+                            </div>
+                            <div class="preview-field required">
+                                <span class="preview-field-icon">📧</span>
+                                <span class="preview-field-label">Email Address (ईमेल)</span>
+                            </div>
+                            <div class="preview-field required">
+                                <span class="preview-field-icon">🔒</span>
+                                <span class="preview-field-label">Password (पासवर्ड)</span>
+                            </div>
+                            <div class="preview-field required">
+                                <span class="preview-field-icon">🔒</span>
+                                <span class="preview-field-label">Confirm Password (पासवर्ड पुन्हा)</span>
+                            </div>
+                            <button class="preview-btn">Register / नोंदणी करा</button>
+                        </div>
+                        
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Field</th>
+                                    <th>वर्णन</th>
+                                    <th>उदाहरण</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Full Name</strong></td>
+                                    <td>तुमचे पूर्ण नाव (First + Last)</td>
+                                    <td>राहुल शर्मा</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Email</strong></td>
+                                    <td>Valid email address (login साठी वापरला जाईल)</td>
+                                    <td>rahul@example.com</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Password</strong></td>
+                                    <td>किमान 8 characters, strong असावा</td>
+                                    <td>MyP@ssw0rd123</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">3</span>
+                        <span class="step-title">Strong Password तयार करा</span>
+                    </div>
+                    <div class="step-body">
+                        <p>तुमचा password secure असणे महत्त्वाचे आहे. खालील नियम follow करा:</p>
+                        
+                        <ul class="feature-list">
+                            <li>किमान <strong>8 characters</strong> असावेत</li>
+                            <li>किमान एक <strong>Capital letter</strong> (A-Z)</li>
+                            <li>किमान एक <strong>Small letter</strong> (a-z)</li>
+                            <li>किमान एक <strong>Number</strong> (0-9)</li>
+                            <li>किमान एक <strong>Special character</strong> (!@#$%)</li>
+                        </ul>
+                        
+                        <div class="password-strength">
+                            <p style="font-weight: 600; margin-bottom: 10px;">Password Strength Indicator:</p>
+                            <div style="display: grid; gap: 10px;">
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.85em;">
+                                        <span>Weak (कमकुवत)</span>
+                                        <span style="color: #ef4444;">abc123</span>
+                                    </div>
+                                    <div class="strength-bar"><div class="strength-fill strength-weak"></div></div>
+                                </div>
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.85em;">
+                                        <span>Medium (मध्यम)</span>
+                                        <span style="color: #f59e0b;">Abc12345</span>
+                                    </div>
+                                    <div class="strength-bar"><div class="strength-fill strength-medium"></div></div>
+                                </div>
+                                <div>
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.85em;">
+                                        <span>Strong (मजबूत)</span>
+                                        <span style="color: #10b981;">MyP@ssw0rd123!</span>
+                                    </div>
+                                    <div class="strength-bar"><div class="strength-fill strength-strong"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box warning">
+                            <span class="info-icon">⚠️</span>
+                            <div class="info-content">
+                                <h4>Password लक्षात ठेवा!</h4>
+                                <p>तुमचा password सुरक्षित ठिकाणी लिहून ठेवा. कोणाशीही share करू नका.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 4 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">4</span>
+                        <span class="step-title">Registration पूर्ण करा</span>
+                    </div>
+                    <div class="step-body">
+                        <p><strong>"Register"</strong> बटण दाबा. यशस्वी झाल्यावर:</p>
+                        
+                        <ul class="feature-list">
+                            <li>Success message दिसेल</li>
+                            <li>Automatically Login page वर redirect होईल</li>
+                            <li>आता तुम्ही Login करू शकता</li>
+                        </ul>
+                        
+                        <div class="info-box tip">
+                            <span class="info-icon">✅</span>
+                            <div class="info-content">
+                                <h4>Registration यशस्वी!</h4>
+                                <p>तुमचे account तयार झाले. आता Login करा आणि CRM वापरायला सुरुवात करा.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section 3: Login -->
+            <div class="section" id="login">
+                <div class="section-header">
+                    <div class="section-icon">🔐</div>
+                    <h2>Login कसे करायचे</h2>
+                </div>
+                
+                <p style="color: #64748b; margin-bottom: 25px;">
+                    Registration केल्यानंतर, CRM मध्ये प्रवेश करण्यासाठी Login करा.
+                </p>
+                
+                <!-- Step 1 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">1</span>
+                        <span class="step-title">Login Page उघडा</span>
+                    </div>
+                    <div class="step-body">
+                        <p>CRM application उघडा. Default मध्ये Login page दिसेल.</p>
+                        <p style="margin-top: 10px;"><strong>URL:</strong> <code style="background: #f1f5f9; padding: 4px 8px; border-radius: 4px;">http://localhost:8000</code></p>
+                    </div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">2</span>
+                        <span class="step-title">Credentials टाका</span>
+                    </div>
+                    <div class="step-body">
+                        <div class="form-preview">
+                            <div class="form-preview-title">Login Form</div>
+                            <div class="preview-field required">
+                                <span class="preview-field-icon">📧</span>
+                                <span class="preview-field-label">Email Address</span>
+                            </div>
+                            <div class="preview-field required">
+                                <span class="preview-field-icon">🔒</span>
+                                <span class="preview-field-label">Password</span>
+                            </div>
+                            <button class="preview-btn">Login / प्रवेश करा</button>
+                        </div>
+                        
+                        <div class="info-box info">
+                            <span class="info-icon">💡</span>
+                            <div class="info-content">
+                                <h4>Remember Me</h4>
+                                <p>"Remember Me" checkbox tick केल्यास browser बंद केल्यावरही login राहील.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">3</span>
+                        <span class="step-title">Login यशस्वी</span>
+                    </div>
+                    <div class="step-body">
+                        <p>Login यशस्वी झाल्यावर <strong>Company Selection</strong> page दिसेल.</p>
+                        
+                        <div class="flow-diagram" style="padding: 20px;">
+                            <div class="flow-steps">
+                                <div class="flow-step">
+                                    <div class="flow-circle" style="width: 50px; height: 50px; font-size: 1.2em;">🔐</div>
+                                    <span class="flow-label">Login</span>
+                                </div>
+                                <span class="flow-arrow">→</span>
+                                <div class="flow-step">
+                                    <div class="flow-circle" style="width: 50px; height: 50px; font-size: 1.2em;">🏢</div>
+                                    <span class="flow-label">Company Select</span>
+                                </div>
+                                <span class="flow-arrow">→</span>
+                                <div class="flow-step">
+                                    <div class="flow-circle" style="width: 50px; height: 50px; font-size: 1.2em;">📊</div>
+                                    <span class="flow-label">Dashboard</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section 4: Forgot Password -->
+            <div class="section" id="forgot-password">
+                <div class="section-header">
+                    <div class="section-icon">🔑</div>
+                    <h2>Password विसरलात?</h2>
+                </div>
+                
+                <p style="color: #64748b; margin-bottom: 25px;">
+                    Password विसरल्यास खालील process follow करा:
+                </p>
+                
+                <!-- Step 1 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">1</span>
+                        <span class="step-title">"Forgot Password" वर क्लिक करा</span>
+                    </div>
+                    <div class="step-body">
+                        <p>Login page वर <strong>"Forgot Password?"</strong> link दिसेल. त्यावर क्लिक करा.</p>
+                    </div>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">2</span>
+                        <span class="step-title">Email टाका</span>
+                    </div>
+                    <div class="step-body">
+                        <p>तुमचा registered email address टाका.</p>
+                        
+                        <div class="form-preview">
+                            <div class="form-preview-title">Forgot Password Form</div>
+                            <div class="preview-field required">
+                                <span class="preview-field-icon">📧</span>
+                                <span class="preview-field-label">Registered Email Address</span>
+                            </div>
+                            <button class="preview-btn">Send Reset Link / लिंक पाठवा</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">3</span>
+                        <span class="step-title">Email तपासा</span>
+                    </div>
+                    <div class="step-body">
+                        <p>तुमच्या email वर password reset link येईल.</p>
+                        
+                        <div class="info-box warning">
+                            <span class="info-icon">⏰</span>
+                            <div class="info-content">
+                                <h4>Link Expiry</h4>
+                                <p>Reset link फक्त <strong>24 तास</strong> valid असतो. त्याआधी password बदला.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box tip">
+                            <span class="info-icon">📬</span>
+                            <div class="info-content">
+                                <h4>Email आला नाही?</h4>
+                                <p>Spam/Junk folder तपासा. तरीही नसल्यास 5 मिनिटे थांबून पुन्हा प्रयत्न करा.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Step 4 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">4</span>
+                        <span class="step-title">नवीन Password सेट करा</span>
+                    </div>
+                    <div class="step-body">
+                        <p>Email मधील link वर क्लिक करा आणि नवीन password टाका.</p>
+                        
+                        <div class="form-preview">
+                            <div class="form-preview-title">Reset Password Form</div>
+                            <div class="preview-field required">
+                                <span class="preview-field-icon">🔒</span>
+                                <span class="preview-field-label">New Password (नवीन पासवर्ड)</span>
+                            </div>
+                            <div class="preview-field required">
+                                <span class="preview-field-icon">🔒</span>
+                                <span class="preview-field-label">Confirm Password (पुन्हा टाका)</span>
+                            </div>
+                            <button class="preview-btn">Reset Password / पासवर्ड बदला</button>
+                        </div>
+                        
+                        <div class="info-box tip">
+                            <span class="info-icon">✅</span>
+                            <div class="info-content">
+                                <h4>Password बदलला!</h4>
+                                <p>आता नवीन password ने Login करा.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section 5: Company Selection -->
+            <div class="section" id="company-select">
+                <div class="section-header">
+                    <div class="section-icon">🏢</div>
+                    <h2>Company निवडणे / तयार करणे</h2>
+                </div>
+                
+                <p style="color: #64748b; margin-bottom: 25px;">
+                    Login केल्यानंतर Company Selection page दिसतो. येथे तुम्ही existing company निवडू शकता किंवा नवीन तयार करू शकता.
+                </p>
+                
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">A</span>
+                        <span class="step-title">Existing Company निवडा</span>
+                    </div>
+                    <div class="step-body">
+                        <p>जर companies list मध्ये तुमची company दिसत असेल तर त्यावर क्लिक करा.</p>
+                        <ul class="feature-list">
+                            <li>Company card वर क्लिक करा</li>
+                            <li>Dashboard उघडेल</li>
+                            <li>CRM वापरायला सुरुवात करा</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">B</span>
+                        <span class="step-title">नवीन Company तयार करा</span>
+                    </div>
+                    <div class="step-body">
+                        <p>पहिल्यांदा वापरत असाल किंवा नवीन company हवी असल्यास:</p>
+                        
+                        <ol style="margin: 15px 0; padding-left: 20px; line-height: 2;">
+                            <li><strong>"Create New Company"</strong> बटण दाबा</li>
+                            <li>Company details भरा:
+                                <ul style="margin-top: 5px; padding-left: 20px;">
+                                    <li>Company Name (आवश्यक)</li>
+                                    <li>Email</li>
+                                    <li>Phone</li>
+                                    <li>Address</li>
+                                </ul>
+                            </li>
+                            <li><strong>"Create Company"</strong> दाबा</li>
+                            <li>Company तयार होईल आणि list मध्ये दिसेल</li>
+                        </ol>
+                        
+                        <div class="info-box tip">
+                            <span class="info-icon">🎉</span>
+                            <div class="info-content">
+                                <h4>Company तयार!</h4>
+                                <p>आता company वर क्लिक करून Dashboard वर जा आणि CRM वापरायला सुरुवात करा.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section 6: Troubleshooting -->
+            <div class="section" id="troubleshooting">
+                <div class="section-header">
+                    <div class="section-icon">🔧</div>
+                    <h2>समस्या निवारण (Troubleshooting)</h2>
+                </div>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>समस्या</th>
+                            <th>कारण</th>
+                            <th>उपाय</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Login होत नाही</strong></td>
+                            <td>चुकीचा email किंवा password</td>
+                            <td>Email आणि password तपासा. Caps Lock बंद आहे का पहा.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>"User not found" error</strong></td>
+                            <td>Account नाही</td>
+                            <td>आधी Registration करा.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Registration error</strong></td>
+                            <td>Email already exists</td>
+                            <td>दुसरा email वापरा किंवा Forgot Password करा.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Password reset email आला नाही</strong></td>
+                            <td>Spam मध्ये गेला</td>
+                            <td>Spam folder तपासा. 5 मिनिटे थांबा.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Company दिसत नाही</strong></td>
+                            <td>Company नाही</td>
+                            <td>"Create New Company" वापरा.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Page load होत नाही</strong></td>
+                            <td>Server down किंवा network issue</td>
+                            <td>Internet connection तपासा. Page refresh करा.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="info-box important" style="margin-top: 30px;">
+                    <span class="info-icon">📞</span>
+                    <div class="info-content">
+                        <h4>अजूनही समस्या आहे?</h4>
+                        <p>Support team शी संपर्क साधा: <strong>support@crmsaas.com</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-nav">
+                <a href="index.html" class="footer-btn secondary">← मुख्य पृष्ठ</a>
+                <a href="company-setup.html" class="footer-btn">पुढे: Company Setup →</a>
+            </div>
+            <p style="margin-top: 20px; color: #64748b; font-size: 0.9em;">
+                CRM SAAS मराठी मार्गदर्शक | Version 2.0 | December 2025
+            </p>
+        </div>
+    </div>
+</body>
+</html>

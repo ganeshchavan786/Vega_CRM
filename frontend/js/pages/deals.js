@@ -425,6 +425,7 @@ window.openDealModal = function(deal = null) {
         </form>
     `;
     
+    modal.style.display = 'flex';
     modal.classList.add('active');
     console.log('Deal modal opened successfully');
 }
@@ -516,40 +517,472 @@ window.handleDealSubmit = async function(e) {
 };
 
 window.deleteDeal = async function(id) {
-    if (!confirm('Are you sure you want to delete this deal? This action cannot be undone.')) {
-        return;
+    showDeleteConfirmModal(
+        'Delete Deal',
+        'Are you sure you want to delete this deal? This action cannot be undone.',
+        async () => {
+            try {
+                const response = await fetch(`${API_BASE}/companies/${companyId}/deals/${id}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+                
+                if (response.status === 401) {
+                    if (typeof handle401Error === 'function') {
+                        handle401Error();
+                    }
+                    return;
+                }
+                
+                if (response.ok) {
+                    if (window.dealsTable && typeof window.dealsTable.refresh === 'function') {
+                        window.dealsTable.refresh();
+                    } else {
+                        loadDeals();
+                    }
+                    showToast('Deal deleted successfully!', 'success');
+                } else {
+                    const result = await response.json();
+                    showToast(result.detail || 'Failed to delete deal', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting deal:', error);
+                showToast('Connection error. Please try again.', 'error');
+            }
+        }
+    );
+};
+
+// ============================================
+// Pipeline Kanban Board Functions
+// ============================================
+
+// Current view state
+window.currentDealView = 'table';
+
+// Switch between Table, Kanban, and Forecast views
+window.switchDealView = function(view) {
+    window.currentDealView = view;
+    
+    const tableView = document.getElementById('dealsTableView');
+    const kanbanView = document.getElementById('dealsKanbanView');
+    const forecastView = document.getElementById('dealsForecastView');
+    const tableBtn = document.getElementById('tableViewBtn');
+    const kanbanBtn = document.getElementById('kanbanViewBtn');
+    const forecastBtn = document.getElementById('forecastViewBtn');
+    
+    // Hide all views
+    tableView.style.display = 'none';
+    kanbanView.style.display = 'none';
+    if (forecastView) forecastView.style.display = 'none';
+    
+    // Remove active from all buttons
+    tableBtn.classList.remove('active');
+    kanbanBtn.classList.remove('active');
+    if (forecastBtn) forecastBtn.classList.remove('active');
+    
+    if (view === 'kanban') {
+        kanbanView.style.display = 'block';
+        kanbanBtn.classList.add('active');
+        loadPipelineView();
+    } else if (view === 'forecast') {
+        if (forecastView) forecastView.style.display = 'block';
+        if (forecastBtn) forecastBtn.classList.add('active');
+        loadForecastView();
+    } else {
+        tableView.style.display = 'block';
+        tableBtn.classList.add('active');
+        loadDeals();
     }
+};
+
+// Load Pipeline/Kanban View
+window.loadPipelineView = async function() {
+    if (!authToken || !companyId) return;
     
     try {
-        const response = await fetch(`${API_BASE}/companies/${companyId}/deals/${id}`, {
-            method: 'DELETE',
+        const response = await fetch(`${API_BASE}/companies/${companyId}/deals/pipeline-view`, {
             headers: getHeaders()
         });
         
-        if (response.status === 401) {
-            if (typeof handle401Error === 'function') {
-                handle401Error();
-            }
+        if (!response.ok) {
+            console.error('Error loading pipeline view');
             return;
         }
         
-        if (response.ok) {
-            if (window.dealsTable && typeof window.dealsTable.refresh === 'function') {
-                window.dealsTable.refresh();
-            } else {
-                loadDeals();
-            }
-            if (typeof showNotification === 'function') {
-                showNotification('Deal deleted successfully!', 'success');
-            }
-        } else {
-            const result = await response.json();
-            alert(result.detail || 'Failed to delete deal');
+        const result = await response.json();
+        const data = result.data || {};
+        
+        // Update pipeline summary
+        updatePipelineSummary(data.summary || {});
+        
+        // Render deals in kanban columns
+        renderKanbanBoard(data.stages || {});
+        
+        // Initialize drag and drop
+        initDragAndDrop();
+        
+        // Refresh Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
         }
     } catch (error) {
-        console.error('Error deleting deal:', error);
-        alert('Connection error. Please try again.');
+        console.error('Error loading pipeline view:', error);
     }
+};
+
+// Update Pipeline Summary
+function updatePipelineSummary(summary) {
+    const summaryDiv = document.getElementById('pipelineSummary');
+    if (!summaryDiv) return;
+    
+    summaryDiv.innerHTML = `
+        <div class="summary-cards">
+            <div class="summary-card">
+                <span class="summary-label">Total Pipeline</span>
+                <span class="summary-value">₹${(summary.total_value || 0).toLocaleString()}</span>
+            </div>
+            <div class="summary-card">
+                <span class="summary-label">Weighted Value</span>
+                <span class="summary-value">₹${(summary.weighted_value || 0).toLocaleString()}</span>
+            </div>
+            <div class="summary-card">
+                <span class="summary-label">Open Deals</span>
+                <span class="summary-value">${summary.total_deals || 0}</span>
+            </div>
+            <div class="summary-card success">
+                <span class="summary-label">Win Rate</span>
+                <span class="summary-value">${summary.win_rate || 0}%</span>
+            </div>
+        </div>
+    `;
+}
+
+// Render Kanban Board
+function renderKanbanBoard(stages) {
+    const stageKeys = ['prospect', 'qualified', 'proposal', 'negotiation', 'closed_won', 'closed_lost'];
+    
+    stageKeys.forEach(stage => {
+        const stageData = stages[stage] || { deals: [], count: 0, total_value: 0 };
+        const cardsContainer = document.getElementById(`cards-${stage}`);
+        const countEl = document.getElementById(`count-${stage}`);
+        const valueEl = document.getElementById(`value-${stage}`);
+        
+        if (countEl) countEl.textContent = stageData.count || 0;
+        if (valueEl) valueEl.textContent = `₹${(stageData.total_value || 0).toLocaleString()}`;
+        
+        if (cardsContainer) {
+            cardsContainer.innerHTML = (stageData.deals || []).map(deal => createDealCard(deal)).join('');
+        }
+    });
+}
+
+// Create Deal Card HTML
+function createDealCard(deal) {
+    const probability = deal.probability || 0;
+    const value = deal.deal_value || 0;
+    const closeDate = deal.expected_close_date ? new Date(deal.expected_close_date).toLocaleDateString() : '-';
+    
+    return `
+        <div class="kanban-card" draggable="true" data-deal-id="${deal.id}" ondragstart="handleDragStart(event)" ondragend="handleDragEnd(event)">
+            <div class="card-header">
+                <span class="deal-name">${escapeHtml(deal.deal_name)}</span>
+                <span class="deal-probability">${probability}%</span>
+            </div>
+            <div class="card-body">
+                <div class="deal-account">
+                    <i data-lucide="building-2"></i>
+                    <span>${escapeHtml(deal.customer_name || deal.account_name || '-')}</span>
+                </div>
+                <div class="deal-value">
+                    <i data-lucide="indian-rupee"></i>
+                    <span>₹${value.toLocaleString()}</span>
+                </div>
+                <div class="deal-date">
+                    <i data-lucide="calendar"></i>
+                    <span>${closeDate}</span>
+                </div>
+            </div>
+            <div class="card-actions">
+                <button class="btn-icon-sm" onclick="editDeal(${deal.id})" title="Edit">
+                    <i data-lucide="edit"></i>
+                </button>
+                <button class="btn-icon-sm" onclick="deleteDeal(${deal.id})" title="Delete">
+                    <i data-lucide="trash-2"></i>
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// Drag and Drop Functions
+function initDragAndDrop() {
+    const columns = document.querySelectorAll('.kanban-cards');
+    
+    columns.forEach(column => {
+        column.addEventListener('dragover', handleDragOver);
+        column.addEventListener('drop', handleDrop);
+        column.addEventListener('dragleave', handleDragLeave);
+    });
+}
+
+window.handleDragStart = function(e) {
+    e.target.classList.add('dragging');
+    e.dataTransfer.setData('text/plain', e.target.dataset.dealId);
+    e.dataTransfer.effectAllowed = 'move';
+};
+
+window.handleDragEnd = function(e) {
+    e.target.classList.remove('dragging');
+    document.querySelectorAll('.kanban-cards').forEach(col => col.classList.remove('drag-over'));
+};
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    e.currentTarget.classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+    e.currentTarget.classList.remove('drag-over');
+}
+
+async function handleDrop(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    
+    const dealId = e.dataTransfer.getData('text/plain');
+    const newStage = e.currentTarget.closest('.kanban-column').dataset.stage;
+    
+    if (!dealId || !newStage) return;
+    
+    try {
+        const response = await fetch(`${API_BASE}/companies/${companyId}/deals/${dealId}/move-stage?new_stage=${newStage}`, {
+            method: 'PUT',
+            headers: getHeaders()
+        });
+        
+        if (response.ok) {
+            showToast(`Deal moved to ${newStage.replace('_', ' ')}`, 'success');
+            loadPipelineView();
+        } else {
+            const result = await response.json();
+            showToast(result.detail || 'Failed to move deal', 'error');
+        }
+    } catch (error) {
+        console.error('Error moving deal:', error);
+        showToast('Error moving deal', 'error');
+    }
+}
+
+// Load Forecast View (Tab)
+window.loadForecastView = async function() {
+    if (!authToken || !companyId) return;
+    
+    try {
+        const [forecastRes, trendRes] = await Promise.all([
+            fetch(`${API_BASE}/companies/${companyId}/deals/forecast`, { headers: getHeaders() }),
+            fetch(`${API_BASE}/companies/${companyId}/deals/trend-analysis?months=6`, { headers: getHeaders() })
+        ]);
+        
+        const forecastData = await forecastRes.json();
+        const trendData = await trendRes.json();
+        
+        const forecast = forecastData.data || {};
+        const trends = trendData.data || {};
+        
+        // Update Pipeline Forecast Cards
+        document.getElementById('fc-total-pipeline').textContent = `₹${(forecast.total_pipeline || 0).toLocaleString()}`;
+        document.getElementById('fc-weighted-pipeline').textContent = `₹${(forecast.weighted_pipeline || 0).toLocaleString()}`;
+        document.getElementById('fc-win-rate').textContent = `${forecast.win_rate || 0}%`;
+        
+        // Update Forecast by Category
+        const byCategory = forecast.by_category || {};
+        document.getElementById('fc-best-case').textContent = `₹${(byCategory.best_case || 0).toLocaleString()}`;
+        document.getElementById('fc-commit').textContent = `₹${(byCategory.commit || 0).toLocaleString()}`;
+        document.getElementById('fc-most-likely').textContent = `₹${(byCategory.most_likely || 0).toLocaleString()}`;
+        document.getElementById('fc-worst-case').textContent = `₹${(byCategory.worst_case || 0).toLocaleString()}`;
+        
+        // Update Historical Trends
+        const growthRate = trends.growth_rate || 0;
+        const growthEl = document.getElementById('fc-growth-rate');
+        growthEl.textContent = `${growthRate >= 0 ? '+' : ''}${growthRate}%`;
+        growthEl.className = `trend-value ${growthRate >= 0 ? 'positive' : 'negative'}`;
+        
+        document.getElementById('fc-total-won').textContent = `₹${(trends.total_won || 0).toLocaleString()}`;
+        document.getElementById('fc-deals-won').textContent = trends.deals_won || 0;
+        
+        // Render Monthly Projections
+        const projectionsDiv = document.getElementById('monthlyProjections');
+        const projections = forecast.monthly_projections || [];
+        
+        if (projections.length > 0) {
+            const maxValue = Math.max(...projections.map(p => p.projected_value || p.weighted_value || 0), 1);
+            projectionsDiv.innerHTML = projections.map(p => {
+                const value = p.projected_value || p.weighted_value || 0;
+                const width = Math.min(100, (value / maxValue) * 100);
+                return `
+                    <div class="projection-row">
+                        <span class="projection-month">${p.month}</span>
+                        <div class="projection-bar-container">
+                            <div class="projection-bar-fill" style="width: ${width}%"></div>
+                        </div>
+                        <span class="projection-value">₹${value.toLocaleString()}</span>
+                        <span class="projection-deals">${p.deal_count || 0} deals</span>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            projectionsDiv.innerHTML = '<p class="empty-text">No projections available</p>';
+        }
+        
+        // Render Monthly Trends Chart
+        const trendsDiv = document.getElementById('trendsChart');
+        const monthlyTrends = trends.monthly_trends || [];
+        
+        if (monthlyTrends.length > 0) {
+            const maxWon = Math.max(...monthlyTrends.map(m => m.won_value || 0), 1);
+            trendsDiv.innerHTML = `
+                <div class="chart-bars">
+                    ${monthlyTrends.map(m => {
+                        const height = Math.min(100, (m.won_value / maxWon) * 100);
+                        return `
+                            <div class="chart-bar-item">
+                                <div class="chart-bar-wrapper">
+                                    <div class="chart-bar" style="height: ${height}%"></div>
+                                </div>
+                                <span class="chart-label">${m.month.split(' ')[0].substring(0, 3)}</span>
+                                <span class="chart-value">₹${(m.won_value || 0).toLocaleString()}</span>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        } else {
+            trendsDiv.innerHTML = '<p class="empty-text">No trend data available</p>';
+        }
+        
+        // Refresh Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    } catch (error) {
+        console.error('Error loading forecast view:', error);
+        showToast('Error loading forecast data', 'error');
+    }
+};
+
+// Show Deal Forecast Modal (legacy - now redirects to tab)
+window.showDealForecast = async function() {
+    try {
+        const [forecastRes, trendRes] = await Promise.all([
+            fetch(`${API_BASE}/companies/${companyId}/deals/forecast`, { headers: getHeaders() }),
+            fetch(`${API_BASE}/companies/${companyId}/deals/trend-analysis?months=6`, { headers: getHeaders() })
+        ]);
+        
+        const forecastData = await forecastRes.json();
+        const trendData = await trendRes.json();
+        
+        const forecast = forecastData.data || {};
+        const trends = trendData.data || {};
+        
+        const modalHtml = `
+            <div class="modal-overlay" id="forecastModal" onclick="closeForecastModal(event)">
+                <div class="modal-content modal-lg" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h3><i data-lucide="trending-up"></i> Sales Forecast & Trends</h3>
+                        <button class="modal-close" onclick="closeForecastModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="forecast-grid">
+                            <!-- Forecast Summary -->
+                            <div class="forecast-card">
+                                <h4>Pipeline Forecast</h4>
+                                <div class="forecast-metrics">
+                                    <div class="metric">
+                                        <span class="metric-label">Total Pipeline</span>
+                                        <span class="metric-value">₹${(forecast.total_pipeline || 0).toLocaleString()}</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="metric-label">Weighted Pipeline</span>
+                                        <span class="metric-value">₹${(forecast.weighted_pipeline || 0).toLocaleString()}</span>
+                                    </div>
+                                    <div class="metric highlight">
+                                        <span class="metric-label">Best Case</span>
+                                        <span class="metric-value">₹${(forecast.by_category?.best_case || 0).toLocaleString()}</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="metric-label">Commit</span>
+                                        <span class="metric-value">₹${(forecast.by_category?.commit || 0).toLocaleString()}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Trend Analysis -->
+                            <div class="forecast-card">
+                                <h4>Historical Trends (6 Months)</h4>
+                                <div class="trend-metrics">
+                                    <div class="metric ${(trends.growth_rate || 0) >= 0 ? 'positive' : 'negative'}">
+                                        <span class="metric-label">Revenue Growth</span>
+                                        <span class="metric-value">${(trends.growth_rate || 0).toFixed(1)}%</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="metric-label">Win Rate</span>
+                                        <span class="metric-value">${(trends.win_rate || 0).toFixed(1)}%</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="metric-label">Total Won</span>
+                                        <span class="metric-value">₹${(trends.total_won || 0).toLocaleString()}</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="metric-label">Deals Won</span>
+                                        <span class="metric-value">${trends.deals_won || 0}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Monthly Projections -->
+                            <div class="forecast-card full-width">
+                                <h4>Monthly Projections</h4>
+                                <div class="projections-list">
+                                    ${(forecast.monthly_projections || []).map(m => `
+                                        <div class="projection-item">
+                                            <span class="month">${m.month}</span>
+                                            <div class="projection-bar">
+                                                <div class="bar" style="width: ${Math.min(100, (m.projected_value / (forecast.total_pipeline || 1)) * 100)}%"></div>
+                                            </div>
+                                            <span class="value">₹${(m.projected_value || 0).toLocaleString()}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="closeForecastModal()">Close</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        const existingModal = document.getElementById('forecastModal');
+        if (existingModal) existingModal.remove();
+        
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    } catch (error) {
+        console.error('Error loading forecast:', error);
+        showToast('Error loading forecast data', 'error');
+    }
+};
+
+window.closeForecastModal = function(event) {
+    if (event && event.target !== event.currentTarget) return;
+    const modal = document.getElementById('forecastModal');
+    if (modal) modal.remove();
 };
 
 // Helper function to escape HTML

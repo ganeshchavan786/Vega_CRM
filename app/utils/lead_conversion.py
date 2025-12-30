@@ -345,4 +345,221 @@ class LeadConversionService:
                 "expected_close_date": close_date.date().isoformat() if isinstance(close_date, datetime) else close_date.isoformat() if hasattr(close_date, 'isoformat') else str(close_date)
             }
         }
-
+    
+    @staticmethod
+    def batch_convert_leads(
+        lead_ids: list,
+        company_id: int,
+        current_user: User,
+        db: Session,
+        skip_eligibility_check: bool = False
+    ) -> Dict:
+        """
+        Batch convert multiple leads to accounts
+        
+        Args:
+            lead_ids: List of Lead IDs to convert
+            company_id: Company ID
+            current_user: Current user performing conversion
+            db: Database session
+            skip_eligibility_check: Skip eligibility check
+            
+        Returns:
+            Dictionary with batch conversion results
+        """
+        results = {
+            "total": len(lead_ids),
+            "successful": 0,
+            "failed": 0,
+            "conversions": [],
+            "errors": []
+        }
+        
+        for lead_id in lead_ids:
+            try:
+                conversion = LeadConversionService.convert_lead_to_account(
+                    lead_id=lead_id,
+                    company_id=company_id,
+                    current_user=current_user,
+                    db=db,
+                    skip_eligibility_check=skip_eligibility_check
+                )
+                results["successful"] += 1
+                results["conversions"].append({
+                    "lead_id": lead_id,
+                    "success": True,
+                    "result": conversion
+                })
+            except Exception as e:
+                results["failed"] += 1
+                results["errors"].append({
+                    "lead_id": lead_id,
+                    "success": False,
+                    "error": str(e)
+                })
+        
+        return results
+    
+    @staticmethod
+    def get_conversion_analytics(
+        company_id: int,
+        db: Session,
+        days: int = 30
+    ) -> Dict:
+        """
+        Get lead conversion analytics
+        
+        Args:
+            company_id: Company ID
+            db: Database session
+            days: Number of days to analyze
+            
+        Returns:
+            Dictionary with conversion analytics
+        """
+        from sqlalchemy import func
+        from datetime import datetime, timedelta
+        
+        start_date = datetime.utcnow() - timedelta(days=days)
+        
+        # Total leads in period
+        total_leads = db.query(func.count(Lead.id)).filter(
+            Lead.company_id == company_id,
+            Lead.created_at >= start_date
+        ).scalar() or 0
+        
+        # Converted leads in period
+        converted_leads = db.query(func.count(Lead.id)).filter(
+            Lead.company_id == company_id,
+            Lead.status == "converted",
+            Lead.converted_at >= start_date
+        ).scalar() or 0
+        
+        # Conversion rate
+        conversion_rate = (converted_leads / total_leads * 100) if total_leads > 0 else 0
+        
+        # Average time to convert (in days)
+        converted_with_time = db.query(Lead).filter(
+            Lead.company_id == company_id,
+            Lead.status == "converted",
+            Lead.converted_at.isnot(None),
+            Lead.created_at.isnot(None)
+        ).all()
+        
+        avg_conversion_time = 0
+        if converted_with_time:
+            total_days = sum(
+                (lead.converted_at - lead.created_at).days 
+                for lead in converted_with_time 
+                if lead.converted_at and lead.created_at
+            )
+            avg_conversion_time = total_days / len(converted_with_time) if converted_with_time else 0
+        
+        # Leads by status
+        leads_by_status = {}
+        statuses = ["new", "contacted", "qualified", "proposal", "negotiation", "converted", "lost"]
+        for status in statuses:
+            count = db.query(func.count(Lead.id)).filter(
+                Lead.company_id == company_id,
+                Lead.status == status
+            ).scalar() or 0
+            leads_by_status[status] = count
+        
+        # Conversion by source
+        conversion_by_source = db.query(
+            Lead.source,
+            func.count(Lead.id).label('total'),
+            func.sum(func.cast(Lead.status == "converted", db.bind.dialect.name == 'sqlite' and 'INTEGER' or 'INT')).label('converted')
+        ).filter(
+            Lead.company_id == company_id
+        ).group_by(Lead.source).all()
+        
+        source_analytics = []
+        for row in conversion_by_source:
+            source_analytics.append({
+                "source": row[0] or "Unknown",
+                "total": row[1],
+                "converted": row[2] or 0,
+                "rate": (row[2] / row[1] * 100) if row[1] > 0 and row[2] else 0
+            })
+        
+        return {
+            "period_days": days,
+            "total_leads": total_leads,
+            "converted_leads": converted_leads,
+            "conversion_rate": round(conversion_rate, 2),
+            "avg_conversion_time_days": round(avg_conversion_time, 1),
+            "leads_by_status": leads_by_status,
+            "conversion_by_source": source_analytics
+        }
+    
+    @staticmethod
+    def validate_conversion(
+        lead_id: int,
+        company_id: int,
+        db: Session
+    ) -> Dict:
+        """
+        Validate if lead can be converted
+        
+        Args:
+            lead_id: Lead ID
+            company_id: Company ID
+            db: Database session
+            
+        Returns:
+            Dictionary with validation results
+        """
+        lead = db.query(Lead).filter(
+            and_(
+                Lead.id == lead_id,
+                Lead.company_id == company_id
+            )
+        ).first()
+        
+        if not lead:
+            return {
+                "valid": False,
+                "errors": ["Lead not found"],
+                "warnings": []
+            }
+        
+        errors = []
+        warnings = []
+        
+        # Check if already converted
+        if lead.status == "converted":
+            errors.append("Lead is already converted")
+        
+        # Check required fields
+        if not lead.email and not lead.phone:
+            errors.append("Lead must have email or phone")
+        
+        if not lead.lead_name and not (lead.first_name or lead.last_name):
+            errors.append("Lead must have a name")
+        
+        # Check eligibility
+        eligibility = NurturingAutomation.check_conversion_eligibility(
+            lead_id, company_id, db
+        )
+        
+        if not eligibility["eligible"]:
+            warnings.append(f"Lead may not be ready: {eligibility['reason']}")
+        
+        # Check for duplicate account
+        account_name = lead.company_name or f"{lead.first_name} {lead.last_name}".strip()
+        if account_name:
+            existing = db.query(Customer).filter(
+                Customer.company_id == company_id,
+                Customer.name == account_name
+            ).first()
+            if existing:
+                warnings.append(f"Account '{account_name}' already exists - will link to existing")
+        
+        return {
+            "valid": len(errors) == 0,
+            "errors": errors,
+            "warnings": warnings,
+            "lead_score": lead.lead_score if hasattr(lead, 'lead_score') else None,
+            "lead_status": lead.status
+        }

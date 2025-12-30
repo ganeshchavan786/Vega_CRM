@@ -13,6 +13,7 @@ from app.schemas.customer import CustomerCreate, CustomerUpdate
 from app.utils.helpers import generate_customer_code
 from app.utils.health_score import HealthScoreCalculator
 from app.utils.lifecycle_stage import LifecycleStageAutomation
+from app.services import audit_service, log_service
 
 
 class CustomerController:
@@ -110,6 +111,26 @@ class CustomerController:
         db.commit()
         db.refresh(new_customer)
         
+        # Log audit trail
+        try:
+            audit_service.log_create(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="Customer",
+                resource_id=new_customer.id,
+                new_values={"name": new_customer.name, "email": new_customer.email, "company_id": company_id}
+            )
+            log_service.log_info(
+                db=db,
+                category="USER_ACTIVITY",
+                action="CREATE_CUSTOMER",
+                message=f"Customer '{new_customer.name}' created",
+                user_id=current_user.id
+            )
+        except Exception:
+            pass  # Don't fail if audit logging fails
+        
         return new_customer
     
     @staticmethod
@@ -170,8 +191,13 @@ class CustomerController:
         """
         customer = CustomerController.get_customer(customer_id, company_id, current_user, db)
         
-        # Update customer
+        # Store old values for audit before update
         update_data = customer_data.model_dump(exclude_unset=True)
+        old_values = {}
+        for key in update_data.keys():
+            old_values[key] = getattr(customer, key, None)
+        
+        # Update customer
         for key, value in update_data.items():
             setattr(customer, key, value)
         
@@ -189,6 +215,27 @@ class CustomerController:
         
         db.commit()
         db.refresh(customer)
+        
+        # Log audit trail for update
+        try:
+            audit_service.log_update(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="Customer",
+                resource_id=customer.id,
+                old_values=old_values,
+                new_values=update_data
+            )
+            log_service.log_info(
+                db=db,
+                category="USER_ACTIVITY",
+                action="UPDATE_CUSTOMER",
+                message=f"Customer '{customer.name}' updated",
+                user_id=current_user.id
+            )
+        except Exception:
+            pass
         
         return customer
     
@@ -235,8 +282,29 @@ class CustomerController:
                 detail="Customer not found"
             )
         
+        customer_name = customer.name
         db.delete(customer)
         db.commit()
+        
+        # Log audit trail for delete
+        try:
+            audit_service.log_delete(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="Customer",
+                resource_id=customer_id,
+                old_values={"name": customer_name, "company_id": company_id}
+            )
+            log_service.log_info(
+                db=db,
+                category="USER_ACTIVITY",
+                action="DELETE_CUSTOMER",
+                message=f"Customer '{customer_name}' deleted",
+                user_id=current_user.id
+            )
+        except Exception:
+            pass
     
     @staticmethod
     def get_customer_stats(company_id: int, db: Session) -> dict:

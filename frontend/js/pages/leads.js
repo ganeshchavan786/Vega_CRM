@@ -75,6 +75,15 @@ window.loadLeads = async function() {
                 data: leads,
                 columns: [
                     {
+                        key: 'select',
+                        label: '<input type="checkbox" id="selectAllLeads" onchange="toggleSelectAllLeads(this)" title="Select All">',
+                        sortable: false,
+                        align: 'center',
+                        render: (value, row) => {
+                            return `<input type="checkbox" class="lead-checkbox" data-id="${row.id}" onchange="updateBulkSelection()">`;
+                        }
+                    },
+                    {
                         key: 'name',
                         label: 'Name',
                         sortable: true,
@@ -138,8 +147,9 @@ window.loadLeads = async function() {
                         sortable: true,
                         type: 'number',
                         align: 'center',
-                        render: (value) => {
-                            return value !== null && value !== undefined ? value : '-';
+                        render: (value, row) => {
+                            if (value === null || value === undefined) return '<span class="score-badge score-none">-</span>';
+                            return renderLeadScoreMeter(value);
                         }
                     },
                     {
@@ -159,18 +169,26 @@ window.loadLeads = async function() {
                         sortable: false,
                         align: 'center',
                         render: (value, row) => {
+                            const canConvert = row.lead_score >= 70 && (row.status === 'contacted' || row.status === 'qualified');
+                            const leadName = row.lead_name || `${row.first_name || ''} ${row.last_name || ''}`.trim() || 'Lead';
                             return `
-                                <button class="btn-icon btn-edit" onclick="editLead(${row.id})" title="Edit">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                        <path d="M11.333 2.00001C11.5084 1.82465 11.7163 1.68571 11.9447 1.59203C12.1731 1.49835 12.4173 1.4519 12.6637 1.45564C12.9101 1.45938 13.1533 1.51324 13.3787 1.6139C13.6041 1.71456 13.8072 1.8598 13.9767 2.04134C14.1462 2.22288 14.2786 2.43706 14.3665 2.67078C14.4544 2.9045 14.4961 3.15326 14.4893 3.40289C14.4825 3.65252 14.4273 3.89824 14.3267 4.12567C14.2261 4.3531 14.0821 4.55767 13.9027 4.72801L13.333 5.33334L10.6667 2.66668L11.2363 2.06134C11.4157 1.891 11.6188 1.74576 11.8442 1.6451C12.0696 1.54444 12.3128 1.49058 12.5592 1.48684C12.8056 1.4831 13.0498 1.52955 13.2782 1.62323C13.5066 1.71691 13.7145 1.85585 13.8898 2.03121L13.333 2.66668L11.333 2.00001Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M9.33333 4L2.66667 10.6667V13.3333H5.33333L12 6.66667" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </button>
-                                <button class="btn-icon btn-delete" onclick="deleteLead(${row.id})" title="Delete">
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                        <path d="M12 4V13.3333C12 13.687 11.8595 14.0261 11.6095 14.2761C11.3594 14.5262 11.0203 14.6667 10.6667 14.6667H5.33333C4.97971 14.6667 4.64057 14.5262 4.39052 14.2761C4.14048 14.0261 4 13.687 4 13.3333V4M6 4V2.66667C6 2.31305 6.14048 1.97391 6.39052 1.72386C6.64057 1.47381 6.97971 1.33334 7.33333 1.33334H8.66667C9.02029 1.33334 9.35943 1.47381 9.60948 1.72386C9.85952 1.97391 10 2.31305 10 2.66667V4M2 4H14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
-                                </button>
+                                <div class="action-buttons">
+                                    <button class="btn-icon btn-info" onclick="showLeadQualification(${row.id})" title="Qualification & Risk">
+                                        <i data-lucide="clipboard-check" style="width:16px;height:16px"></i>
+                                    </button>
+                                    ${row.phone ? `<button class="btn-icon btn-whatsapp" onclick="openWhatsAppPanel(${row.id}, '${leadName.replace(/'/g, "\\'")}', '${row.phone}')" title="WhatsApp">
+                                        <i data-lucide="message-circle" style="width:16px;height:16px"></i>
+                                    </button>` : ''}
+                                    ${canConvert ? `<button class="btn-icon btn-success" onclick="convertLead(${row.id})" title="Convert to Account">
+                                        <i data-lucide="user-check" style="width:16px;height:16px"></i>
+                                    </button>` : ''}
+                                    <button class="btn-icon btn-edit" onclick="editLead(${row.id})" title="Edit">
+                                        <i data-lucide="edit" style="width:16px;height:16px"></i>
+                                    </button>
+                                    <button class="btn-icon btn-delete" onclick="deleteLead(${row.id})" title="Delete">
+                                        <i data-lucide="trash-2" style="width:16px;height:16px"></i>
+                                    </button>
+                                </div>
                             `;
                         }
                     }
@@ -442,6 +460,7 @@ window.openLeadModal = function(lead = null) {
         </form>
     `;
     
+    modal.style.display = 'flex';
     modal.classList.add('active');
 }
 
@@ -602,40 +621,356 @@ window.handleLeadSubmit = async function(e) {
 };
 
 window.deleteLead = async function(id) {
-    if (!confirm('Are you sure you want to delete this lead? This action cannot be undone.')) {
+    showDeleteConfirmModal(
+        'Delete Lead',
+        'Are you sure you want to delete this lead? This action cannot be undone.',
+        async () => {
+            try {
+                const response = await fetch(`${API_BASE}/companies/${companyId}/leads/${id}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+                
+                if (response.status === 401) {
+                    if (typeof handle401Error === 'function') {
+                        handle401Error();
+                    }
+                    return;
+                }
+                
+                if (response.ok) {
+                    if (window.leadsTable && typeof window.leadsTable.refresh === 'function') {
+                        window.leadsTable.refresh();
+                    } else {
+                        loadLeads();
+                    }
+                    showToast('Lead deleted successfully!', 'success');
+                } else {
+                    const result = await response.json();
+                    showToast(result.detail || 'Failed to delete lead', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting lead:', error);
+                showToast('Connection error. Please try again.', 'error');
+            }
+        }
+    );
+};
+
+// Show Lead Qualification & Risk Modal
+window.showLeadQualification = async function(leadId) {
+    try {
+        // Fetch qualification score, risk score, and conversion eligibility in parallel
+        const [qualResponse, riskResponse, convResponse] = await Promise.all([
+            fetch(`${API_BASE}/companies/${companyId}/leads/${leadId}/qualification-score`, { headers: getHeaders() }),
+            fetch(`${API_BASE}/companies/${companyId}/leads/${leadId}/risk-score`, { headers: getHeaders() }),
+            fetch(`${API_BASE}/companies/${companyId}/leads/${leadId}/conversion-eligibility`, { headers: getHeaders() })
+        ]);
+
+        const qualData = await qualResponse.json();
+        const riskData = await riskResponse.json();
+        const convData = await convResponse.json();
+
+        const qual = qualData.data || {};
+        const risk = riskData.data?.risk_assessment || {};
+        const conv = convData.data || {};
+
+        // Build modal content
+        const modalHtml = `
+            <div class="modal-overlay" id="qualificationModal" onclick="closeQualificationModal(event)">
+                <div class="modal-content modal-lg" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h3><i data-lucide="clipboard-check"></i> Lead Qualification & Risk Assessment</h3>
+                        <button class="modal-close" onclick="closeQualificationModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="qual-grid">
+                            <!-- BANT Score Card -->
+                            <div class="qual-card">
+                                <h4><i data-lucide="target"></i> BANT Qualification Score</h4>
+                                <div class="score-circle ${qual.total_score >= 70 ? 'score-high' : qual.total_score >= 40 ? 'score-medium' : 'score-low'}">
+                                    <span class="score-value">${qual.total_score || 0}</span>
+                                    <span class="score-max">/100</span>
+                                </div>
+                                <div class="score-status ${qual.qualified ? 'status-qualified' : 'status-unqualified'}">
+                                    ${qual.status?.toUpperCase() || 'UNQUALIFIED'}
+                                </div>
+                                <div class="bant-breakdown">
+                                    <div class="bant-item">
+                                        <span>Budget</span>
+                                        <div class="progress-bar"><div class="progress" style="width:${(qual.breakdown?.budget || 0) / 25 * 100}%"></div></div>
+                                        <span>${qual.breakdown?.budget || 0}/25</span>
+                                    </div>
+                                    <div class="bant-item">
+                                        <span>Authority</span>
+                                        <div class="progress-bar"><div class="progress" style="width:${(qual.breakdown?.authority || 0) / 30 * 100}%"></div></div>
+                                        <span>${qual.breakdown?.authority || 0}/30</span>
+                                    </div>
+                                    <div class="bant-item">
+                                        <span>Need</span>
+                                        <div class="progress-bar"><div class="progress" style="width:${(qual.breakdown?.need || 0) / 25 * 100}%"></div></div>
+                                        <span>${qual.breakdown?.need || 0}/25</span>
+                                    </div>
+                                    <div class="bant-item">
+                                        <span>Timeline</span>
+                                        <div class="progress-bar"><div class="progress" style="width:${(qual.breakdown?.timeline || 0) / 20 * 100}%"></div></div>
+                                        <span>${qual.breakdown?.timeline || 0}/20</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Risk Score Card -->
+                            <div class="qual-card">
+                                <h4><i data-lucide="alert-triangle"></i> Risk Assessment</h4>
+                                <div class="risk-badge risk-${risk.risk_level || 'medium'}">
+                                    ${(risk.risk_level || 'medium').toUpperCase()} RISK
+                                </div>
+                                <div class="risk-score">Score: ${risk.total_score || 0}/100</div>
+                                ${risk.risk_factors?.length ? `
+                                <div class="risk-factors">
+                                    <h5>Risk Factors:</h5>
+                                    <ul>
+                                        ${risk.risk_factors.map(f => `<li><i data-lucide="alert-circle"></i> ${f}</li>`).join('')}
+                                    </ul>
+                                </div>` : ''}
+                                ${risk.recommendations?.length ? `
+                                <div class="risk-recommendations">
+                                    <h5>Recommendations:</h5>
+                                    <ul>
+                                        ${risk.recommendations.map(r => `<li><i data-lucide="lightbulb"></i> ${r}</li>`).join('')}
+                                    </ul>
+                                </div>` : ''}
+                            </div>
+
+                            <!-- Conversion Eligibility Card -->
+                            <div class="qual-card full-width">
+                                <h4><i data-lucide="user-check"></i> Conversion Eligibility</h4>
+                                <div class="conversion-status ${conv.eligible ? 'eligible' : 'not-eligible'}">
+                                    ${conv.eligible ? '✓ READY FOR CONVERSION' : '✗ NOT ELIGIBLE'}
+                                </div>
+                                <div class="criteria-list">
+                                    ${Object.entries(conv.criteria || {}).map(([key, val]) => `
+                                        <div class="criteria-item ${val.met ? 'met' : 'not-met'}">
+                                            <i data-lucide="${val.met ? 'check-circle' : 'x-circle'}"></i>
+                                            <span>${key.replace(/_/g, ' ').toUpperCase()}</span>
+                                            <small>${val.message || ''}</small>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                ${conv.eligible ? `
+                                <div class="conversion-actions">
+                                    <button class="btn btn-success" onclick="convertLead(${leadId}); closeQualificationModal();">
+                                        <i data-lucide="arrow-right-circle"></i> Convert to Account
+                                    </button>
+                                </div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="closeQualificationModal()">Close</button>
+                        <button class="btn btn-primary" onclick="qualifyLead(${leadId})">
+                            <i data-lucide="check"></i> Qualify Lead
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Remove existing modal if any
+        const existingModal = document.getElementById('qualificationModal');
+        if (existingModal) existingModal.remove();
+
+        // Add modal to body
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    } catch (error) {
+        console.error('Error loading qualification data:', error);
+        showToast('Error loading qualification data', 'error');
+    }
+};
+
+window.closeQualificationModal = function(event) {
+    if (event && event.target !== event.currentTarget) return;
+    const modal = document.getElementById('qualificationModal');
+    if (modal) modal.remove();
+};
+
+// Qualify Lead
+window.qualifyLead = async function(leadId) {
+    try {
+        const response = await fetch(`${API_BASE}/companies/${companyId}/leads/${leadId}/qualify`, {
+            method: 'POST',
+            headers: getHeaders()
+        });
+
+        if (response.ok) {
+            showToast('Lead qualified successfully!', 'success');
+            closeQualificationModal();
+            loadLeads();
+        } else {
+            const result = await response.json();
+            showToast(result.detail || 'Failed to qualify lead', 'error');
+        }
+    } catch (error) {
+        console.error('Error qualifying lead:', error);
+        showToast('Error qualifying lead', 'error');
+    }
+};
+
+// Open WhatsApp Panel for Lead
+window.openWhatsAppPanel = async function(leadId, leadName, phone) {
+    // Remove existing panel
+    const existingPanel = document.getElementById('whatsappPanel');
+    if (existingPanel) existingPanel.remove();
+    
+    const panelHtml = `
+        <div class="whatsapp-panel open" id="whatsappPanel">
+            <div class="whatsapp-header">
+                <h3><i data-lucide="message-circle"></i> WhatsApp</h3>
+                <button class="whatsapp-close" onclick="closeWhatsAppPanel()">&times;</button>
+            </div>
+            <div class="whatsapp-contact">
+                <div class="whatsapp-contact-name">${escapeHtml(leadName)}</div>
+                <div class="whatsapp-contact-phone">${escapeHtml(phone || 'No phone')}</div>
+            </div>
+            <div class="whatsapp-messages" id="whatsappMessages">
+                <div class="empty-state" style="text-align:center;padding:40px;color:var(--jira-text-tertiary);">
+                    <i data-lucide="message-square" style="width:48px;height:48px;margin-bottom:12px;"></i>
+                    <p>Start a conversation</p>
+                </div>
+            </div>
+            <div class="whatsapp-templates">
+                <label>Quick Templates</label>
+                <select id="whatsappTemplate" onchange="selectWhatsAppTemplate()">
+                    <option value="">Select template...</option>
+                    <option value="welcome">Welcome Message</option>
+                    <option value="follow_up">Follow Up</option>
+                    <option value="reminder">Appointment Reminder</option>
+                </select>
+            </div>
+            <div class="whatsapp-input">
+                <input type="text" id="whatsappMessage" placeholder="Type a message..." onkeypress="if(event.key==='Enter')sendWhatsAppMessage(${leadId}, '${phone}')">
+                <button class="whatsapp-send" onclick="sendWhatsAppMessage(${leadId}, '${phone}')">
+                    <i data-lucide="send"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', panelHtml);
+    
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+    
+    // Focus on input
+    document.getElementById('whatsappMessage')?.focus();
+};
+
+window.closeWhatsAppPanel = function() {
+    const panel = document.getElementById('whatsappPanel');
+    if (panel) {
+        panel.classList.remove('open');
+        setTimeout(() => panel.remove(), 300);
+    }
+};
+
+window.selectWhatsAppTemplate = function() {
+    const template = document.getElementById('whatsappTemplate')?.value;
+    const messageInput = document.getElementById('whatsappMessage');
+    
+    const templates = {
+        welcome: "Hello! Thank you for your interest in our services. How can we help you today?",
+        follow_up: "Hi! We wanted to follow up on your inquiry. Are you available for a quick call?",
+        reminder: "Hi! This is a reminder about your scheduled appointment. Please confirm your availability."
+    };
+    
+    if (template && templates[template] && messageInput) {
+        messageInput.value = templates[template];
+        messageInput.focus();
+    }
+};
+
+window.sendWhatsAppMessage = async function(leadId, phone) {
+    const messageInput = document.getElementById('whatsappMessage');
+    const message = messageInput?.value?.trim();
+    
+    if (!message) {
+        showToast('Please enter a message', 'warning');
+        return;
+    }
+    
+    if (!phone) {
+        showToast('No phone number available', 'error');
         return;
     }
     
     try {
-        const response = await fetch(`${API_BASE}/companies/${companyId}/leads/${id}`, {
-            method: 'DELETE',
+        const response = await fetch(`${API_BASE}/companies/${companyId}/whatsapp/send?phone=${encodeURIComponent(phone)}&message=${encodeURIComponent(message)}&lead_id=${leadId}`, {
+            method: 'POST',
             headers: getHeaders()
         });
         
-        if (response.status === 401) {
-            if (typeof handle401Error === 'function') {
-                handle401Error();
-            }
-            return;
-        }
-        
         if (response.ok) {
-            if (window.leadsTable && typeof window.leadsTable.refresh === 'function') {
-                window.leadsTable.refresh();
-            } else {
-                loadLeads();
+            // Add message to chat
+            const messagesDiv = document.getElementById('whatsappMessages');
+            if (messagesDiv) {
+                const emptyState = messagesDiv.querySelector('.empty-state');
+                if (emptyState) emptyState.remove();
+                
+                messagesDiv.innerHTML += `
+                    <div class="whatsapp-message sent">
+                        ${escapeHtml(message)}
+                        <small style="display:block;font-size:10px;opacity:0.7;margin-top:4px;">${new Date().toLocaleTimeString()}</small>
+                    </div>
+                `;
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
             }
-            if (typeof showNotification === 'function') {
-                showNotification('Lead deleted successfully!', 'success');
-            }
+            
+            messageInput.value = '';
+            document.getElementById('whatsappTemplate').value = '';
+            showToast('Message sent!', 'success');
         } else {
-            const result = await response.json();
-            alert(result.detail || 'Failed to delete lead');
+            showToast('Failed to send message', 'error');
         }
     } catch (error) {
-        console.error('Error deleting lead:', error);
-        alert('Connection error. Please try again.');
+        console.error('Error sending WhatsApp message:', error);
+        showToast('Error sending message', 'error');
     }
+};
+
+// Convert Lead to Account
+window.convertLead = async function(leadId) {
+    showDeleteConfirmModal(
+        'Convert Lead',
+        'This will convert the lead to an Account, Contact, and Opportunity. Continue?',
+        async () => {
+            try {
+                const response = await fetch(`${API_BASE}/companies/${companyId}/leads/${leadId}/auto-convert`, {
+                    method: 'POST',
+                    headers: getHeaders()
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showToast('Lead converted successfully!', 'success');
+                    loadLeads();
+                } else {
+                    const result = await response.json();
+                    showToast(result.detail || 'Failed to convert lead', 'error');
+                }
+            } catch (error) {
+                console.error('Error converting lead:', error);
+                showToast('Error converting lead', 'error');
+            }
+        },
+        'Convert',
+        'btn-success'
+    );
 };
 
 // Helper function to escape HTML
@@ -644,4 +979,544 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// ============================================
+// CSV Import Functionality
+// ============================================
+
+window.showLeadImportModal = function() {
+    // Remove existing modal if any
+    const existingModal = document.getElementById('leadImportModal');
+    if (existingModal) existingModal.remove();
+    
+    const modal = document.createElement('div');
+    modal.id = 'leadImportModal';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+        <div class="modal-container" style="max-width: 600px;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px 12px 0 0;">
+                <h2 style="margin: 0; display: flex; align-items: center; gap: 10px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Import Leads from CSV
+                </h2>
+                <button onclick="closeLeadImportModal()" style="background: rgba(255,255,255,0.2); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 18px;">×</button>
+            </div>
+            <div class="modal-body" style="padding: 25px;">
+                <!-- Step 1: Upload -->
+                <div id="importStep1">
+                    <div style="text-align: center; padding: 30px; border: 2px dashed #d1d5db; border-radius: 12px; background: #f9fafb; margin-bottom: 20px;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#667eea" stroke-width="1.5" style="margin-bottom: 15px;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <h3 style="margin: 0 0 10px 0; color: #1e293b;">Upload CSV File</h3>
+                        <p style="color: #64748b; margin: 0 0 15px 0;">Drag and drop or click to select</p>
+                        <input type="file" id="csvFileInput" accept=".csv" style="display: none;" onchange="handleCSVFileSelect(this)">
+                        <button onclick="document.getElementById('csvFileInput').click()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            Select CSV File
+                        </button>
+                    </div>
+                    
+                    <div style="background: #eff6ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                        <h4 style="margin: 0 0 10px 0; color: #1d4ed8; display: flex; align-items: center; gap: 8px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            CSV Format Requirements
+                        </h4>
+                        <p style="margin: 0; color: #1e40af; font-size: 0.9em;">
+                            Required columns: <strong>first_name, last_name, email</strong><br>
+                            Optional: phone, company_name, source, status, notes
+                        </p>
+                    </div>
+                    
+                    <button onclick="downloadSampleCSV()" style="background: white; color: #667eea; border: 2px solid #667eea; padding: 10px 20px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: 500;">
+                        📥 Download Sample CSV Template
+                    </button>
+                </div>
+                
+                <!-- Step 2: Preview -->
+                <div id="importStep2" style="display: none;">
+                    <div style="margin-bottom: 15px;">
+                        <span id="csvFileName" style="font-weight: 600; color: #1e293b;"></span>
+                        <span id="csvRowCount" style="color: #64748b; margin-left: 10px;"></span>
+                    </div>
+                    
+                    <div style="max-height: 300px; overflow: auto; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 20px;">
+                        <table id="csvPreviewTable" style="width: 100%; border-collapse: collapse; font-size: 0.85em;">
+                            <thead id="csvPreviewHead" style="background: #f8fafc; position: sticky; top: 0;"></thead>
+                            <tbody id="csvPreviewBody"></tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="csvValidationErrors" style="display: none; background: #fef2f2; border: 1px solid #ef4444; border-radius: 8px; padding: 15px; margin-bottom: 15px; color: #991b1b;"></div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="resetImport()" style="flex: 1; background: white; color: #64748b; border: 1px solid #d1d5db; padding: 12px; border-radius: 8px; cursor: pointer;">
+                            ← Back
+                        </button>
+                        <button id="importBtn" onclick="importLeadsFromCSV()" style="flex: 2; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            Import <span id="importCount">0</span> Leads
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Progress -->
+                <div id="importStep3" style="display: none; text-align: center; padding: 20px;">
+                    <div class="spinner" style="width: 50px; height: 50px; border: 4px solid #e5e7eb; border-top-color: #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                    <h3 style="margin: 0 0 10px 0;">Importing Leads...</h3>
+                    <p id="importProgress" style="color: #64748b;">0 of 0 imported</p>
+                    <div style="background: #e5e7eb; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 15px;">
+                        <div id="importProgressBar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                    </div>
+                </div>
+                
+                <!-- Step 4: Complete -->
+                <div id="importStep4" style="display: none; text-align: center; padding: 20px;">
+                    <div style="width: 60px; height: 60px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <h3 style="margin: 0 0 10px 0; color: #065f46;">Import Complete!</h3>
+                    <p id="importResult" style="color: #64748b;"></p>
+                    <button onclick="closeLeadImportModal(); loadLeads();" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; margin-top: 15px; font-weight: 600;">
+                        View Leads
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Add animation
+    setTimeout(() => modal.classList.add('active'), 10);
+};
+
+window.closeLeadImportModal = function() {
+    const modal = document.getElementById('leadImportModal');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => modal.remove(), 300);
+    }
+};
+
+// Store parsed CSV data
+let parsedCSVData = [];
+
+window.handleCSVFileSelect = function(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const content = e.target.result;
+        parseCSV(content, file.name);
+    };
+    reader.readAsText(file);
+};
+
+function parseCSV(content, fileName) {
+    const lines = content.split('\n').filter(line => line.trim());
+    if (lines.length < 2) {
+        showToast('CSV file is empty or has no data rows', 'error');
+        return;
+    }
+    
+    // Parse header
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/['"]/g, ''));
+    
+    // Check required columns
+    const requiredColumns = ['first_name', 'last_name', 'email'];
+    const missingColumns = requiredColumns.filter(col => !headers.includes(col));
+    
+    if (missingColumns.length > 0) {
+        showToast(`Missing required columns: ${missingColumns.join(', ')}`, 'error');
+        return;
+    }
+    
+    // Parse data rows
+    parsedCSVData = [];
+    const errors = [];
+    
+    for (let i = 1; i < lines.length; i++) {
+        const values = parseCSVLine(lines[i]);
+        if (values.length !== headers.length) continue;
+        
+        const row = {};
+        headers.forEach((header, index) => {
+            row[header] = values[index]?.trim().replace(/['"]/g, '') || '';
+        });
+        
+        // Validate email
+        if (row.email && !isValidEmail(row.email)) {
+            errors.push(`Row ${i}: Invalid email "${row.email}"`);
+        }
+        
+        if (row.first_name && row.last_name && row.email) {
+            parsedCSVData.push(row);
+        }
+    }
+    
+    // Show preview
+    showCSVPreview(fileName, headers, errors);
+}
+
+function parseCSVLine(line) {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+            inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+            result.push(current);
+            current = '';
+        } else {
+            current += char;
+        }
+    }
+    result.push(current);
+    return result;
+}
+
+function showCSVPreview(fileName, headers, errors) {
+    document.getElementById('importStep1').style.display = 'none';
+    document.getElementById('importStep2').style.display = 'block';
+    
+    document.getElementById('csvFileName').textContent = fileName;
+    document.getElementById('csvRowCount').textContent = `(${parsedCSVData.length} rows)`;
+    document.getElementById('importCount').textContent = parsedCSVData.length;
+    
+    // Build preview table
+    const thead = document.getElementById('csvPreviewHead');
+    const tbody = document.getElementById('csvPreviewBody');
+    
+    thead.innerHTML = '<tr>' + headers.map(h => `<th style="padding: 10px; text-align: left; border-bottom: 2px solid #e5e7eb; white-space: nowrap;">${h}</th>`).join('') + '</tr>';
+    
+    tbody.innerHTML = parsedCSVData.slice(0, 10).map(row => 
+        '<tr>' + headers.map(h => `<td style="padding: 8px 10px; border-bottom: 1px solid #f1f5f9;">${escapeHtml(row[h] || '-')}</td>`).join('') + '</tr>'
+    ).join('');
+    
+    if (parsedCSVData.length > 10) {
+        tbody.innerHTML += `<tr><td colspan="${headers.length}" style="padding: 10px; text-align: center; color: #64748b; font-style: italic;">... and ${parsedCSVData.length - 10} more rows</td></tr>`;
+    }
+    
+    // Show errors if any
+    const errorsDiv = document.getElementById('csvValidationErrors');
+    if (errors.length > 0) {
+        errorsDiv.style.display = 'block';
+        errorsDiv.innerHTML = `<strong>⚠️ Warnings:</strong><br>${errors.slice(0, 5).join('<br>')}${errors.length > 5 ? `<br>... and ${errors.length - 5} more` : ''}`;
+    } else {
+        errorsDiv.style.display = 'none';
+    }
+}
+
+window.resetImport = function() {
+    document.getElementById('importStep1').style.display = 'block';
+    document.getElementById('importStep2').style.display = 'none';
+    document.getElementById('csvFileInput').value = '';
+    parsedCSVData = [];
+};
+
+window.importLeadsFromCSV = async function() {
+    if (parsedCSVData.length === 0) {
+        showToast('No data to import', 'error');
+        return;
+    }
+    
+    document.getElementById('importStep2').style.display = 'none';
+    document.getElementById('importStep3').style.display = 'block';
+    
+    let imported = 0;
+    let failed = 0;
+    const total = parsedCSVData.length;
+    
+    for (let i = 0; i < parsedCSVData.length; i++) {
+        const row = parsedCSVData[i];
+        
+        try {
+            const leadData = {
+                first_name: row.first_name,
+                last_name: row.last_name,
+                email: row.email,
+                phone: row.phone || null,
+                company_name: row.company_name || null,
+                source: row.source || 'csv_import',
+                status: row.status || 'new',
+                notes: row.notes || null
+            };
+            
+            const response = await fetch(`${API_BASE}/companies/${companyId}/leads`, {
+                method: 'POST',
+                headers: getHeaders(),
+                body: JSON.stringify(leadData)
+            });
+            
+            if (response.ok) {
+                imported++;
+            } else {
+                failed++;
+            }
+        } catch (error) {
+            failed++;
+        }
+        
+        // Update progress
+        const progress = Math.round(((i + 1) / total) * 100);
+        document.getElementById('importProgress').textContent = `${i + 1} of ${total} processed`;
+        document.getElementById('importProgressBar').style.width = `${progress}%`;
+    }
+    
+    // Show complete
+    document.getElementById('importStep3').style.display = 'none';
+    document.getElementById('importStep4').style.display = 'block';
+    document.getElementById('importResult').innerHTML = `
+        <strong>${imported}</strong> leads imported successfully<br>
+        ${failed > 0 ? `<span style="color: #ef4444;">${failed} failed</span>` : ''}
+    `;
+};
+
+window.downloadSampleCSV = function() {
+    const sampleData = `first_name,last_name,email,phone,company_name,source,status,notes
+John,Doe,john.doe@example.com,+91 98765 43210,ABC Corp,website,new,Interested in our services
+Jane,Smith,jane.smith@example.com,+91 87654 32109,XYZ Ltd,referral,contacted,Follow up next week
+Rahul,Sharma,rahul@example.com,+91 76543 21098,Tech Solutions,social_media,qualified,Hot lead`;
+    
+    const blob = new Blob([sampleData], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'lead_import_template.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+};
+
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// ============================================
+// Lead Score Visual Meter
+// ============================================
+
+// ============================================
+// Bulk Actions Functionality
+// ============================================
+
+let selectedLeadIds = [];
+
+window.toggleSelectAllLeads = function(checkbox) {
+    const checkboxes = document.querySelectorAll('.lead-checkbox');
+    checkboxes.forEach(cb => {
+        cb.checked = checkbox.checked;
+    });
+    updateBulkSelection();
+};
+
+window.updateBulkSelection = function() {
+    const checkboxes = document.querySelectorAll('.lead-checkbox:checked');
+    selectedLeadIds = Array.from(checkboxes).map(cb => parseInt(cb.dataset.id));
+    
+    const bulkBar = document.getElementById('bulkActionsBar');
+    const countSpan = document.getElementById('selectedCount');
+    
+    if (selectedLeadIds.length > 0) {
+        bulkBar.style.display = 'flex';
+        countSpan.textContent = `${selectedLeadIds.length} selected`;
+    } else {
+        bulkBar.style.display = 'none';
+    }
+    
+    // Update select all checkbox state
+    const allCheckboxes = document.querySelectorAll('.lead-checkbox');
+    const selectAllCheckbox = document.getElementById('selectAllLeads');
+    if (selectAllCheckbox) {
+        selectAllCheckbox.checked = allCheckboxes.length > 0 && selectedLeadIds.length === allCheckboxes.length;
+        selectAllCheckbox.indeterminate = selectedLeadIds.length > 0 && selectedLeadIds.length < allCheckboxes.length;
+    }
+};
+
+window.clearBulkSelection = function() {
+    const checkboxes = document.querySelectorAll('.lead-checkbox');
+    checkboxes.forEach(cb => cb.checked = false);
+    
+    const selectAllCheckbox = document.getElementById('selectAllLeads');
+    if (selectAllCheckbox) selectAllCheckbox.checked = false;
+    
+    selectedLeadIds = [];
+    document.getElementById('bulkActionsBar').style.display = 'none';
+};
+
+window.bulkUpdateStatus = async function(newStatus) {
+    if (selectedLeadIds.length === 0) {
+        showToast('No leads selected', 'warning');
+        return;
+    }
+    
+    const statusLabels = {
+        'contacted': 'Contacted',
+        'qualified': 'Qualified',
+        'converted': 'Converted',
+        'lost': 'Lost'
+    };
+    
+    showDeleteConfirmModal(
+        'Bulk Update Status',
+        `Are you sure you want to mark ${selectedLeadIds.length} lead(s) as "${statusLabels[newStatus] || newStatus}"?`,
+        async () => {
+            let success = 0;
+            let failed = 0;
+            
+            for (const leadId of selectedLeadIds) {
+                try {
+                    const response = await fetch(`${API_BASE}/companies/${companyId}/leads/${leadId}`, {
+                        method: 'PUT',
+                        headers: getHeaders(),
+                        body: JSON.stringify({ status: newStatus })
+                    });
+                    
+                    if (response.ok) {
+                        success++;
+                    } else {
+                        failed++;
+                    }
+                } catch (error) {
+                    failed++;
+                }
+            }
+            
+            showToast(`${success} lead(s) updated${failed > 0 ? `, ${failed} failed` : ''}`, success > 0 ? 'success' : 'error');
+            clearBulkSelection();
+            loadLeads();
+        },
+        'Update',
+        'btn-primary'
+    );
+};
+
+window.bulkDeleteLeads = async function() {
+    if (selectedLeadIds.length === 0) {
+        showToast('No leads selected', 'warning');
+        return;
+    }
+    
+    showDeleteConfirmModal(
+        'Delete Multiple Leads',
+        `Are you sure you want to delete ${selectedLeadIds.length} lead(s)? This action cannot be undone.`,
+        async () => {
+            let success = 0;
+            let failed = 0;
+            
+            for (const leadId of selectedLeadIds) {
+                try {
+                    const response = await fetch(`${API_BASE}/companies/${companyId}/leads/${leadId}`, {
+                        method: 'DELETE',
+                        headers: getHeaders()
+                    });
+                    
+                    if (response.ok) {
+                        success++;
+                    } else {
+                        failed++;
+                    }
+                } catch (error) {
+                    failed++;
+                }
+            }
+            
+            showToast(`${success} lead(s) deleted${failed > 0 ? `, ${failed} failed` : ''}`, success > 0 ? 'success' : 'error');
+            clearBulkSelection();
+            loadLeads();
+        },
+        'Delete',
+        'btn-danger'
+    );
+};
+
+function renderLeadScoreMeter(score) {
+    const numScore = parseInt(score) || 0;
+    
+    // Determine score category
+    let category, color, bgColor, icon, label;
+    
+    if (numScore >= 80) {
+        category = 'very-hot';
+        color = '#dc2626';
+        bgColor = '#fef2f2';
+        icon = '🔥🔥';
+        label = 'Very Hot';
+    } else if (numScore >= 60) {
+        category = 'hot';
+        color = '#ea580c';
+        bgColor = '#fff7ed';
+        icon = '🔥';
+        label = 'Hot';
+    } else if (numScore >= 40) {
+        category = 'warm';
+        color = '#d97706';
+        bgColor = '#fffbeb';
+        icon = '🌤️';
+        label = 'Warm';
+    } else if (numScore >= 20) {
+        category = 'cool';
+        color = '#0284c7';
+        bgColor = '#f0f9ff';
+        icon = '❄️';
+        label = 'Cool';
+    } else {
+        category = 'cold';
+        color = '#64748b';
+        bgColor = '#f8fafc';
+        icon = '🥶';
+        label = 'Cold';
+    }
+    
+    return `
+        <div class="lead-score-meter" title="${label} Lead - Score: ${numScore}/100" style="
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            min-width: 70px;
+        ">
+            <div style="
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                font-size: 0.75em;
+                color: ${color};
+                font-weight: 600;
+            ">
+                <span>${icon}</span>
+                <span>${numScore}</span>
+            </div>
+            <div style="
+                width: 60px;
+                height: 6px;
+                background: #e5e7eb;
+                border-radius: 3px;
+                overflow: hidden;
+            ">
+                <div style="
+                    width: ${numScore}%;
+                    height: 100%;
+                    background: linear-gradient(90deg, ${color}88, ${color});
+                    border-radius: 3px;
+                    transition: width 0.3s ease;
+                "></div>
+            </div>
+            <span style="
+                font-size: 0.65em;
+                color: ${color};
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            ">${label}</span>
+        </div>
+    `;
 }

@@ -1,0 +1,574 @@
+<!-- Admin Page with Sidebar Menu -->
+<div class="admin-page-container">
+    <!-- Sidebar Menu -->
+    <div class="admin-sidebar">
+        <div class="admin-sidebar-header">
+            <h2>Admin Panel</h2>
+        </div>
+        <nav class="admin-sidebar-menu">
+            <a href="#" class="admin-menu-item active" data-admin-section="permissions">
+                <i class="icon">🔐</i>
+                <span>Role Permissions</span>
+            </a>
+            <a href="#" class="admin-menu-item" data-admin-section="users">
+                <i class="icon">👥</i>
+                <span>User Management</span>
+            </a>
+            <a href="#" class="admin-menu-item" data-admin-section="companies">
+                <i class="icon">🏢</i>
+                <span>Company Management</span>
+            </a>
+            <a href="#" class="admin-menu-item" data-admin-section="settings">
+                <i class="icon">⚙️</i>
+                <span>Settings</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="admin-content">
+        <!-- Permissions Section -->
+        <div id="adminPermissionsSection" class="admin-section active">
+            <!-- Permissions Management Content -->
+            <div class="page-container">
+                <div class="page-header">
+                    <h1>Role Permissions Management</h1>
+                    <div class="page-actions">
+                        <button id="permissionsSaveBtn" class="btn btn-primary" style="display: none;">
+                            <i class="icon">💾</i> Save Changes
+                        </button>
+                        <button id="permissionsResetBtn" class="btn btn-secondary">
+                            <i class="icon">↻</i> Reset to Defaults
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tab Navigation -->
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="list">All Permissions</button>
+                    <button class="tab-btn" data-tab="roles">Role Permissions</button>
+                    <button class="tab-btn" data-tab="company">Company Permissions</button>
+                </div>
+
+                <!-- Tab 1: All Permissions List -->
+                <div id="permissionsListTab" class="tab-content active">
+                    <div class="page-toolbar">
+                        <div class="search-box">
+                            <input type="text" id="permissionSearch" placeholder="Search permissions..." />
+                            <i class="icon">🔍</i>
+                        </div>
+                        <select id="permissionResourceFilter" class="filter-select">
+                            <option value="">All Resources</option>
+                            <option value="customer">Customer</option>
+                            <option value="lead">Lead</option>
+                            <option value="deal">Deal</option>
+                            <option value="task">Task</option>
+                            <option value="activity">Activity</option>
+                            <option value="user">User</option>
+                            <option value="company">Company</option>
+                        </select>
+                        <select id="permissionActionFilter" class="filter-select">
+                            <option value="">All Actions</option>
+                            <option value="create">Create</option>
+                            <option value="read">Read</option>
+                            <option value="update">Update</option>
+                            <option value="delete">Delete</option>
+                            <option value="convert">Convert</option>
+                        </select>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table" id="permissionsTable">
+                            <thead>
+                                <tr>
+                                    <th>Resource</th>
+                                    <th>Action</th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="permissionsTableBody">
+                                <tr>
+                                    <td colspan="4" class="loading-state">
+                                        <div class="spinner"></div>
+                                        Loading permissions...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Role Permissions Matrix -->
+                <div id="permissionsRolesTab" class="tab-content">
+                    <div class="permissions-matrix-header">
+                        <p class="info-text">Toggle checkboxes to grant or revoke permissions for each role.</p>
+                        <div class="matrix-actions">
+                            <button id="rolesExportCsvBtn" class="btn btn-secondary btn-sm">
+                                <i class="icon">📥</i> Export CSV
+                            </button>
+                            <button id="rolesExportJsonBtn" class="btn btn-secondary btn-sm">
+                                <i class="icon">📥</i> Export JSON
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="matrix-container">
+                        <table class="permission-matrix" id="rolesMatrix">
+                            <thead>
+                                <tr>
+                                    <th class="matrix-permission-col">Permission</th>
+                                    <th class="matrix-role-col">Admin</th>
+                                    <th class="matrix-role-col">Manager</th>
+                                    <th class="matrix-role-col">Sales Rep</th>
+                                    <th class="matrix-role-col">User</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rolesMatrixBody">
+                                <tr>
+                                    <td colspan="5" class="loading-state">
+                                        <div class="spinner"></div>
+                                        Loading role permissions...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Company Permissions -->
+                <div id="permissionsCompanyTab" class="tab-content">
+                    <div class="company-selector-container">
+                        <label>Select Company:</label>
+                        <select id="companyPermissionsSelect" class="company-select">
+                            <option value="">-- Select Company --</option>
+                        </select>
+                        <button id="copyFromGlobalBtn" class="btn btn-secondary btn-sm" style="display: none;">
+                            <i class="icon">📋</i> Copy from Global
+                        </button>
+                        <button id="resetCompanyPermsBtn" class="btn btn-secondary btn-sm" style="display: none;">
+                            <i class="icon">↻</i> Reset Company Permissions
+                        </button>
+                    </div>
+
+                    <div id="companyPermissionsMatrixContainer" style="display: none;">
+                        <div class="permissions-matrix-header">
+                            <p class="info-text">
+                                <i class="icon">ℹ️</i> Company-specific permissions override global permissions.
+                            </p>
+                        </div>
+
+                        <div class="matrix-container">
+                            <table class="permission-matrix" id="companyMatrix">
+                                <thead>
+                                    <tr>
+                                        <th class="matrix-permission-col">Permission</th>
+                                        <th class="matrix-role-col">Admin</th>
+                                        <th class="matrix-role-col">Manager</th>
+                                        <th class="matrix-role-col">Sales Rep</th>
+                                        <th class="matrix-role-col">User</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="companyMatrixBody">
+                                    <tr>
+                                        <td colspan="5" class="loading-state">
+                                            <div class="spinner"></div>
+                                            Loading company permissions...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="companyPermissionsEmpty" class="empty-state" style="display: none;">
+                        <p>Please select a company to view permissions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Section -->
+        <div id="adminUsersSection" class="admin-section">
+            <div class="page-container">
+                <div class="page-header">
+                    <h1>User Management</h1>
+                    <div class="page-actions">
+                        <button class="btn btn-primary" onclick="showCreateUserModal()">
+                            <i class="icon">+</i> Add User
+                        </button>
+                    </div>
+                </div>
+                <div class="page-toolbar">
+                    <div class="search-box">
+                        <input type="text" id="userSearch" placeholder="Search users..." onkeyup="filterUsers()" />
+                    </div>
+                    <select id="userRoleFilter" class="filter-select" onchange="filterUsers()">
+                        <option value="">All Roles</option>
+                        <option value="super_admin">Super Admin</option>
+                        <option value="admin">Admin</option>
+                        <option value="manager">Manager</option>
+                        <option value="sales_rep">Sales Rep</option>
+                        <option value="user">User</option>
+                    </select>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr><td colspan="6" class="loading-state">Loading users...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Companies Section -->
+        <div id="adminCompaniesSection" class="admin-section">
+            <div class="page-container">
+                <div class="page-header">
+                    <h1>Company Management</h1>
+                    <div class="page-actions">
+                        <button class="btn btn-primary" onclick="showCreateCompanyModal()">
+                            <i class="icon">+</i> Add Company
+                        </button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="companiesTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Users</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="companiesTableBody">
+                            <tr><td colspan="6" class="loading-state">Loading companies...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="adminSettingsSection" class="admin-section">
+            <div class="page-container">
+                <div class="page-header">
+                    <h1>System Settings</h1>
+                </div>
+                
+                <!-- Settings Tabs -->
+                <div class="tabs">
+                    <button class="tab-btn active" data-settings-tab="email">Email Settings</button>
+                    <button class="tab-btn" data-settings-tab="system">System Info</button>
+                    <button class="tab-btn" data-settings-tab="audit">Audit Trail</button>
+                    <button class="tab-btn" data-settings-tab="logs">System Logs</button>
+                </div>
+
+                <!-- Email Settings Tab -->
+                <div id="emailSettingsTab" class="tab-content active">
+                    <div class="settings-card">
+                        <h3>SMTP Configuration</h3>
+                        <form id="emailSettingsForm" class="settings-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Email Provider</label>
+                                    <select id="emailProvider" onchange="selectEmailProvider(this.value)">
+                                        <option value="">Select Provider...</option>
+                                        <option value="gmail">Gmail</option>
+                                        <option value="outlook">Outlook/Office365</option>
+                                        <option value="yahoo">Yahoo</option>
+                                        <option value="sendgrid">SendGrid</option>
+                                        <option value="custom">Custom SMTP</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>SMTP Host</label>
+                                    <input type="text" id="smtpHost" placeholder="smtp.gmail.com" />
+                                </div>
+                                <div class="form-group">
+                                    <label>SMTP Port</label>
+                                    <input type="number" id="smtpPort" value="587" />
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Username</label>
+                                    <input type="text" id="smtpUsername" placeholder="your-email@gmail.com" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Password</label>
+                                    <input type="password" id="smtpPassword" placeholder="App password" />
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>From Email</label>
+                                    <input type="email" id="smtpFromEmail" placeholder="noreply@yourcompany.com" />
+                                </div>
+                                <div class="form-group">
+                                    <label>From Name</label>
+                                    <input type="text" id="smtpFromName" value="Vega CRM" />
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group checkbox-group">
+                                    <label><input type="checkbox" id="smtpUseTls" checked /> Use TLS</label>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" onclick="testEmailSettings()">
+                                    Send Test Email
+                                </button>
+                                <button type="submit" class="btn btn-primary">Save Settings</button>
+                            </div>
+                        </form>
+                        <div id="emailConfigStatus" class="config-status"></div>
+                    </div>
+                </div>
+
+                <!-- System Info Tab -->
+                <div id="systemSettingsTab" class="tab-content">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-value" id="statTotalUsers">-</div>
+                            <div class="stat-label">Total Users</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🏢</div>
+                            <div class="stat-value" id="statTotalCompanies">-</div>
+                            <div class="stat-label">Companies</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">👤</div>
+                            <div class="stat-value" id="statTotalCustomers">-</div>
+                            <div class="stat-label">Customers</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🎯</div>
+                            <div class="stat-value" id="statTotalLeads">-</div>
+                            <div class="stat-label">Leads</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-value" id="statTotalDeals">-</div>
+                            <div class="stat-label">Deals</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">✅</div>
+                            <div class="stat-value" id="statTotalTasks">-</div>
+                            <div class="stat-label">Tasks</div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3>System Health</h3>
+                        <div id="systemHealthStatus" class="health-status">
+                            <div class="health-item">
+                                <span class="health-label">Database</span>
+                                <span class="health-value" id="healthDatabase">Checking...</span>
+                            </div>
+                            <div class="health-item">
+                                <span class="health-label">Email Service</span>
+                                <span class="health-value" id="healthEmail">Checking...</span>
+                            </div>
+                            <div class="health-item">
+                                <span class="health-label">API Status</span>
+                                <span class="health-value" id="healthApi">Checking...</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="refreshSystemHealth()">Refresh Status</button>
+                    </div>
+                </div>
+
+                <!-- Audit Trail Tab -->
+                <div id="auditSettingsTab" class="tab-content">
+                    <div class="page-toolbar">
+                        <div class="search-box">
+                            <input type="text" id="auditSearch" placeholder="Search audit logs..." />
+                        </div>
+                        <select id="auditActionFilter" class="filter-select">
+                            <option value="">All Actions</option>
+                            <option value="CREATE">Create</option>
+                            <option value="UPDATE">Update</option>
+                            <option value="DELETE">Delete</option>
+                            <option value="LOGIN">Login</option>
+                            <option value="LOGOUT">Logout</option>
+                        </select>
+                        <select id="auditResourceFilter" class="filter-select">
+                            <option value="">All Resources</option>
+                            <option value="User">User</option>
+                            <option value="Customer">Customer</option>
+                            <option value="Lead">Lead</option>
+                            <option value="Deal">Deal</option>
+                            <option value="Company">Company</option>
+                        </select>
+                        <button class="btn btn-secondary" onclick="loadAuditTrails()">Search</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="auditTable">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Resource</th>
+                                    <th>Status</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditTableBody">
+                                <tr><td colspan="6" class="loading-state">Loading audit trails...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="auditPagination"></div>
+                </div>
+
+                <!-- System Logs Tab -->
+                <div id="logsSettingsTab" class="tab-content">
+                    <div class="page-toolbar">
+                        <select id="logLevelFilter" class="filter-select">
+                            <option value="">All Levels</option>
+                            <option value="INFO">Info</option>
+                            <option value="WARNING">Warning</option>
+                            <option value="ERROR">Error</option>
+                            <option value="DEBUG">Debug</option>
+                        </select>
+                        <select id="logCategoryFilter" class="filter-select">
+                            <option value="">All Categories</option>
+                            <option value="Auth">Auth</option>
+                            <option value="Email">Email</option>
+                            <option value="System">System</option>
+                            <option value="Security">Security</option>
+                        </select>
+                        <button class="btn btn-secondary" onclick="loadSystemLogs()">Search</button>
+                        <button class="btn btn-danger" onclick="cleanupOldLogs()" style="margin-left: auto;">Cleanup Old Logs</button>
+                    </div>
+                    
+                    <div class="log-stats" id="logStats">
+                        <div class="log-stat"><span class="log-stat-value" id="logStatTotal">-</span> Total</div>
+                        <div class="log-stat error"><span class="log-stat-value" id="logStatErrors">-</span> Errors</div>
+                        <div class="log-stat warning"><span class="log-stat-value" id="logStatWarnings">-</span> Warnings</div>
+                        <div class="log-stat info"><span class="log-stat-value" id="logStatInfo">-</span> Info</div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="data-table" id="logsTable">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Level</th>
+                                    <th>Category</th>
+                                    <th>Action</th>
+                                    <th>Message</th>
+                                    <th>User</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logsTableBody">
+                                <tr><td colspan="6" class="loading-state">Loading logs...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="logsPagination"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create User Modal -->
+<div id="createUserModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="userModalTitle">Add New User</h2>
+            <button class="modal-close" onclick="closeUserModal()">&times;</button>
+        </div>
+        <form id="userForm" onsubmit="saveUser(event)">
+            <div class="form-group">
+                <label>First Name *</label>
+                <input type="text" id="userFirstName" required />
+            </div>
+            <div class="form-group">
+                <label>Last Name *</label>
+                <input type="text" id="userLastName" required />
+            </div>
+            <div class="form-group">
+                <label>Email *</label>
+                <input type="email" id="userEmail" required />
+            </div>
+            <div class="form-group">
+                <label>Password *</label>
+                <input type="password" id="userPassword" />
+            </div>
+            <div class="form-group">
+                <label>Role *</label>
+                <select id="userRole" required>
+                    <option value="user">User</option>
+                    <option value="sales_rep">Sales Rep</option>
+                    <option value="manager">Manager</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" id="userPhone" />
+            </div>
+            <input type="hidden" id="editUserId" />
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeUserModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save User</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Create Company Modal -->
+<div id="createCompanyModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="companyModalTitle">Add New Company</h2>
+            <button class="modal-close" onclick="closeCompanyModal()">&times;</button>
+        </div>
+        <form id="companyForm" onsubmit="saveCompany(event)">
+            <div class="form-group">
+                <label>Company Name *</label>
+                <input type="text" id="companyName" required />
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="companyEmail" />
+            </div>
+            <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" id="companyPhone" />
+            </div>
+            <div class="form-group">
+                <label>Address</label>
+                <textarea id="companyAddress" rows="2"></textarea>
+            </div>
+            <input type="hidden" id="editCompanyId" />
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeCompanyModal()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Company</button>
+            </div>
+        </form>
+    </div>
+</div>
+

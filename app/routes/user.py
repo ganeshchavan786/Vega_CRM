@@ -10,6 +10,7 @@ from app.schemas.user import UserCreate, UserUpdate, UserRoleUpdate
 from app.controllers.user_controller import UserController
 from app.utils.dependencies import get_current_active_user
 from app.utils.helpers import success_response
+from app.utils.permissions import check_company_admin, require_admin
 from app.models.user import User
 
 router = APIRouter()
@@ -81,8 +82,15 @@ async def create_user(
     Path Parameters:
     - **company_id**: Company ID
     
-    Requires: JWT token, Admin/Manager role
+    Requires: JWT token, Admin role in company
     """
+    # Check if user is admin in company or super_admin
+    if current_user.role != "super_admin" and not check_company_admin(current_user.id, company_id, db):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required for this company"
+        )
+    
     try:
         user = UserController.create_user(company_id, user_data, current_user, db)
         return success_response(
@@ -176,8 +184,15 @@ async def update_user_role(
     - **company_id**: Company ID
     - **user_id**: User ID
     
-    Requires: JWT token, Admin role
+    Requires: JWT token, Admin role in company
     """
+    # Check if user is admin in company or super_admin
+    if current_user.role != "super_admin" and not check_company_admin(current_user.id, company_id, db):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required for this company"
+        )
+    
     try:
         UserController.update_user_role(user_id, company_id, role_data, current_user, db)
         return success_response(
@@ -207,8 +222,15 @@ async def delete_user(
     - **company_id**: Company ID
     - **user_id**: User ID
     
-    Requires: JWT token, Admin role
+    Requires: JWT token, Admin role in company
     """
+    # Check if user is admin in company or super_admin
+    if current_user.role != "super_admin" and not check_company_admin(current_user.id, company_id, db):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required for this company"
+        )
+    
     try:
         UserController.delete_user(user_id, company_id, current_user, db)
         return success_response(

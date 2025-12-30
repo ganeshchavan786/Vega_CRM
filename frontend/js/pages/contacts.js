@@ -128,7 +128,17 @@ window.loadContacts = async function() {
                         filterable: true,
                         render: (value) => {
                             if (!value) return '-';
-                            return `<span class="status-badge status-${value}">${escapeHtml(value.replace('_', ' ').toUpperCase())}</span>`;
+                            const roleClass = value.replace('_', '-').toLowerCase();
+                            const icons = {
+                                'decision_maker': 'crown',
+                                'influencer': 'star',
+                                'champion': 'award',
+                                'end_user': 'user',
+                                'technical': 'settings',
+                                'executive': 'briefcase'
+                            };
+                            const icon = icons[value] || 'user';
+                            return `<span class="role-badge ${roleClass}"><i data-lucide="${icon}"></i> ${value.replace('_', ' ')}</span>`;
                         }
                     },
                     {
@@ -368,6 +378,7 @@ window.openContactModal = function(contact = null) {
         </form>
     `;
     
+    modal.style.display = 'flex';
     modal.classList.add('active');
     console.log('Modal opened successfully');
 };
@@ -440,38 +451,41 @@ window.handleContactSubmit = async function(event) {
 };
 
 window.deleteContact = async function(id) {
-    if (!confirm('Are you sure you want to delete this contact?')) {
-        return;
-    }
-    
-    try {
-        const response = await fetch(`${API_BASE}/companies/${companyId}/contacts/${id}`, {
-            method: 'DELETE',
-            headers: getHeaders()
-        });
-        
-        if (response.status === 401) {
-            if (typeof handle401Error === 'function') {
-                handle401Error();
+    showDeleteConfirmModal(
+        'Delete Contact',
+        'Are you sure you want to delete this contact? This action cannot be undone.',
+        async () => {
+            try {
+                const response = await fetch(`${API_BASE}/companies/${companyId}/contacts/${id}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+                
+                if (response.status === 401) {
+                    if (typeof handle401Error === 'function') {
+                        handle401Error();
+                    }
+                    return;
+                }
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    showToast(error.detail || 'Failed to delete contact', 'error');
+                    return;
+                }
+                
+                if (window.contactsTable && typeof window.contactsTable.refresh === 'function') {
+                    window.contactsTable.refresh();
+                } else {
+                    loadContacts();
+                }
+                showToast('Contact deleted successfully!', 'success');
+            } catch (error) {
+                console.error('Error deleting contact:', error);
+                showToast('Error deleting contact: ' + error.message, 'error');
             }
-            return;
         }
-        
-        if (!response.ok) {
-            const error = await response.json();
-            alert(error.detail || 'Failed to delete contact');
-            return;
-        }
-        
-            if (window.contactsTable && typeof window.contactsTable.refresh === 'function') {
-                window.contactsTable.refresh();
-            } else {
-                loadContacts();
-            }
-    } catch (error) {
-        console.error('Error deleting contact:', error);
-        alert('Error deleting contact: ' + error.message);
-    }
+    );
 };
 
 // Helper function to escape HTML

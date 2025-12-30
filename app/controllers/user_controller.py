@@ -10,6 +10,7 @@ from app.models.user import User
 from app.models.user_company import UserCompany
 from app.schemas.user import UserCreate, UserUpdate, UserRoleUpdate
 from app.utils.security import get_password_hash
+from app.services import audit_service, log_service
 
 
 class UserController:
@@ -122,6 +123,19 @@ class UserController:
         db.commit()
         db.refresh(new_user)
         
+        # Log audit trail
+        try:
+            audit_service.log_create(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="User",
+                resource_id=new_user.id,
+                new_values={"email": new_user.email, "first_name": new_user.first_name, "last_name": new_user.last_name, "role": user_data.role}
+            )
+        except Exception:
+            pass
+        
         return new_user
     
     @staticmethod
@@ -194,6 +208,15 @@ class UserController:
                     detail="Insufficient permissions"
                 )
         
+        # Store old values for audit
+        old_values = {
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "phone": user.phone,
+            "role": user.role
+        }
+        
         # Update user
         update_data = user_data.model_dump(exclude_unset=True)
         for key, value in update_data.items():
@@ -201,6 +224,20 @@ class UserController:
         
         db.commit()
         db.refresh(user)
+        
+        # Log audit trail for update
+        try:
+            audit_service.log_update(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="User",
+                resource_id=user.id,
+                old_values=old_values,
+                new_values=update_data
+            )
+        except Exception:
+            pass
         
         return user
     
@@ -294,4 +331,16 @@ class UserController:
         
         db.delete(target_user_company)
         db.commit()
-
+        
+        # Log audit trail for delete
+        try:
+            audit_service.log_delete(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="User",
+                resource_id=user_id,
+                old_values={"user_id": user_id, "company_id": company_id}
+            )
+        except Exception:
+            pass

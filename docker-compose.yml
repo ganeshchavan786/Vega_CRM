@@ -1,25 +1,32 @@
+version: '3.8'
+
 services:
-  web:
-    build: .
+  # CRM SAAS Application
+  crm-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: crm-saas
     ports:
-      - "8016:8000"
+      - "8000:8000"
     volumes:
-      # Mount database file for persistence
-      - ./data/crm.db:/app/data/crm.db
-      # Mount frontend files for hot-reload (no rebuild needed for JS/CSS changes)
-      - ./frontend:/app/frontend
+      # Persist SQLite database
+      - crm-data:/app/data
+      # Mount frontend for live updates (development)
+      - ./frontend:/app/frontend:ro
     environment:
       - DATABASE_URL=sqlite:///./data/crm.db
-      - SECRET_KEY=${SECRET_KEY:-your-secret-key-change-in-production}
+      - SECRET_KEY=your-super-secret-key-change-in-production
       - ALGORITHM=HS256
-      - ACCESS_TOKEN_EXPIRE_MINUTES=30
-      - DEBUG=${DEBUG:-false}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=1440
     restart: unless-stopped
-    networks:
-      - crm-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
-networks:
-  crm-network:
-    driver: bridge
-
+volumes:
+  crm-data:
+    driver: local

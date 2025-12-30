@@ -1,0 +1,220 @@
+<!-- Add Contact Full Page - VEGA CRM Theme -->
+<style>
+    .vega-form-page {
+        min-height: calc(100vh - 60px);
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        padding: 40px 20px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .vega-form-container { max-width: 900px; margin: 0 auto; }
+    .vega-form-header { text-align: center; margin-bottom: 40px; }
+    .vega-form-badge { display: inline-block; padding: 8px 16px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%); color: #6366f1; border-radius: 50px; font-size: 0.85rem; font-weight: 600; margin-bottom: 16px; }
+    .vega-form-title { font-size: 2rem; font-weight: 800; color: #1e293b; margin-bottom: 8px; }
+    .vega-form-subtitle { color: #64748b; font-size: 1rem; }
+    .vega-form-card { background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; }
+    .vega-form-card-header { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 24px 32px; color: white; }
+    .vega-form-card-header h2 { margin: 0; font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+    .vega-form-card-body { padding: 32px; }
+    .vega-form-section { margin-bottom: 32px; }
+    .vega-form-section:last-child { margin-bottom: 0; }
+    .vega-form-section-title { font-size: 0.9rem; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb; display: flex; align-items: center; gap: 8px; }
+    .vega-form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .vega-form-grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .vega-form-group { display: flex; flex-direction: column; }
+    .vega-form-group.full-width { grid-column: 1 / -1; }
+    .vega-form-label { font-size: 0.85rem; font-weight: 600; color: #374151; margin-bottom: 8px; }
+    .vega-form-label .required { color: #ef4444; margin-left: 2px; }
+    .vega-form-input, .vega-form-select, .vega-form-textarea { padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.95rem; font-family: inherit; transition: all 0.3s; background: #f8fafc; }
+    .vega-form-input:focus, .vega-form-select:focus, .vega-form-textarea:focus { outline: none; border-color: #6366f1; background: white; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+    .vega-form-textarea { min-height: 100px; resize: vertical; }
+    .vega-form-actions { display: flex; justify-content: flex-end; gap: 16px; padding-top: 24px; border-top: 2px solid #e5e7eb; margin-top: 32px; }
+    .vega-btn { padding: 14px 28px; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+    .vega-btn-primary { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
+    .vega-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5); }
+    .vega-btn-secondary { background: white; color: #64748b; border: 2px solid #e5e7eb; }
+    .vega-btn-secondary:hover { background: #f8fafc; border-color: #cbd5e1; color: #475569; }
+    .vega-back-link { display: inline-flex; align-items: center; gap: 8px; color: #6366f1; text-decoration: none; font-weight: 500; margin-bottom: 24px; transition: all 0.3s; }
+    .vega-back-link:hover { color: #4f46e5; }
+    @media (max-width: 768px) { .vega-form-grid, .vega-form-grid-2 { grid-template-columns: 1fr; } .vega-form-actions { flex-direction: column; } .vega-btn { width: 100%; justify-content: center; } }
+</style>
+
+<section id="add-contact" class="section vega-form-page">
+    <div class="vega-form-container">
+        <a href="#" class="vega-back-link" onclick="loadPage('contacts'); return false;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 10H5M5 10L10 5M5 10L10 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Back to Contacts
+        </a>
+
+        <div class="vega-form-header">
+            <span class="vega-form-badge">📇 Contact Management</span>
+            <h1 class="vega-form-title">Add New Contact</h1>
+            <p class="vega-form-subtitle">Fill in the details to create a new contact</p>
+        </div>
+
+        <div class="vega-form-card">
+            <div class="vega-form-card-header">
+                <h2>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+                    Contact Information
+                </h2>
+            </div>
+            <div class="vega-form-card-body">
+                <form id="contactFormPage" onsubmit="handleContactPageSubmit(event)">
+                    <div class="vega-form-section">
+                        <h3 class="vega-form-section-title">👤 Personal Information</h3>
+                        <div class="vega-form-grid">
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">First Name <span class="required">*</span></label>
+                                <input type="text" id="fpContactFirstName" class="vega-form-input" placeholder="John" required>
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Last Name <span class="required">*</span></label>
+                                <input type="text" id="fpContactLastName" class="vega-form-input" placeholder="Doe" required>
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Email <span class="required">*</span></label>
+                                <input type="email" id="fpContactEmail" class="vega-form-input" placeholder="john@example.com" required>
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Phone</label>
+                                <input type="tel" id="fpContactPhone" class="vega-form-input" placeholder="+91 98765 43210">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Mobile</label>
+                                <input type="tel" id="fpContactMobile" class="vega-form-input" placeholder="+91 98765 43210">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Job Title</label>
+                                <input type="text" id="fpContactTitle" class="vega-form-input" placeholder="Sales Manager">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vega-form-section">
+                        <h3 class="vega-form-section-title">🏢 Company Information</h3>
+                        <div class="vega-form-grid">
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Account</label>
+                                <select id="fpContactCustomer" class="vega-form-select">
+                                    <option value="">Select Account</option>
+                                </select>
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Department</label>
+                                <input type="text" id="fpContactDepartment" class="vega-form-input" placeholder="Sales">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Contact Type</label>
+                                <select id="fpContactType" class="vega-form-select">
+                                    <option value="primary">Primary</option>
+                                    <option value="secondary">Secondary</option>
+                                    <option value="billing">Billing</option>
+                                    <option value="technical">Technical</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vega-form-section">
+                        <h3 class="vega-form-section-title">📍 Address</h3>
+                        <div class="vega-form-grid vega-form-grid-2">
+                            <div class="vega-form-group full-width">
+                                <label class="vega-form-label">Street Address</label>
+                                <input type="text" id="fpContactAddress" class="vega-form-input" placeholder="123 Main Street">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">City</label>
+                                <input type="text" id="fpContactCity" class="vega-form-input" placeholder="Mumbai">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">State</label>
+                                <input type="text" id="fpContactState" class="vega-form-input" placeholder="Maharashtra">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vega-form-section">
+                        <h3 class="vega-form-section-title">📝 Notes</h3>
+                        <div class="vega-form-group">
+                            <textarea id="fpContactNotes" class="vega-form-textarea" placeholder="Additional notes about this contact..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="vega-form-actions">
+                        <button type="button" class="vega-btn vega-btn-secondary" onclick="loadPage('contacts')">Cancel</button>
+                        <button type="submit" class="vega-btn vega-btn-primary" id="fpContactSubmitBtn">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 4.5L6.75 12.75L3 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Save Contact
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Load customers for dropdown
+(async function() {
+    try {
+        const response = await fetch(`${API_BASE}/companies/${companyId}/customers`, { headers: getHeaders() });
+        if (response.ok) {
+            const data = await response.json();
+            const select = document.getElementById('fpContactCustomer');
+            if (select && data.data) {
+                data.data.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = c.name;
+                    select.appendChild(opt);
+                });
+            }
+        }
+    } catch (e) { console.error('Error loading customers:', e); }
+})();
+
+window.handleContactPageSubmit = async function(e) {
+    e.preventDefault();
+    const submitBtn = document.getElementById('fpContactSubmitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span>Saving...</span>';
+    
+    const contactData = {
+        first_name: document.getElementById('fpContactFirstName').value,
+        last_name: document.getElementById('fpContactLastName').value,
+        email: document.getElementById('fpContactEmail').value,
+        phone: document.getElementById('fpContactPhone').value || null,
+        mobile: document.getElementById('fpContactMobile').value || null,
+        title: document.getElementById('fpContactTitle').value || null,
+        customer_id: document.getElementById('fpContactCustomer').value || null,
+        department: document.getElementById('fpContactDepartment').value || null,
+        contact_type: document.getElementById('fpContactType').value || 'primary',
+        address: document.getElementById('fpContactAddress').value || null,
+        city: document.getElementById('fpContactCity').value || null,
+        state: document.getElementById('fpContactState').value || null,
+        notes: document.getElementById('fpContactNotes').value || null
+    };
+    
+    try {
+        const response = await fetch(`${API_BASE}/companies/${companyId}/contacts`, {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(contactData)
+        });
+        
+        if (response.ok) {
+            alert('Contact created successfully!');
+            loadPage('contacts');
+        } else {
+            const error = await response.json();
+            alert('Error: ' + (error.detail || 'Failed to create contact'));
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 4.5L6.75 12.75L3 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Save Contact';
+        }
+    } catch (error) {
+        alert('Error: ' + error.message);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 4.5L6.75 12.75L3 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Save Contact';
+    }
+};
+</script>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM SAAS - मराठी मार्गदर्शक</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header p {
+            font-size: 1.3em;
+            opacity: 0.95;
+        }
+        
+        .lang-switch {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .lang-btn {
+            padding: 8px 16px;
+            border: 2px solid rgba(255,255,255,0.5);
+            background: transparent;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .lang-btn:hover, .lang-btn.active {
+            background: white;
+            color: #667eea;
+        }
+        
+        .content {
+            padding: 50px 40px;
+        }
+        
+        .guide-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-top: 30px;
+        }
+        
+        .guide-card {
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9ff 100%);
+            border: 2px solid #e9ecef;
+            border-radius: 16px;
+            padding: 30px;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .guide-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+        
+        .guide-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .guide-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+        
+        .guide-card h3 {
+            color: #1e293b;
+            margin-bottom: 12px;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .guide-card p {
+            color: #64748b;
+            line-height: 1.7;
+            font-size: 0.95em;
+        }
+        
+        .icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.75em;
+            margin-top: 15px;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 25px;
+            text-align: center;
+            color: #6c757d;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .section-title {
+            font-size: 1.8em;
+            color: #1e293b;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .section-subtitle {
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="lang-switch">
+                <a href="../english/index.html" class="lang-btn">English</a>
+                <span class="lang-btn active">मराठी</span>
+            </div>
+            <h1>📚 CRM SAAS मार्गदर्शक</h1>
+            <p>तुमच्या CRM सिस्टमचा संपूर्ण वापर मार्गदर्शक</p>
+        </div>
+        
+        <div class="content">
+            <h2 class="section-title">🚀 सुरुवात करा</h2>
+            <p class="section-subtitle">CRM वापरण्यासाठी पहिली पायरी</p>
+            
+            <div class="guide-grid">
+                <a href="suruvat-kara.html" class="guide-card">
+                    <span class="icon">🔐</span>
+                    <h3>सुरुवात कुठून करायची?</h3>
+                    <p>Login, Registration, Forgot Password - CRM मध्ये प्रवेश कसा करायचा याची संपूर्ण माहिती.</p>
+                    <span class="badge">नवीन वापरकर्त्यांसाठी</span>
+                </a>
+                
+                <a href="company-setup.html" class="guide-card">
+                    <span class="icon">🏢</span>
+                    <h3>Company Setup</h3>
+                    <p>नवीन Company कशी तयार करायची, Settings कसे करायचे.</p>
+                    <span class="badge">Setup Guide</span>
+                </a>
+            </div>
+            
+            <h2 class="section-title" style="margin-top: 50px;">📖 Module मार्गदर्शक</h2>
+            <p class="section-subtitle">प्रत्येक feature चा विस्तृत वापर</p>
+            
+            <div class="guide-grid">
+                <a href="lead-management-guide.html" class="guide-card">
+                    <span class="icon">🎯</span>
+                    <h3>Leads</h3>
+                    <p>Lead management, scoring, follow-up आणि conversion ची संपूर्ण माहिती.</p>
+                </a>
+                
+                <a href="customers-guide.html" class="guide-card">
+                    <span class="icon">👥</span>
+                    <h3>Customers</h3>
+                    <p>Customer accounts, health scores आणि lifecycle stages.</p>
+                </a>
+                
+                <a href="contacts-guide.html" class="guide-card">
+                    <span class="icon">📇</span>
+                    <h3>Contacts</h3>
+                    <p>Multiple contacts, roles आणि communication preferences.</p>
+                </a>
+                
+                <a href="deals-guide.html" class="guide-card">
+                    <span class="icon">💰</span>
+                    <h3>Deals</h3>
+                    <p>Sales pipeline, deal stages आणि revenue forecast.</p>
+                </a>
+                
+                <a href="tasks-guide.html" class="guide-card">
+                    <span class="icon">✅</span>
+                    <h3>Tasks</h3>
+                    <p>Task creation, priorities आणि completion tracking.</p>
+                </a>
+                
+                <a href="reports-guide.html" class="guide-card">
+                    <span class="icon">📊</span>
+                    <h3>Reports</h3>
+                    <p>सर्व प्रकारचे reports आणि analytics.</p>
+                </a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>CRM SAAS मराठी मार्गदर्शक | Version 2.0 | December 2025</p>
+        </div>
+    </div>
+</body>
+</html>

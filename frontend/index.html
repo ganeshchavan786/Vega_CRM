@@ -6,14 +6,24 @@
     <title>CRM SAAS - Customer Relationship Management</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/permissions.css">
+    <link rel="stylesheet" href="css/accountreport.css">
     <link rel="stylesheet" href="static/css/datatable.css">
+    <!-- Leaflet.js for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Chart.js for BI Dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
     <!-- Navigation Bar (Loaded from component) -->
     <div id="navbar-container"></div>
 
-    <!-- Login Modal -->
-    <div id="loginModal" class="modal">
+    <!-- Login Modal - Hidden by default, shown via JS -->
+    <div id="loginModal" class="modal" style="display: none;">
         <div class="modal-content">
             <h2>Login to CRM SAAS</h2>
             <form id="loginForm">
@@ -31,8 +41,8 @@
         </div>
     </div>
 
-    <!-- Company Selection Modal -->
-    <div id="companyModal" class="modal">
+    <!-- Company Selection Modal - Hidden by default, shown via JS -->
+    <div id="companyModal" class="modal" style="display: none;">
         <div class="modal-content">
             <h2>Select Company</h2>
             <div id="companyList" class="company-list"></div>
@@ -86,8 +96,8 @@
         </section>
     </div>
 
-    <!-- Forms Modal -->
-    <div id="formModal" class="modal">
+    <!-- Forms Modal - Hidden by default -->
+    <div id="formModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div id="formContent"></div>
         </div>

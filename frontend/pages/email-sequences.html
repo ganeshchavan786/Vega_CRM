@@ -1,0 +1,86 @@
+<!-- Email Sequences Page -->
+<section id="email-sequences" class="section subscription-saas-style">
+    <div class="subscription-saas-container">
+        <h1 class="subscription-saas-heading">Email Sequence Management</h1>
+        <div class="subscription-saas-actions">
+            <button class="btn-reports" onclick="showSequenceAnalytics()">
+                <i data-lucide="bar-chart-2"></i>
+                Analytics
+            </button>
+            <button class="btn-add-primary" onclick="showSequenceForm()">
+                <i data-lucide="plus"></i>
+                + Create Sequence
+            </button>
+        </div>
+    </div>
+    
+    <!-- Sequence Stats -->
+    <div class="sequence-stats" id="sequenceStats"></div>
+    
+    <div class="page-body-advanced">
+        <!-- Sequences List -->
+        <div class="sequences-grid" id="sequencesGrid">
+            <div class="loading-state">Loading sequences...</div>
+        </div>
+    </div>
+</section>
+
+<!-- Sequence Form Modal Template -->
+<template id="sequenceFormTemplate">
+    <div class="modal-overlay" id="sequenceFormModal" onclick="closeSequenceForm(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3><i data-lucide="mail"></i> <span id="sequenceFormTitle">Create Email Sequence</span></h3>
+                <button class="modal-close" onclick="closeSequenceForm()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="sequenceForm" onsubmit="saveSequence(event)">
+                    <div class="form-group">
+                        <label for="sequenceName">Sequence Name *</label>
+                        <input type="text" id="sequenceName" name="name" required placeholder="e.g., Welcome Series">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="triggerCondition">Trigger Condition *</label>
+                            <select id="triggerCondition" name="trigger_condition" required onchange="toggleScoreThreshold()">
+                                <option value="on_creation">On Lead Creation</option>
+                                <option value="score_threshold">Score Threshold</option>
+                                <option value="manual">Manual Enrollment</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="scoreThresholdGroup" style="display:none;">
+                            <label for="scoreThreshold">Score Threshold</label>
+                            <input type="number" id="scoreThreshold" name="score_threshold" min="0" max="100" value="50">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="totalEmails">Total Emails</label>
+                            <input type="number" id="totalEmails" name="total_emails" min="1" max="20" value="5">
+                        </div>
+                        <div class="form-group">
+                            <label for="durationDays">Duration (Days)</label>
+                            <input type="number" id="durationDays" name="duration_days" min="1" max="90" value="14">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sequenceDescription">Description</label>
+                        <textarea id="sequenceDescription" name="description" rows="3" placeholder="Describe this sequence..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="sequenceActive" name="is_active" checked>
+                            Active (Start sending immediately)
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeSequenceForm()">Cancel</button>
+                <button type="submit" form="sequenceForm" class="btn btn-primary">
+                    <i data-lucide="save"></i> Save Sequence
+                </button>
+            </div>
+        </div>
+    </div>
+</template>

@@ -10,6 +10,7 @@ from app.schemas.lead import LeadCreate, LeadUpdate
 from app.controllers.lead_controller import LeadController
 from app.utils.dependencies import get_current_active_user
 from app.utils.helpers import success_response
+from app.utils.permissions import has_permission
 from app.models.user import User
 
 router = APIRouter()
@@ -76,8 +77,15 @@ async def create_lead(
     Query Parameters:
     - **skip_duplicate_check**: Skip duplicate check (requires admin role)
     
-    Requires: JWT token
+    Requires: JWT token, Permission to create leads
     """
+    # Check permission to create lead
+    if not has_permission(current_user, "lead", "create", company_id, db):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied: create lead"
+        )
+    
     try:
         # Check permission for skip_duplicate_check
         if skip_duplicate_check:
@@ -144,7 +152,22 @@ async def update_lead(
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
-    """Update lead"""
+    """
+    Update lead
+    
+    Path Parameters:
+    - **company_id**: Company ID
+    - **lead_id**: Lead ID
+    
+    Requires: JWT token, Permission to update leads
+    """
+    # Check permission to update lead
+    if not has_permission(current_user, "lead", "update", company_id, db):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied: update lead"
+        )
+    
     try:
         lead = LeadController.update_lead(lead_id, company_id, lead_data, current_user, db)
         return success_response(
@@ -167,7 +190,22 @@ async def delete_lead(
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):
-    """Delete lead"""
+    """
+    Delete lead
+    
+    Path Parameters:
+    - **company_id**: Company ID
+    - **lead_id**: Lead ID
+    
+    Requires: JWT token, Permission to delete leads
+    """
+    # Check permission to delete lead
+    if not has_permission(current_user, "lead", "delete", company_id, db):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied: delete lead"
+        )
+    
     try:
         LeadController.delete_lead(lead_id, company_id, current_user, db)
         return success_response(
@@ -872,8 +910,15 @@ async def convert_lead(
     Query Parameters:
     - **skip_eligibility_check**: Skip eligibility check (requires admin role)
     
-    Requires: JWT token
+    Requires: JWT token, Permission to convert leads
     """
+    # Check permission to convert lead
+    if not has_permission(current_user, "lead", "convert", company_id, db):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied: convert lead"
+        )
+    
     try:
         from app.utils.lead_conversion import LeadConversionService
         from app.models.user_company import UserCompany
@@ -1041,5 +1086,138 @@ async def get_lead_stats(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
+        )
+
+
+@router.post("/{company_id}/leads/batch-convert")
+async def batch_convert_leads(
+    company_id: int = Path(..., description="Company ID"),
+    lead_ids: List[int] = Query(..., description="List of Lead IDs to convert"),
+    skip_eligibility_check: bool = Query(False, description="Skip eligibility check"),
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Batch convert multiple leads to accounts
+    
+    Path Parameters:
+    - **company_id**: Company ID
+    
+    Query Parameters:
+    - **lead_ids**: List of Lead IDs to convert
+    - **skip_eligibility_check**: Skip eligibility check (requires admin role)
+    
+    Requires: Admin role
+    """
+    from app.utils.permissions import require_admin
+    from app.models.user_company import UserCompany
+    
+    # Check admin permission
+    user_company = db.query(UserCompany).filter(
+        UserCompany.user_id == current_user.id,
+        UserCompany.company_id == company_id,
+        UserCompany.role.in_(["admin", "manager"])
+    ).first()
+    
+    if not user_company and current_user.role != "super_admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin or Manager role required for batch conversion"
+        )
+    
+    try:
+        result = LeadConversionService.batch_convert_leads(
+            lead_ids=lead_ids,
+            company_id=company_id,
+            current_user=current_user,
+            db=db,
+            skip_eligibility_check=skip_eligibility_check
+        )
+        
+        return success_response(
+            data=result,
+            message=f"Batch conversion complete: {result['successful']} successful, {result['failed']} failed"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error in batch conversion: {str(e)}"
+        )
+
+
+@router.get("/{company_id}/leads/conversion-analytics")
+async def get_conversion_analytics(
+    company_id: int = Path(..., description="Company ID"),
+    days: int = Query(30, ge=1, le=365, description="Number of days to analyze"),
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get lead conversion analytics
+    
+    Path Parameters:
+    - **company_id**: Company ID
+    
+    Query Parameters:
+    - **days**: Number of days to analyze (default: 30)
+    
+    Returns:
+    - Conversion rate
+    - Average time to convert
+    - Leads by status
+    - Conversion by source
+    """
+    try:
+        analytics = LeadConversionService.get_conversion_analytics(
+            company_id=company_id,
+            db=db,
+            days=days
+        )
+        
+        return success_response(
+            data=analytics,
+            message="Conversion analytics fetched successfully"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching conversion analytics: {str(e)}"
+        )
+
+
+@router.get("/{company_id}/leads/{lead_id}/validate-conversion")
+async def validate_lead_conversion(
+    company_id: int = Path(..., description="Company ID"),
+    lead_id: int = Path(..., description="Lead ID"),
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Validate if lead can be converted with detailed errors/warnings
+    
+    Path Parameters:
+    - **company_id**: Company ID
+    - **lead_id**: Lead ID
+    
+    Returns:
+    - valid: Boolean
+    - errors: List of blocking errors
+    - warnings: List of non-blocking warnings
+    """
+    try:
+        validation = LeadConversionService.validate_conversion(
+            lead_id=lead_id,
+            company_id=company_id,
+            db=db
+        )
+        
+        return success_response(
+            data=validation,
+            message="Conversion validation complete"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error validating conversion: {str(e)}"
         )
 

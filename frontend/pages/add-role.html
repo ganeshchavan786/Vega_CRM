@@ -1,0 +1,157 @@
+<!-- Add Role/Permission Full Page - VEGA CRM Theme -->
+<style>
+    .vega-form-page { min-height: calc(100vh - 60px); background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 40px 20px; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    .vega-form-container { max-width: 900px; margin: 0 auto; }
+    .vega-form-header { text-align: center; margin-bottom: 40px; }
+    .vega-form-badge { display: inline-block; padding: 8px 16px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%); color: #6366f1; border-radius: 50px; font-size: 0.85rem; font-weight: 600; margin-bottom: 16px; }
+    .vega-form-title { font-size: 2rem; font-weight: 800; color: #1e293b; margin-bottom: 8px; }
+    .vega-form-subtitle { color: #64748b; font-size: 1rem; }
+    .vega-form-card { background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; }
+    .vega-form-card-header { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 24px 32px; color: white; }
+    .vega-form-card-header h2 { margin: 0; font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+    .vega-form-card-body { padding: 32px; }
+    .vega-form-section { margin-bottom: 32px; }
+    .vega-form-section-title { font-size: 0.9rem; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb; display: flex; align-items: center; gap: 8px; }
+    .vega-form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .vega-form-group { display: flex; flex-direction: column; }
+    .vega-form-group.full-width { grid-column: 1 / -1; }
+    .vega-form-label { font-size: 0.85rem; font-weight: 600; color: #374151; margin-bottom: 8px; }
+    .vega-form-label .required { color: #ef4444; }
+    .vega-form-input, .vega-form-select, .vega-form-textarea { padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.95rem; font-family: inherit; transition: all 0.3s; background: #f8fafc; }
+    .vega-form-input:focus, .vega-form-select:focus { outline: none; border-color: #6366f1; background: white; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+    .vega-form-textarea { min-height: 80px; resize: vertical; }
+    .vega-form-actions { display: flex; justify-content: flex-end; gap: 16px; padding-top: 24px; border-top: 2px solid #e5e7eb; margin-top: 32px; }
+    .vega-btn { padding: 14px 28px; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+    .vega-btn-primary { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
+    .vega-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5); }
+    .vega-btn-secondary { background: white; color: #64748b; border: 2px solid #e5e7eb; }
+    .vega-back-link { display: inline-flex; align-items: center; gap: 8px; color: #6366f1; text-decoration: none; font-weight: 500; margin-bottom: 24px; }
+    .permission-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+    .permission-item { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #f8fafc; border: 2px solid #e5e7eb; border-radius: 10px; cursor: pointer; transition: all 0.2s; }
+    .permission-item:hover { border-color: #6366f1; background: #f0f0ff; }
+    .permission-item input { width: 18px; height: 18px; accent-color: #6366f1; }
+    .permission-item label { cursor: pointer; font-size: 0.9rem; color: #374151; }
+    @media (max-width: 768px) { .vega-form-grid { grid-template-columns: 1fr; } }
+</style>
+
+<section id="add-role" class="section vega-form-page">
+    <div class="vega-form-container">
+        <a href="#" class="vega-back-link" onclick="loadPage('admin'); return false;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 10H5M5 10L10 5M5 10L10 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Back to Admin Panel
+        </a>
+
+        <div class="vega-form-header">
+            <span class="vega-form-badge">🔐 Role Permissions</span>
+            <h1 class="vega-form-title">Create New Role</h1>
+            <p class="vega-form-subtitle">Define a new role with specific permissions</p>
+        </div>
+
+        <div class="vega-form-card">
+            <div class="vega-form-card-header">
+                <h2>🔐 Role Configuration</h2>
+            </div>
+            <div class="vega-form-card-body">
+                <form id="roleFormPage" onsubmit="handleRolePageSubmit(event)">
+                    <div class="vega-form-section">
+                        <h3 class="vega-form-section-title">📋 Role Details</h3>
+                        <div class="vega-form-grid">
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Role Name <span class="required">*</span></label>
+                                <input type="text" id="fpRoleName" class="vega-form-input" placeholder="e.g., Sales Manager" required>
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Role Level</label>
+                                <select id="fpRoleLevel" class="vega-form-select">
+                                    <option value="1">Level 1 - Basic</option>
+                                    <option value="2">Level 2 - Standard</option>
+                                    <option value="3">Level 3 - Advanced</option>
+                                    <option value="4">Level 4 - Manager</option>
+                                    <option value="5">Level 5 - Admin</option>
+                                </select>
+                            </div>
+                            <div class="vega-form-group full-width">
+                                <label class="vega-form-label">Description</label>
+                                <textarea id="fpRoleDescription" class="vega-form-textarea" placeholder="Describe this role's responsibilities..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vega-form-section">
+                        <h3 class="vega-form-section-title">📊 CRM Permissions</h3>
+                        <div class="permission-grid">
+                            <div class="permission-item"><input type="checkbox" id="perm_customer_view" checked><label for="perm_customer_view">View Accounts</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_customer_create"><label for="perm_customer_create">Create Accounts</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_customer_edit"><label for="perm_customer_edit">Edit Accounts</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_customer_delete"><label for="perm_customer_delete">Delete Accounts</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_contact_view" checked><label for="perm_contact_view">View Contacts</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_contact_create"><label for="perm_contact_create">Create Contacts</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_contact_edit"><label for="perm_contact_edit">Edit Contacts</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_contact_delete"><label for="perm_contact_delete">Delete Contacts</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_lead_view" checked><label for="perm_lead_view">View Leads</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_lead_create"><label for="perm_lead_create">Create Leads</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_lead_edit"><label for="perm_lead_edit">Edit Leads</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_lead_convert"><label for="perm_lead_convert">Convert Leads</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_deal_view" checked><label for="perm_deal_view">View Opportunities</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_deal_create"><label for="perm_deal_create">Create Opportunities</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_deal_edit"><label for="perm_deal_edit">Edit Opportunities</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_deal_delete"><label for="perm_deal_delete">Delete Opportunities</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_task_view" checked><label for="perm_task_view">View Tasks</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_task_create"><label for="perm_task_create">Create Tasks</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_activity_view" checked><label for="perm_activity_view">View Activities</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_activity_create"><label for="perm_activity_create">Log Activities</label></div>
+                        </div>
+                    </div>
+
+                    <div class="vega-form-section">
+                        <h3 class="vega-form-section-title">⚙️ Admin Permissions</h3>
+                        <div class="permission-grid">
+                            <div class="permission-item"><input type="checkbox" id="perm_reports_view"><label for="perm_reports_view">View Reports</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_reports_export"><label for="perm_reports_export">Export Reports</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_users_manage"><label for="perm_users_manage">Manage Users</label></div>
+                            <div class="permission-item"><input type="checkbox" id="perm_settings_manage"><label for="perm_settings_manage">Manage Settings</label></div>
+                        </div>
+                    </div>
+
+                    <div class="vega-form-actions">
+                        <button type="button" class="vega-btn vega-btn-secondary" onclick="loadPage('admin')">Cancel</button>
+                        <button type="submit" class="vega-btn vega-btn-primary" id="fpRoleSubmitBtn">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 4.5L6.75 12.75L3 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Create Role
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+window.handleRolePageSubmit = async function(e) {
+    e.preventDefault();
+    const submitBtn = document.getElementById('fpRoleSubmitBtn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span>Creating...</span>';
+    
+    // Collect all checked permissions
+    const permissions = [];
+    document.querySelectorAll('.permission-item input:checked').forEach(cb => {
+        permissions.push(cb.id.replace('perm_', ''));
+    });
+    
+    const roleData = {
+        name: document.getElementById('fpRoleName').value,
+        level: parseInt(document.getElementById('fpRoleLevel').value),
+        description: document.getElementById('fpRoleDescription').value || null,
+        permissions: permissions
+    };
+    
+    try {
+        const response = await fetch(`${API_BASE}/companies/${companyId}/roles`, {
+            method: 'POST', headers: getHeaders(), body: JSON.stringify(roleData)
+        });
+        if (response.ok) { alert('Role created successfully!'); loadPage('admin'); }
+        else { const error = await response.json(); alert('Error: ' + (error.detail || 'Failed')); submitBtn.disabled = false; submitBtn.innerHTML = 'Create Role'; }
+    } catch (error) { alert('Error: ' + error.message); submitBtn.disabled = false; submitBtn.innerHTML = 'Create Role'; }
+};
+</script>

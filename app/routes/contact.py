@@ -188,3 +188,230 @@ async def delete_contact(
             detail=f"Error deleting contact: {str(e)}"
         )
 
+
+# Contact Role Management Endpoints
+
+@router.put("/{company_id}/contacts/{contact_id}/role")
+async def update_contact_role(
+    company_id: int = Path(..., description="Company ID"),
+    contact_id: int = Path(..., description="Contact ID"),
+    role: str = Query(..., description="New role: decision_maker, influencer, user, gatekeeper, champion, economic_buyer"),
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Update contact role
+    
+    Path Parameters:
+    - **company_id**: Company ID
+    - **contact_id**: Contact ID
+    
+    Query Parameters:
+    - **role**: New role (decision_maker, influencer, user, gatekeeper, champion, economic_buyer)
+    """
+    from app.models.contact import Contact
+    
+    valid_roles = ["decision_maker", "influencer", "user", "gatekeeper", "champion", "economic_buyer"]
+    if role not in valid_roles:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid role. Must be one of: {', '.join(valid_roles)}"
+        )
+    
+    try:
+        contact = ContactController.get_contact(company_id, contact_id, current_user, db)
+        old_role = contact.role
+        contact.role = role
+        db.commit()
+        db.refresh(contact)
+        
+        return success_response(
+            data={
+                "id": contact.id,
+                "name": contact.name,
+                "old_role": old_role,
+                "new_role": role
+            },
+            message=f"Contact role updated from {old_role} to {role}"
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error updating contact role: {str(e)}"
+        )
+
+
+@router.put("/{company_id}/contacts/{contact_id}/set-primary")
+async def set_primary_contact(
+    company_id: int = Path(..., description="Company ID"),
+    contact_id: int = Path(..., description="Contact ID"),
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Set contact as primary contact for account
+    
+    Path Parameters:
+    - **company_id**: Company ID
+    - **contact_id**: Contact ID
+    """
+    from app.models.contact import Contact
+    
+    try:
+        contact = ContactController.get_contact(company_id, contact_id, current_user, db)
+        
+        # Unset other primary contacts for this account
+        db.query(Contact).filter(
+            Contact.account_id == contact.account_id,
+            Contact.id != contact_id,
+            Contact.is_primary_contact == True
+        ).update({"is_primary_contact": False})
+        
+        # Set this contact as primary
+        contact.is_primary_contact = True
+        db.commit()
+        db.refresh(contact)
+        
+        return success_response(
+            data=contact.to_dict(),
+            message=f"Contact '{contact.name}' set as primary contact"
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error setting primary contact: {str(e)}"
+        )
+
+
+@router.get("/{company_id}/contacts/by-role")
+async def get_contacts_by_role(
+    company_id: int = Path(..., description="Company ID"),
+    role: str = Query(..., description="Filter by role"),
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get contacts filtered by role
+    
+    Path Parameters:
+    - **company_id**: Company ID
+    
+    Query Parameters:
+    - **role**: Role to filter by
+    """
+    from app.models.contact import Contact
+    from app.models.user_company import UserCompany
+    
+    # Check access
+    user_company = db.query(UserCompany).filter(
+        UserCompany.user_id == current_user.id,
+        UserCompany.company_id == company_id
+    ).first()
+    
+    if not user_company and current_user.role != "super_admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied"
+        )
+    
+    try:
+        contacts = db.query(Contact).filter(
+            Contact.company_id == company_id,
+            Contact.role == role
+        ).all()
+        
+        return success_response(
+            data=[c.to_dict() for c in contacts],
+            message=f"Found {len(contacts)} contacts with role '{role}'"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching contacts: {str(e)}"
+        )
+
+
+@router.get("/{company_id}/contacts/role-analytics")
+async def get_contact_role_analytics(
+    company_id: int = Path(..., description="Company ID"),
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get contact role analytics
+    
+    Returns:
+    - Contact count by role
+    - Role distribution
+    - Influence score averages
+    """
+    from sqlalchemy import func
+    from app.models.contact import Contact
+    from app.models.user_company import UserCompany
+    
+    # Check access
+    user_company = db.query(UserCompany).filter(
+        UserCompany.user_id == current_user.id,
+        UserCompany.company_id == company_id
+    ).first()
+    
+    if not user_company and current_user.role != "super_admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied"
+        )
+    
+    try:
+        # Total contacts
+        total = db.query(func.count(Contact.id)).filter(
+            Contact.company_id == company_id
+        ).scalar() or 0
+        
+        # Contacts by role
+        roles = ["decision_maker", "influencer", "user", "gatekeeper", "champion", "economic_buyer"]
+        role_counts = {}
+        for role in roles:
+            count = db.query(func.count(Contact.id)).filter(
+                Contact.company_id == company_id,
+                Contact.role == role
+            ).scalar() or 0
+            role_counts[role] = count
+        
+        # Primary contacts count
+        primary_count = db.query(func.count(Contact.id)).filter(
+            Contact.company_id == company_id,
+            Contact.is_primary_contact == True
+        ).scalar() or 0
+        
+        # Average influence score by role
+        influence_by_role = {}
+        for role in roles:
+            avg = db.query(func.avg(Contact.influence_score)).filter(
+                Contact.company_id == company_id,
+                Contact.role == role
+            ).scalar()
+            influence_by_role[role] = round(float(avg), 2) if avg else 0
+        
+        return success_response(
+            data={
+                "total_contacts": total,
+                "by_role": role_counts,
+                "primary_contacts": primary_count,
+                "influence_by_role": influence_by_role,
+                "role_distribution": {
+                    role: round((count / total * 100), 2) if total > 0 else 0
+                    for role, count in role_counts.items()
+                }
+            },
+            message="Contact role analytics fetched successfully"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error fetching role analytics: {str(e)}"
+        )
+

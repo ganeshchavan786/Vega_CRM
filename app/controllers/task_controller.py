@@ -10,6 +10,7 @@ from datetime import datetime
 from app.models.task import Task
 from app.models.user import User
 from app.schemas.task import TaskCreate, TaskUpdate
+from app.services import audit_service
 
 
 class TaskController:
@@ -68,6 +69,19 @@ class TaskController:
         db.commit()
         db.refresh(new_task)
         
+        # Log audit trail
+        try:
+            audit_service.log_create(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="Task",
+                resource_id=new_task.id,
+                new_values={"title": new_task.title, "status": new_task.status, "priority": new_task.priority}
+            )
+        except Exception:
+            pass
+        
         return new_task
     
     @staticmethod
@@ -102,7 +116,12 @@ class TaskController:
         """Update task"""
         task = TaskController.get_task(task_id, company_id, current_user, db)
         
+        # Store old values for audit
         update_data = task_data.model_dump(exclude_unset=True)
+        old_values = {}
+        for key in update_data.keys():
+            old_values[key] = getattr(task, key, None)
+        
         for key, value in update_data.items():
             setattr(task, key, value)
         
@@ -112,6 +131,20 @@ class TaskController:
         
         db.commit()
         db.refresh(task)
+        
+        # Log audit trail
+        try:
+            audit_service.log_update(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="Task",
+                resource_id=task.id,
+                old_values=old_values,
+                new_values=update_data
+            )
+        except Exception:
+            pass
         
         return task
     
@@ -154,6 +187,19 @@ class TaskController:
         
         db.delete(task)
         db.commit()
+        
+        # Log audit trail
+        try:
+            audit_service.log_delete(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="Task",
+                resource_id=task_id,
+                old_values={"title": task.title, "status": task.status}
+            )
+        except Exception:
+            pass
     
     @staticmethod
     def get_task_stats(company_id: int, db: Session) -> dict:

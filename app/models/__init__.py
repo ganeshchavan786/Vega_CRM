@@ -11,6 +11,11 @@ from app.models.lead import Lead
 from app.models.deal import Deal
 from app.models.task import Task
 from app.models.activity import Activity
+from app.models.log import Log
+from app.models.audit_trail import AuditTrail
+from app.models.permission import Permission, RolePermission
+from app.models.report import Report
+from app.models.password_reset import PasswordResetToken
 
 __all__ = [
     "Company",
@@ -21,6 +26,12 @@ __all__ = [
     "Lead",
     "Deal",
     "Task",
-    "Activity"
+    "Activity",
+    "Log",
+    "AuditTrail",
+    "Permission",
+    "RolePermission",
+    "Report",
+    "PasswordResetToken"
 ]
 

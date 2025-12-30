@@ -97,6 +97,43 @@ function setupNavListeners() {
     
     // Company switcher
     setupCompanySwitcher();
+    
+    // Reports dropdown menu
+    setupReportsDropdown();
+}
+
+// Setup Reports Dropdown
+function setupReportsDropdown() {
+    const dropdownContainer = document.querySelector('.nav-dropdown-container');
+    const dropdownItems = document.querySelectorAll('.nav-dropdown-item');
+    
+    if (!dropdownContainer) return;
+    
+    // Handle dropdown item clicks
+    dropdownItems.forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const section = item.dataset.section;
+            if (section && section !== 'salesreport' && section !== 'leadreport' && section !== 'activityreport') {
+                loadPage(section);
+                // Close dropdown
+                dropdownContainer.classList.remove('active');
+                closeMobileMenu();
+            } else {
+                // Show coming soon message for unimplemented reports
+                alert('This report is coming soon!');
+            }
+        });
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!dropdownContainer.contains(e.target)) {
+            dropdownContainer.classList.remove('active');
+        }
+    });
 }
 
 // Global Sign Out Handler
@@ -107,25 +144,23 @@ window.handleSignOut = function() {
     const profileDropdown = document.getElementById('profileDropdown');
     if (profileDropdown) profileDropdown.classList.remove('active');
     
-    // Call logout function
-    if (typeof window.handleLogout === 'function') {
-        window.handleLogout();
-    } else {
-        console.error('handleLogout function not found, using fallback');
-        // Fallback logout
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('companyId');
-        localStorage.removeItem('currentUser');
-        const navbarContainer = document.getElementById('navbar-container');
-        if (navbarContainer) navbarContainer.style.display = 'none';
-        if (typeof loadPage === 'function') {
-            loadPage('home');
-        } else if (typeof window.loadPage === 'function') {
-            window.loadPage('home');
-        } else {
-            window.location.href = 'index.html';
-        }
-    }
+    // Clear ALL auth data
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('companyId');
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('currentPage');
+    sessionStorage.clear();
+    
+    // Clear global variables
+    if (typeof window.authToken !== 'undefined') window.authToken = null;
+    if (typeof window.companyId !== 'undefined') window.companyId = null;
+    if (typeof window.currentUser !== 'undefined') window.currentUser = null;
+    
+    // Clear URL hash
+    window.location.hash = '';
+    
+    // Redirect to VEGA CRM website login page
+    window.location.href = '/website/login.html';
 };
 
 // Setup Dark Mode Toggle
@@ -179,6 +214,34 @@ function setupProfileDropdown() {
                 profileDropdown.classList.remove('active');
             }
         });
+    }
+    
+    // Setup admin menu link click handler
+    const adminMenuLink = document.getElementById('adminMenuLink');
+    if (adminMenuLink) {
+        adminMenuLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (profileDropdown) profileDropdown.classList.remove('active');
+            loadPage('admin');
+        });
+    }
+    
+    // Show/hide admin link based on user role
+    updateAdminMenuLink();
+}
+
+// Update Admin Menu Link visibility based on user role
+window.updateAdminMenuLink = function() {
+    const adminMenuLink = document.getElementById('adminMenuLink');
+    if (!adminMenuLink) return;
+    
+    const user = currentUser || JSON.parse(localStorage.getItem('currentUser') || 'null');
+    
+    if (user && (user.role === 'super_admin' || user.role === 'admin')) {
+        adminMenuLink.style.display = 'flex';
+        console.log('Admin menu link shown for role:', user.role);
+    } else {
+        adminMenuLink.style.display = 'none';
     }
 }
 
@@ -341,6 +404,18 @@ window.loadPage = async function(pageName) {
         const html = await response.text();
         pageContent.innerHTML = html;
         
+        // Execute inline scripts in loaded HTML (important for full page forms)
+        const scripts = pageContent.querySelectorAll('script');
+        scripts.forEach(oldScript => {
+            const newScript = document.createElement('script');
+            if (oldScript.src) {
+                newScript.src = oldScript.src;
+            } else {
+                newScript.textContent = oldScript.textContent;
+            }
+            oldScript.parentNode.replaceChild(newScript, oldScript);
+        });
+        
         // Show loaded page
         const loadedSection = pageContent.querySelector('.section');
         if (loadedSection) {
@@ -350,8 +425,10 @@ window.loadPage = async function(pageName) {
 
         // Show/hide navigation based on page
         const navbarContainer = document.getElementById('navbar-container');
+        // Pages that should hide the main CRM navbar (full page forms)
+        const hideNavbarPages = ['home', 'login', 'register', 'company-selection', 'add-customer', 'add-contact', 'add-lead', 'add-deal', 'add-task', 'add-activity', 'add-user', 'add-role', 'add-company', 'settings'];
         if (navbarContainer) {
-            if (pageName === 'home' || pageName === 'login' || pageName === 'register' || pageName === 'company-selection') {
+            if (hideNavbarPages.includes(pageName)) {
                 navbarContainer.style.display = 'none';
                 // Allow scrolling on all pages
                 document.body.classList.remove('auth-page-active');
@@ -472,12 +549,9 @@ window.closeFormModal = function() {
     const formContent = document.getElementById('formContent');
     
     if (modal) {
-        // Remove active class
+        // Remove active class and hide modal
         modal.classList.remove('active');
-        // Remove any inline display styles that might be set
-        if (modal.style.display) {
-            modal.style.removeProperty('display');
-        }
+        modal.style.display = 'none';
         console.log('Modal closed successfully');
     } else {
         console.error('Modal element not found!');
@@ -538,4 +612,106 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
+// Global Toast Notification Function
+window.showToast = function(message, type = 'info') {
+    // Remove existing toast
+    const existingToast = document.querySelector('.toast-notification');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast-notification toast-${type}`;
+    
+    // Icon based on type
+    const icons = {
+        success: '✓',
+        error: '✕',
+        warning: '⚠',
+        info: 'ℹ'
+    };
+    
+    toast.innerHTML = `
+        <span class="toast-icon">${icons[type] || icons.info}</span>
+        <span class="toast-message">${message}</span>
+        <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+    `;
+    
+    // Add to body
+    document.body.appendChild(toast);
+    
+    // Trigger animation
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    // Auto remove after 4 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+};
+
+// Global Delete Confirmation Modal
+window.showDeleteConfirmModal = function(title, message, onConfirm) {
+    // Remove existing modal if any
+    const existingModal = document.getElementById('deleteConfirmModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    const modalHtml = `
+        <div id="deleteConfirmModal" class="modal delete-confirm-modal" style="display: flex;">
+            <div class="modal-content delete-confirm-content">
+                <div class="delete-confirm-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#dc3545" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                </div>
+                <h3 class="delete-confirm-title">${title}</h3>
+                <p class="delete-confirm-message">${message}</p>
+                <div class="delete-confirm-actions">
+                    <button class="btn btn-secondary" onclick="closeDeleteConfirmModal()">Cancel</button>
+                    <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Add event listener to confirm button
+    document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+        const btn = document.getElementById('confirmDeleteBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-small"></span> Deleting...';
+        
+        await onConfirm();
+        closeDeleteConfirmModal();
+    });
+    
+    // Close on backdrop click
+    document.getElementById('deleteConfirmModal').addEventListener('click', (e) => {
+        if (e.target.id === 'deleteConfirmModal') {
+            closeDeleteConfirmModal();
+        }
+    });
+    
+    // Close on Escape key
+    document.addEventListener('keydown', function escHandler(e) {
+        if (e.key === 'Escape') {
+            closeDeleteConfirmModal();
+            document.removeEventListener('keydown', escHandler);
+        }
+    });
+};
+
+window.closeDeleteConfirmModal = function() {
+    const modal = document.getElementById('deleteConfirmModal');
+    if (modal) {
+        modal.remove();
+    }
+};
 

@@ -10,6 +10,7 @@ from app.models.company import Company
 from app.models.user import User
 from app.models.user_company import UserCompany
 from app.schemas.company import CompanyCreate, CompanyUpdate
+from app.services import audit_service
 
 
 class CompanyController:
@@ -28,7 +29,11 @@ class CompanyController:
         Returns:
             List of companies
         """
-        query = db.query(Company).join(UserCompany).filter(UserCompany.user_id == user.id)
+        # Super admin can access all companies
+        if user.role == "super_admin":
+            query = db.query(Company)
+        else:
+            query = db.query(Company).join(UserCompany).filter(UserCompany.user_id == user.id)
         
         if search:
             query = query.filter(
@@ -78,6 +83,19 @@ class CompanyController:
         
         db.commit()
         db.refresh(new_company)
+        
+        # Log audit trail
+        try:
+            audit_service.log_create(
+                db=db,
+                user_id=user.id,
+                user_email=user.email,
+                resource_type="Company",
+                resource_id=new_company.id,
+                new_values={"name": new_company.name, "email": new_company.email}
+            )
+        except Exception:
+            pass
         
         return new_company
     
@@ -156,13 +174,32 @@ class CompanyController:
                 detail="Insufficient permissions"
             )
         
-        # Update company
+        # Store old values for audit
         update_data = company_data.model_dump(exclude_unset=True)
+        old_values = {}
+        for key in update_data.keys():
+            old_values[key] = getattr(company, key, None)
+        
+        # Update company
         for key, value in update_data.items():
             setattr(company, key, value)
         
         db.commit()
         db.refresh(company)
+        
+        # Log audit trail
+        try:
+            audit_service.log_update(
+                db=db,
+                user_id=user.id,
+                user_email=user.email,
+                resource_type="Company",
+                resource_id=company.id,
+                old_values=old_values,
+                new_values=update_data
+            )
+        except Exception:
+            pass
         
         return company
     
@@ -195,4 +232,17 @@ class CompanyController:
         
         db.delete(company)
         db.commit()
+        
+        # Log audit trail
+        try:
+            audit_service.log_delete(
+                db=db,
+                user_id=user.id,
+                user_email=user.email,
+                resource_type="Company",
+                resource_id=company_id,
+                old_values={"name": company.name, "email": company.email}
+            )
+        except Exception:
+            pass
 

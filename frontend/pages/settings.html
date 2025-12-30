@@ -1,0 +1,223 @@
+<!-- Settings Full Page - VEGA CRM Theme -->
+<style>
+    .vega-form-page { min-height: calc(100vh - 60px); background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 40px 20px; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    .vega-form-container { max-width: 900px; margin: 0 auto; }
+    .vega-form-header { text-align: center; margin-bottom: 40px; }
+    .vega-form-badge { display: inline-block; padding: 8px 16px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%); color: #6366f1; border-radius: 50px; font-size: 0.85rem; font-weight: 600; margin-bottom: 16px; }
+    .vega-form-title { font-size: 2rem; font-weight: 800; color: #1e293b; margin-bottom: 8px; }
+    .vega-form-subtitle { color: #64748b; font-size: 1rem; }
+    .vega-form-card { background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; margin-bottom: 24px; }
+    .vega-form-card-header { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 24px 32px; color: white; }
+    .vega-form-card-header h2 { margin: 0; font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+    .vega-form-card-body { padding: 32px; }
+    .vega-form-section { margin-bottom: 32px; }
+    .vega-form-section:last-child { margin-bottom: 0; }
+    .vega-form-section-title { font-size: 0.9rem; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb; display: flex; align-items: center; gap: 8px; }
+    .vega-form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .vega-form-group { display: flex; flex-direction: column; }
+    .vega-form-group.full-width { grid-column: 1 / -1; }
+    .vega-form-label { font-size: 0.85rem; font-weight: 600; color: #374151; margin-bottom: 8px; }
+    .vega-form-input, .vega-form-select { padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.95rem; font-family: inherit; transition: all 0.3s; background: #f8fafc; }
+    .vega-form-input:focus, .vega-form-select:focus { outline: none; border-color: #6366f1; background: white; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+    .vega-form-actions { display: flex; justify-content: flex-end; gap: 16px; padding-top: 24px; border-top: 2px solid #e5e7eb; margin-top: 32px; }
+    .vega-btn { padding: 14px 28px; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+    .vega-btn-primary { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
+    .vega-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5); }
+    .vega-btn-secondary { background: white; color: #64748b; border: 2px solid #e5e7eb; }
+    .vega-back-link { display: inline-flex; align-items: center; gap: 8px; color: #6366f1; text-decoration: none; font-weight: 500; margin-bottom: 24px; }
+    .toggle-switch { position: relative; width: 50px; height: 26px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .3s; border-radius: 26px; }
+    .toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+    .toggle-switch input:checked + .toggle-slider { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); }
+    .toggle-switch input:checked + .toggle-slider:before { transform: translateX(24px); }
+    .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #e5e7eb; }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-info h4 { margin: 0 0 4px 0; font-size: 0.95rem; color: #1e293b; }
+    .setting-info p { margin: 0; font-size: 0.85rem; color: #64748b; }
+    @media (max-width: 768px) { .vega-form-grid { grid-template-columns: 1fr; } }
+</style>
+
+<section id="settings" class="section vega-form-page">
+    <div class="vega-form-container">
+        <a href="#" class="vega-back-link" onclick="loadPage('admin'); return false;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 10H5M5 10L10 5M5 10L10 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Back to Admin Panel
+        </a>
+
+        <div class="vega-form-header">
+            <span class="vega-form-badge">⚙️ Settings</span>
+            <h1 class="vega-form-title">System Settings</h1>
+            <p class="vega-form-subtitle">Configure your CRM preferences</p>
+        </div>
+
+        <!-- General Settings -->
+        <div class="vega-form-card">
+            <div class="vega-form-card-header">
+                <h2>🎨 General Settings</h2>
+            </div>
+            <div class="vega-form-card-body">
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Dark Mode</h4>
+                        <p>Enable dark theme for the application</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="settingDarkMode">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Compact View</h4>
+                        <p>Use compact layout for tables and lists</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="settingCompactView">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Language</h4>
+                        <p>Select your preferred language</p>
+                    </div>
+                    <select id="settingLanguage" class="vega-form-select" style="width: 150px;">
+                        <option value="en">English</option>
+                        <option value="hi">हिंदी</option>
+                        <option value="mr">मराठी</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Settings -->
+        <div class="vega-form-card">
+            <div class="vega-form-card-header">
+                <h2>🔔 Notification Settings</h2>
+            </div>
+            <div class="vega-form-card-body">
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Email Notifications</h4>
+                        <p>Receive email alerts for important updates</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="settingEmailNotif" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Task Reminders</h4>
+                        <p>Get notified before task due dates</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="settingTaskReminder" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Deal Updates</h4>
+                        <p>Notifications when deals change stage</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="settingDealUpdates" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Settings -->
+        <div class="vega-form-card">
+            <div class="vega-form-card-header">
+                <h2>📊 Data & Privacy</h2>
+            </div>
+            <div class="vega-form-card-body">
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Auto-save Forms</h4>
+                        <p>Automatically save form data as you type</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="settingAutoSave" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Export Format</h4>
+                        <p>Default format for data exports</p>
+                    </div>
+                    <select id="settingExportFormat" class="vega-form-select" style="width: 150px;">
+                        <option value="csv">CSV</option>
+                        <option value="xlsx">Excel (XLSX)</option>
+                        <option value="pdf">PDF</option>
+                    </select>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Date Format</h4>
+                        <p>How dates are displayed</p>
+                    </div>
+                    <select id="settingDateFormat" class="vega-form-select" style="width: 150px;">
+                        <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                        <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                        <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="vega-form-actions">
+            <button type="button" class="vega-btn vega-btn-secondary" onclick="loadPage('admin')">Cancel</button>
+            <button type="button" class="vega-btn vega-btn-primary" onclick="saveSettings()">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 4.5L6.75 12.75L3 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Save Settings
+            </button>
+        </div>
+    </div>
+</section>
+
+<script>
+// Load saved settings
+(function() {
+    const settings = JSON.parse(localStorage.getItem('crmSettings') || '{}');
+    if (settings.darkMode) document.getElementById('settingDarkMode').checked = settings.darkMode;
+    if (settings.compactView) document.getElementById('settingCompactView').checked = settings.compactView;
+    if (settings.language) document.getElementById('settingLanguage').value = settings.language;
+    if (settings.emailNotif !== undefined) document.getElementById('settingEmailNotif').checked = settings.emailNotif;
+    if (settings.taskReminder !== undefined) document.getElementById('settingTaskReminder').checked = settings.taskReminder;
+    if (settings.dealUpdates !== undefined) document.getElementById('settingDealUpdates').checked = settings.dealUpdates;
+    if (settings.autoSave !== undefined) document.getElementById('settingAutoSave').checked = settings.autoSave;
+    if (settings.exportFormat) document.getElementById('settingExportFormat').value = settings.exportFormat;
+    if (settings.dateFormat) document.getElementById('settingDateFormat').value = settings.dateFormat;
+})();
+
+window.saveSettings = function() {
+    const settings = {
+        darkMode: document.getElementById('settingDarkMode').checked,
+        compactView: document.getElementById('settingCompactView').checked,
+        language: document.getElementById('settingLanguage').value,
+        emailNotif: document.getElementById('settingEmailNotif').checked,
+        taskReminder: document.getElementById('settingTaskReminder').checked,
+        dealUpdates: document.getElementById('settingDealUpdates').checked,
+        autoSave: document.getElementById('settingAutoSave').checked,
+        exportFormat: document.getElementById('settingExportFormat').value,
+        dateFormat: document.getElementById('settingDateFormat').value
+    };
+    
+    localStorage.setItem('crmSettings', JSON.stringify(settings));
+    
+    // Apply dark mode if changed
+    if (settings.darkMode) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+    }
+    
+    alert('Settings saved successfully!');
+};
+</script>

@@ -10,6 +10,7 @@ from app.models.deal import Deal
 from app.models.user import User
 from app.models.user_company import UserCompany
 from app.schemas.deal import DealCreate, DealUpdate
+from app.services import audit_service
 
 
 class DealController:
@@ -83,6 +84,19 @@ class DealController:
                 force_update=True
             )
         
+        # Log audit trail
+        try:
+            audit_service.log_create(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="Deal",
+                resource_id=new_deal.id,
+                new_values={"deal_name": new_deal.deal_name, "amount": new_deal.amount, "stage": new_deal.stage}
+            )
+        except Exception:
+            pass
+        
         return new_deal
     
     @staticmethod
@@ -120,7 +134,12 @@ class DealController:
         # Store old customer_id before update
         old_customer_id = deal.customer_id or deal.account_id
         
+        # Store old values for audit
         update_data = deal_data.model_dump(exclude_unset=True)
+        old_values = {}
+        for key in update_data.keys():
+            old_values[key] = getattr(deal, key, None)
+        
         for key, value in update_data.items():
             setattr(deal, key, value)
         
@@ -160,6 +179,20 @@ class DealController:
                     db,
                     force_update=True
                 )
+        
+        # Log audit trail
+        try:
+            audit_service.log_update(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="Deal",
+                resource_id=deal.id,
+                old_values=old_values,
+                new_values=update_data
+            )
+        except Exception:
+            pass
         
         return deal
     
@@ -218,6 +251,19 @@ class DealController:
                 db,
                 force_update=True
             )
+        
+        # Log audit trail
+        try:
+            audit_service.log_delete(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="Deal",
+                resource_id=deal_id,
+                old_values={"deal_name": deal.deal_name, "amount": deal.amount}
+            )
+        except Exception:
+            pass
     
     @staticmethod
     def get_deal_stats(company_id: int, db: Session) -> dict:

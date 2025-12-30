@@ -445,6 +445,7 @@ window.openTaskModal = function(task = null) {
         </form>
     `;
     
+    modal.style.display = 'flex';
     modal.classList.add('active');
     console.log('Modal opened successfully');
     
@@ -579,39 +580,451 @@ window.completeTask = async function(id) {
 };
 
 window.deleteTask = async function(id) {
-    if (!confirm('Are you sure you want to delete this task? This action cannot be undone.')) {
-        return;
+    showDeleteConfirmModal(
+        'Delete Task',
+        'Are you sure you want to delete this task? This action cannot be undone.',
+        async () => {
+            try {
+                const response = await fetch(`${API_BASE}/companies/${companyId}/tasks/${id}`, {
+                    method: 'DELETE',
+                    headers: getHeaders()
+                });
+                
+                if (response.status === 401) {
+                    if (typeof handle401Error === 'function') {
+                        handle401Error();
+                    }
+                    return;
+                }
+                
+                if (response.ok) {
+                    if (window.tasksTable && typeof window.tasksTable.refresh === 'function') {
+                        window.tasksTable.refresh();
+                    } else {
+                        loadTasks();
+                    }
+                    showToast('Task deleted successfully!', 'success');
+                } else {
+                    const result = await response.json();
+                    showToast(result.detail || 'Failed to delete task', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting task:', error);
+                showToast('Connection error. Please try again.', 'error');
+            }
+        }
+    );
+};
+
+// ============================================
+// Task View Switching Functions
+// ============================================
+
+window.currentTaskView = 'table';
+
+// Switch between Table, Automation, and Overdue views
+window.switchTaskView = function(view) {
+    window.currentTaskView = view;
+    
+    const tableView = document.getElementById('tasksTableView');
+    const automationView = document.getElementById('tasksAutomationView');
+    const overdueView = document.getElementById('tasksOverdueView');
+    const tableBtn = document.getElementById('taskTableViewBtn');
+    const automationBtn = document.getElementById('taskAutomationViewBtn');
+    const overdueBtn = document.getElementById('taskOverdueViewBtn');
+    
+    // Hide all views
+    if (tableView) tableView.style.display = 'none';
+    if (automationView) automationView.style.display = 'none';
+    if (overdueView) overdueView.style.display = 'none';
+    
+    // Remove active from all buttons
+    if (tableBtn) tableBtn.classList.remove('active');
+    if (automationBtn) automationBtn.classList.remove('active');
+    if (overdueBtn) overdueBtn.classList.remove('active');
+    
+    if (view === 'automation') {
+        if (automationView) automationView.style.display = 'block';
+        if (automationBtn) automationBtn.classList.add('active');
+        loadAutomationView();
+    } else if (view === 'overdue') {
+        if (overdueView) overdueView.style.display = 'block';
+        if (overdueBtn) overdueBtn.classList.add('active');
+        loadOverdueView();
+    } else {
+        if (tableView) tableView.style.display = 'block';
+        if (tableBtn) tableBtn.classList.add('active');
+        loadTasks();
     }
+};
+
+// Load Automation View
+window.loadAutomationView = async function() {
+    if (!authToken || !companyId) return;
     
     try {
-        const response = await fetch(`${API_BASE}/companies/${companyId}/tasks/${id}`, {
-            method: 'DELETE',
+        const response = await fetch(`${API_BASE}/companies/${companyId}/tasks/automation-stats`, {
             headers: getHeaders()
         });
         
-        if (response.status === 401) {
-            if (typeof handle401Error === 'function') {
-                handle401Error();
-            }
+        if (!response.ok) {
+            showToast('Error loading automation stats', 'error');
             return;
         }
         
-        if (response.ok) {
-            if (window.tasksTable && typeof window.tasksTable.refresh === 'function') {
-                window.tasksTable.refresh();
-            } else {
-                loadTasks();
-            }
-            if (typeof showNotification === 'function') {
-                showNotification('Task deleted successfully!', 'success');
-            }
-        } else {
-            const result = await response.json();
-            alert(result.detail || 'Failed to delete task');
+        const result = await response.json();
+        const stats = result.data || {};
+        
+        // Update stat cards
+        document.getElementById('auto-total-tasks').textContent = stats.total_tasks || 0;
+        document.getElementById('auto-pending-tasks').textContent = stats.pending_tasks || 0;
+        document.getElementById('auto-overdue-tasks').textContent = stats.overdue_tasks || 0;
+        document.getElementById('auto-completed-today').textContent = stats.completed_today || 0;
+        
+        // Update priority bars
+        const byPriority = stats.by_priority || {};
+        const maxPriority = Math.max(
+            byPriority.urgent || 0,
+            byPriority.high || 0,
+            byPriority.medium || 0,
+            byPriority.low || 0,
+            1
+        );
+        
+        ['urgent', 'high', 'medium', 'low'].forEach(priority => {
+            const count = byPriority[priority] || 0;
+            const width = Math.min(100, (count / maxPriority) * 100);
+            const bar = document.getElementById(`bar-${priority}`);
+            const countEl = document.getElementById(`count-${priority}`);
+            if (bar) bar.style.width = `${width}%`;
+            if (countEl) countEl.textContent = count;
+        });
+        
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
         }
     } catch (error) {
-        console.error('Error deleting task:', error);
-        alert('Connection error. Please try again.');
+        console.error('Error loading automation view:', error);
+        showToast('Error loading automation data', 'error');
+    }
+};
+
+// Load Overdue View
+window.loadOverdueView = async function() {
+    if (!authToken || !companyId) return;
+    
+    try {
+        const response = await fetch(`${API_BASE}/companies/${companyId}/tasks/overdue`, {
+            headers: getHeaders()
+        });
+        
+        if (!response.ok) {
+            showToast('Error loading overdue tasks', 'error');
+            return;
+        }
+        
+        const result = await response.json();
+        const tasks = result.data?.overdue_tasks || [];
+        
+        // Update count badge
+        document.getElementById('overdue-total-count').textContent = tasks.length;
+        
+        // Render overdue list
+        const container = document.getElementById('overdueListContainer');
+        if (!container) return;
+        
+        if (tasks.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i data-lucide="check-circle" style="width:64px;height:64px;color:var(--jira-success);"></i>
+                    <h3>No Overdue Tasks!</h3>
+                    <p>Great job! All tasks are on track.</p>
+                </div>
+            `;
+        } else {
+            container.innerHTML = tasks.map(task => `
+                <div class="overdue-task-card priority-${task.priority}">
+                    <div class="overdue-task-info">
+                        <h4>${escapeHtml(task.title)}</h4>
+                        <div class="overdue-task-meta">
+                            <span class="days-badge">${task.days_overdue} days overdue</span>
+                            <span class="priority-badge ${task.priority}">${task.priority}</span>
+                            ${task.assigned_to ? `<span class="assigned-badge"><i data-lucide="user"></i> ${task.assigned_to}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="overdue-task-actions">
+                        <button class="btn btn-sm btn-primary" onclick="editTask(${task.id})">
+                            <i data-lucide="edit"></i> Edit
+                        </button>
+                        <button class="btn btn-sm btn-success" onclick="completeTask(${task.id})">
+                            <i data-lucide="check"></i> Complete
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    } catch (error) {
+        console.error('Error loading overdue view:', error);
+        showToast('Error loading overdue tasks', 'error');
+    }
+};
+
+// Complete Task
+window.completeTask = async function(taskId) {
+    try {
+        const response = await fetch(`${API_BASE}/companies/${companyId}/tasks/${taskId}/complete`, {
+            method: 'PUT',
+            headers: getHeaders()
+        });
+        
+        if (response.ok) {
+            showToast('Task completed!', 'success');
+            loadOverdueView();
+        } else {
+            showToast('Failed to complete task', 'error');
+        }
+    } catch (error) {
+        console.error('Error completing task:', error);
+        showToast('Error completing task', 'error');
+    }
+};
+
+// ============================================
+// Task Automation Functions (Legacy Modal - kept for compatibility)
+// ============================================
+
+// Show Task Automation Dashboard (Modal - legacy)
+window.showTaskAutomationDashboard = async function() {
+    try {
+        const response = await fetch(`${API_BASE}/companies/${companyId}/tasks/automation-stats`, {
+            headers: getHeaders()
+        });
+        
+        if (!response.ok) {
+            showToast('Error loading automation stats', 'error');
+            return;
+        }
+        
+        const result = await response.json();
+        const stats = result.data || {};
+        
+        const modalHtml = `
+            <div class="modal-overlay" id="automationModal" onclick="closeAutomationModal(event)">
+                <div class="modal-content modal-lg" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h3><i data-lucide="zap"></i> Task Automation Dashboard</h3>
+                        <button class="modal-close" onclick="closeAutomationModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Stats Cards -->
+                        <div class="automation-stats-grid">
+                            <div class="stat-card">
+                                <i data-lucide="list-todo"></i>
+                                <span class="stat-value">${stats.total_tasks || 0}</span>
+                                <span class="stat-label">Total Tasks</span>
+                            </div>
+                            <div class="stat-card warning">
+                                <i data-lucide="clock"></i>
+                                <span class="stat-value">${stats.pending_tasks || 0}</span>
+                                <span class="stat-label">Pending</span>
+                            </div>
+                            <div class="stat-card danger">
+                                <i data-lucide="alert-triangle"></i>
+                                <span class="stat-value">${stats.overdue_tasks || 0}</span>
+                                <span class="stat-label">Overdue</span>
+                            </div>
+                            <div class="stat-card success">
+                                <i data-lucide="check-circle"></i>
+                                <span class="stat-value">${stats.completed_today || 0}</span>
+                                <span class="stat-label">Completed Today</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Priority Breakdown -->
+                        <div class="automation-section">
+                            <h4>Tasks by Priority</h4>
+                            <div class="priority-bars">
+                                <div class="priority-item">
+                                    <span class="priority-label">Urgent</span>
+                                    <div class="priority-bar urgent" style="width: ${Math.min(100, (stats.by_priority?.urgent || 0) * 10)}%"></div>
+                                    <span class="priority-count">${stats.by_priority?.urgent || 0}</span>
+                                </div>
+                                <div class="priority-item">
+                                    <span class="priority-label">High</span>
+                                    <div class="priority-bar high" style="width: ${Math.min(100, (stats.by_priority?.high || 0) * 10)}%"></div>
+                                    <span class="priority-count">${stats.by_priority?.high || 0}</span>
+                                </div>
+                                <div class="priority-item">
+                                    <span class="priority-label">Medium</span>
+                                    <div class="priority-bar medium" style="width: ${Math.min(100, (stats.by_priority?.medium || 0) * 10)}%"></div>
+                                    <span class="priority-count">${stats.by_priority?.medium || 0}</span>
+                                </div>
+                                <div class="priority-item">
+                                    <span class="priority-label">Low</span>
+                                    <div class="priority-bar low" style="width: ${Math.min(100, (stats.by_priority?.low || 0) * 10)}%"></div>
+                                    <span class="priority-count">${stats.by_priority?.low || 0}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Automation Actions -->
+                        <div class="automation-section">
+                            <h4>Automation Actions</h4>
+                            <div class="automation-actions">
+                                <button class="btn btn-primary" onclick="autoCreateTasksForLeads()">
+                                    <i data-lucide="plus-circle"></i> Auto-Create Follow-up Tasks
+                                </button>
+                                <button class="btn btn-warning" onclick="escalateOverdueTasks()">
+                                    <i data-lucide="arrow-up-circle"></i> Escalate Overdue Tasks
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="closeAutomationModal()">Close</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        const existingModal = document.getElementById('automationModal');
+        if (existingModal) existingModal.remove();
+        
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    } catch (error) {
+        console.error('Error loading automation dashboard:', error);
+        showToast('Error loading automation dashboard', 'error');
+    }
+};
+
+window.closeAutomationModal = function(event) {
+    if (event && event.target !== event.currentTarget) return;
+    const modal = document.getElementById('automationModal');
+    if (modal) modal.remove();
+};
+
+// Show Overdue Tasks
+window.showOverdueTasks = async function() {
+    try {
+        const response = await fetch(`${API_BASE}/companies/${companyId}/tasks/overdue`, {
+            headers: getHeaders()
+        });
+        
+        if (!response.ok) {
+            showToast('Error loading overdue tasks', 'error');
+            return;
+        }
+        
+        const result = await response.json();
+        const tasks = result.data?.overdue_tasks || [];
+        
+        const modalHtml = `
+            <div class="modal-overlay" id="overdueModal" onclick="closeOverdueModal(event)">
+                <div class="modal-content modal-lg" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h3><i data-lucide="alert-triangle"></i> Overdue Tasks (${tasks.length})</h3>
+                        <button class="modal-close" onclick="closeOverdueModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        ${tasks.length === 0 ? '<div class="empty-state"><p>No overdue tasks! 🎉</p></div>' : `
+                        <div class="overdue-list">
+                            ${tasks.map(task => `
+                                <div class="overdue-item priority-${task.priority}">
+                                    <div class="overdue-info">
+                                        <span class="overdue-title">${escapeHtml(task.title)}</span>
+                                        <span class="overdue-meta">
+                                            <span class="days-overdue">${task.days_overdue} days overdue</span>
+                                            <span class="priority-badge ${task.priority}">${task.priority}</span>
+                                        </span>
+                                    </div>
+                                    <div class="overdue-actions">
+                                        <button class="btn btn-sm btn-primary" onclick="editTask(${task.id}); closeOverdueModal();">Edit</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        `}
+                    </div>
+                    <div class="modal-footer">
+                        ${tasks.length > 0 ? `<button class="btn btn-warning" onclick="escalateOverdueTasks()">
+                            <i data-lucide="arrow-up-circle"></i> Escalate All
+                        </button>` : ''}
+                        <button class="btn btn-secondary" onclick="closeOverdueModal()">Close</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        const existingModal = document.getElementById('overdueModal');
+        if (existingModal) existingModal.remove();
+        
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    } catch (error) {
+        console.error('Error loading overdue tasks:', error);
+        showToast('Error loading overdue tasks', 'error');
+    }
+};
+
+window.closeOverdueModal = function(event) {
+    if (event && event.target !== event.currentTarget) return;
+    const modal = document.getElementById('overdueModal');
+    if (modal) modal.remove();
+};
+
+// Auto-create tasks for leads
+window.autoCreateTasksForLeads = async function() {
+    try {
+        const response = await fetch(`${API_BASE}/companies/${companyId}/tasks/auto-create-for-leads?days_since_creation=7`, {
+            method: 'POST',
+            headers: getHeaders()
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            showToast(`Created ${result.data?.tasks_created || 0} follow-up tasks`, 'success');
+            closeAutomationModal();
+            loadTasks();
+        } else {
+            showToast('Failed to create tasks', 'error');
+        }
+    } catch (error) {
+        console.error('Error creating tasks:', error);
+        showToast('Error creating tasks', 'error');
+    }
+};
+
+// Escalate overdue tasks
+window.escalateOverdueTasks = async function() {
+    try {
+        const response = await fetch(`${API_BASE}/companies/${companyId}/tasks/escalate-overdue?escalation_days=3`, {
+            method: 'POST',
+            headers: getHeaders()
+        });
+        
+        if (response.ok) {
+            const result = await response.json();
+            showToast(`Escalated ${result.data?.escalated || 0} tasks`, 'success');
+            closeAutomationModal();
+            closeOverdueModal();
+            loadTasks();
+        } else {
+            showToast('Failed to escalate tasks', 'error');
+        }
+    } catch (error) {
+        console.error('Error escalating tasks:', error);
+        showToast('Error escalating tasks', 'error');
     }
 };
 

@@ -1,13 +1,30 @@
 /**
- * Advanced DataTable Framework
+ * Advanced DataTable Framework v2.0
  * A plug-and-play data table component with sorting, filtering, pagination, export, and more
+ * 
+ * Features:
+ * - Sorting (single/multi column)
+ * - Global & Column Search
+ * - Pagination with page size options
+ * - Column visibility toggle
+ * - Export (CSV, Excel, PDF, Print)
+ * - Row selection (single/multi)
+ * - Responsive design
+ * - Loading states
+ * - Empty states
+ * - Row actions
+ * - Inline editing
+ * - Sticky header
+ * - Column resizing
  * 
  * Usage:
  * const table = new DataTable('containerId', {
  *     data: [...],
  *     columns: [...],
  *     pagination: true,
- *     sorting: true
+ *     sorting: true,
+ *     stickyHeader: true,
+ *     loading: false
  * });
  */
 
@@ -49,6 +66,26 @@ class DataTable {
             
             // Styling
             className: options.className || 'datatable',
+            
+            // Advanced features
+            stickyHeader: options.stickyHeader || false,
+            loading: options.loading || false,
+            emptyMessage: options.emptyMessage || 'No data available',
+            loadingMessage: options.loadingMessage || 'Loading...',
+            striped: options.striped !== false,
+            hover: options.hover !== false,
+            bordered: options.bordered || false,
+            compact: options.compact || false,
+            
+            // Inline editing
+            editable: options.editable || false,
+            onEdit: options.onEdit || null,
+            
+            // Row actions
+            rowActions: options.rowActions || null,
+            
+            // Bulk actions
+            bulkActions: options.bulkActions || null,
             
             ...options
         };
@@ -263,7 +300,13 @@ class DataTable {
 
     createTable() {
         const table = document.createElement('table');
-        table.className = 'datatable-table';
+        let tableClass = 'datatable-table';
+        if (this.options.striped) tableClass += ' datatable-striped';
+        if (this.options.hover) tableClass += ' datatable-hover';
+        if (this.options.bordered) tableClass += ' datatable-bordered';
+        if (this.options.compact) tableClass += ' datatable-compact';
+        if (this.options.stickyHeader) tableClass += ' datatable-sticky-header';
+        table.className = tableClass;
         
         // Header
         const thead = document.createElement('thead');
@@ -304,12 +347,34 @@ class DataTable {
         const tbody = document.createElement('tbody');
         tbody.className = 'datatable-body';
         
-        if (this.displayData.length === 0) {
+        // Loading state
+        if (this.options.loading) {
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = this.visibleColumns.size + (this.options.selection ? 1 : 0);
+            cell.className = 'datatable-loading';
+            cell.innerHTML = `
+                <div class="datatable-loading-spinner">
+                    <div class="spinner"></div>
+                    <span>${this.options.loadingMessage}</span>
+                </div>
+            `;
+            row.appendChild(cell);
+            tbody.appendChild(row);
+        } else if (this.displayData.length === 0) {
             const row = document.createElement('tr');
             const cell = document.createElement('td');
             cell.colSpan = this.visibleColumns.size + (this.options.selection ? 1 : 0);
             cell.className = 'datatable-empty';
-            cell.textContent = 'No data available';
+            cell.innerHTML = `
+                <div class="datatable-empty-state">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1">
+                        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                        <polyline points="13 2 13 9 20 9"/>
+                    </svg>
+                    <p>${this.options.emptyMessage}</p>
+                </div>
+            `;
             row.appendChild(cell);
             tbody.appendChild(row);
         } else {
@@ -721,6 +786,59 @@ class DataTable {
     updateData(data) {
         this.loadData(data);
         // render() is already called in loadData()
+    }
+    
+    setLoading(loading) {
+        this.options.loading = loading;
+        this.render();
+    }
+    
+    getFilteredData() {
+        return this.filteredData;
+    }
+    
+    getSortedData() {
+        return this.sortedData;
+    }
+    
+    getCurrentPage() {
+        return this.currentPage;
+    }
+    
+    getTotalPages() {
+        return Math.ceil(this.sortedData.length / this.options.pageSize);
+    }
+    
+    getTotalRecords() {
+        return this.currentData.length;
+    }
+    
+    getFilteredRecords() {
+        return this.filteredData.length;
+    }
+    
+    clearFilters() {
+        this.filterState = {};
+        this.applyFilters();
+    }
+    
+    clearSelection() {
+        this.selectedRows.clear();
+        this.render();
+    }
+    
+    selectRow(index) {
+        this.selectedRows.add(index);
+        this.render();
+    }
+    
+    deselectRow(index) {
+        this.selectedRows.delete(index);
+        this.render();
+    }
+    
+    destroy() {
+        this.container.innerHTML = '';
     }
 }
 

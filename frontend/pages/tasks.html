@@ -1,67 +1,279 @@
-<!-- Tasks Page -->
-<section id="tasks" class="section subscription-saas-style">
-    <div class="subscription-saas-container">
-        <h1 class="subscription-saas-heading">Task Management</h1>
-        <div class="subscription-saas-actions">
-            <button class="btn-reports" onclick="alert('Reports feature coming soon!')">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="20" x2="18" y2="10"></line>
-                    <line x1="12" y1="20" x2="12" y2="4"></line>
-                    <line x1="6" y1="20" x2="6" y2="14"></line>
-                </svg>
-                Reports
-            </button>
-            <button class="btn-add-primary" onclick="window.showTaskForm && window.showTaskForm()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-                + Add Task
-            </button>
-            <button class="btn-import-csv" onclick="alert('Import CSV feature coming soon!')">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                Import CSV
-            </button>
+<!-- Tasks Page - VEGA CRM Theme -->
+<style>
+    .vega-page { min-height: calc(100vh - 60px); background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 24px; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    .vega-page-header { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border-radius: 20px; padding: 32px; margin-bottom: 24px; color: white; box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3); }
+    .vega-page-header-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+    .vega-page-title-section { display: flex; align-items: center; gap: 16px; }
+    .vega-page-icon { width: 56px; height: 56px; background: rgba(255,255,255,0.2); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+    .vega-page-title { font-size: 1.8rem; font-weight: 800; margin: 0; }
+    .vega-page-subtitle { font-size: 0.95rem; opacity: 0.9; margin-top: 4px; }
+    .vega-page-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .vega-action-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 12px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s; border: none; }
+    .vega-action-btn-primary { background: white; color: #6366f1; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .vega-action-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+    .vega-view-toggle { display: flex; background: rgba(255,255,255,0.2); border-radius: 10px; padding: 4px; }
+    .vega-view-btn { padding: 10px 18px; border: none; background: transparent; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 600; color: rgba(255,255,255,0.8); transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+    .vega-view-btn.active { background: white; color: #6366f1; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .vega-view-btn:hover:not(.active) { background: rgba(255,255,255,0.1); color: white; }
+    .vega-stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .vega-stat-card { background: white; border-radius: 16px; padding: 20px 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 16px; transition: all 0.3s; }
+    .vega-stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+    .vega-stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+    .vega-stat-icon.blue { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); }
+    .vega-stat-icon.green { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); }
+    .vega-stat-icon.yellow { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); }
+    .vega-stat-icon.red { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); }
+    .vega-stat-icon.purple { background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); }
+    .vega-stat-value { font-size: 1.6rem; font-weight: 800; color: #1e293b; line-height: 1; }
+    .vega-stat-label { font-size: 0.85rem; color: #64748b; margin-top: 4px; }
+    .vega-filters-card { background: white; border-radius: 16px; padding: 20px 24px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+    .vega-filters-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+    .vega-search-box { flex: 1; min-width: 250px; position: relative; }
+    .vega-search-box input { width: 100%; padding: 14px 20px 14px 48px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 0.95rem; transition: all 0.3s; background: #f8fafc; }
+    .vega-search-box input:focus { outline: none; border-color: #6366f1; background: white; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+    .vega-search-box svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+    .vega-filter-select { padding: 14px 20px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 0.95rem; background: #f8fafc; min-width: 150px; cursor: pointer; transition: all 0.3s; }
+    .vega-filter-select:focus { outline: none; border-color: #6366f1; background: white; }
+    .vega-table-card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); overflow: hidden; }
+    .vega-table-header { padding: 20px 24px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .vega-table-title { font-size: 1.1rem; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 10px; }
+    .vega-table-count { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+    .vega-table-actions { display: flex; gap: 8px; }
+    .vega-table-action-btn { padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 8px; background: white; cursor: pointer; font-size: 0.85rem; color: #64748b; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+    .vega-table-action-btn:hover { border-color: #6366f1; color: #6366f1; }
+    @media (max-width: 768px) { .vega-page-header-content { flex-direction: column; align-items: flex-start; } .vega-stats-row { grid-template-columns: repeat(2, 1fr); } .vega-filters-row { flex-direction: column; } .vega-search-box { min-width: 100%; } }
+</style>
+
+<section id="tasks" class="section vega-page">
+    <!-- Page Header -->
+    <div class="vega-page-header">
+        <div class="vega-page-header-content">
+            <div class="vega-page-title-section">
+                <div class="vega-page-icon">✅</div>
+                <div>
+                    <h1 class="vega-page-title">Task Management</h1>
+                    <p class="vega-page-subtitle">Organize and track your team's tasks</p>
+                </div>
+            </div>
+            <div class="vega-page-actions">
+                <div class="vega-view-toggle">
+                    <button class="vega-view-btn active" id="taskTableViewBtn" onclick="switchTaskView('table')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        Tasks
+                    </button>
+                    <button class="vega-view-btn" id="taskAutomationViewBtn" onclick="switchTaskView('automation')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        Automation
+                    </button>
+                    <button class="vega-view-btn" id="taskOverdueViewBtn" onclick="switchTaskView('overdue')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        Overdue
+                    </button>
+                </div>
+                <button class="vega-action-btn vega-action-btn-primary" onclick="loadPage('add-task')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Add Task
+                </button>
+            </div>
         </div>
     </div>
-    <div class="page-body-advanced">
-        <div class="filters-advanced">
-            <div class="filter-group">
-                <svg class="filter-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M7 12L11 8L7 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-                <input type="text" id="taskSearch" class="filter-input" placeholder="Search tasks..." onkeyup="loadTasks()">
-            </div>
-            <div class="filter-group">
-                <svg class="filter-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M2 4H14M4 8H12M6 12H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                </svg>
-                <select id="taskStatusFilter" class="filter-select" onchange="loadTasks()">
-                    <option value="">All Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="completed">Completed</option>
-                    <option value="cancelled">Cancelled</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <svg class="filter-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M8 2L10 6L14 7L10 8L8 12L6 8L2 7L6 6L8 2Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                </svg>
-                <select id="taskPriorityFilter" class="filter-select" onchange="loadTasks()">
-                    <option value="">All Priorities</option>
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                    <option value="urgent">Urgent</option>
-                </select>
+
+    <!-- Stats Row -->
+    <div class="vega-stats-row">
+        <div class="vega-stat-card">
+            <div class="vega-stat-icon blue">📋</div>
+            <div>
+                <div class="vega-stat-value" id="statTotalTasks">0</div>
+                <div class="vega-stat-label">Total Tasks</div>
             </div>
         </div>
-        <div id="tasksTable" class="table-container-advanced"></div>
+        <div class="vega-stat-card">
+            <div class="vega-stat-icon yellow">⏳</div>
+            <div>
+                <div class="vega-stat-value" id="statPendingTasks">0</div>
+                <div class="vega-stat-label">Pending</div>
+            </div>
+        </div>
+        <div class="vega-stat-card">
+            <div class="vega-stat-icon purple">🔄</div>
+            <div>
+                <div class="vega-stat-value" id="statInProgressTasks">0</div>
+                <div class="vega-stat-label">In Progress</div>
+            </div>
+        </div>
+        <div class="vega-stat-card">
+            <div class="vega-stat-icon green">✅</div>
+            <div>
+                <div class="vega-stat-value" id="statCompletedTasks">0</div>
+                <div class="vega-stat-label">Completed</div>
+            </div>
+        </div>
+        <div class="vega-stat-card">
+            <div class="vega-stat-icon red">⚠️</div>
+            <div>
+                <div class="vega-stat-value" id="statOverdueTasks">0</div>
+                <div class="vega-stat-label">Overdue</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="vega-filters-card">
+        <div class="vega-filters-row">
+            <div class="vega-search-box">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input type="text" id="taskSearch" placeholder="Search tasks..." onkeyup="loadTasks()">
+            </div>
+            <select id="taskStatusFilter" class="vega-filter-select" onchange="loadTasks()">
+                <option value="">📋 All Status</option>
+                <option value="pending">⏳ Pending</option>
+                <option value="in_progress">🔄 In Progress</option>
+                <option value="completed">✅ Completed</option>
+                <option value="cancelled">❌ Cancelled</option>
+            </select>
+            <select id="taskPriorityFilter" class="vega-filter-select" onchange="loadTasks()">
+                <option value="">⭐ All Priorities</option>
+                <option value="urgent">🔴 Urgent</option>
+                <option value="high">🟠 High</option>
+                <option value="medium">🟡 Medium</option>
+                <option value="low">🟢 Low</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="vega-table-card">
+        <div class="vega-table-header">
+            <div class="vega-table-title">
+                <span>📋 Tasks List</span>
+                <span class="vega-table-count" id="tasksCount">0</span>
+            </div>
+            <div class="vega-table-actions">
+                <button class="vega-table-action-btn" onclick="loadTasks()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+                    </svg>
+                    Refresh
+                </button>
+            </div>
+        </div>
+        <!-- Table View -->
+        <div id="tasksTableView">
+            <div id="tasksTable" class="table-container-advanced"></div>
+        </div>
+        
+        <!-- Automation View -->
+        <div id="tasksAutomationView" style="display: none;">
+            <div class="automation-dashboard">
+                <!-- Stats Cards -->
+                <div class="automation-section">
+                    <h3><i data-lucide="bar-chart-2"></i> Task Statistics</h3>
+                    <div class="automation-stats-grid" id="automationStatsGrid">
+                        <div class="stat-card">
+                            <i data-lucide="list-todo"></i>
+                            <span class="stat-value" id="auto-total-tasks">0</span>
+                            <span class="stat-label">Total Tasks</span>
+                        </div>
+                        <div class="stat-card warning">
+                            <i data-lucide="clock"></i>
+                            <span class="stat-value" id="auto-pending-tasks">0</span>
+                            <span class="stat-label">Pending</span>
+                        </div>
+                        <div class="stat-card danger">
+                            <i data-lucide="alert-triangle"></i>
+                            <span class="stat-value" id="auto-overdue-tasks">0</span>
+                            <span class="stat-label">Overdue</span>
+                        </div>
+                        <div class="stat-card success">
+                            <i data-lucide="check-circle"></i>
+                            <span class="stat-value" id="auto-completed-today">0</span>
+                            <span class="stat-label">Completed Today</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Priority Breakdown -->
+                <div class="automation-section">
+                    <h3><i data-lucide="flag"></i> Tasks by Priority</h3>
+                    <div class="priority-bars" id="priorityBars">
+                        <div class="priority-item">
+                            <span class="priority-label">Urgent</span>
+                            <div class="priority-bar-container">
+                                <div class="priority-bar urgent" id="bar-urgent" style="width: 0%"></div>
+                            </div>
+                            <span class="priority-count" id="count-urgent">0</span>
+                        </div>
+                        <div class="priority-item">
+                            <span class="priority-label">High</span>
+                            <div class="priority-bar-container">
+                                <div class="priority-bar high" id="bar-high" style="width: 0%"></div>
+                            </div>
+                            <span class="priority-count" id="count-high">0</span>
+                        </div>
+                        <div class="priority-item">
+                            <span class="priority-label">Medium</span>
+                            <div class="priority-bar-container">
+                                <div class="priority-bar medium" id="bar-medium" style="width: 0%"></div>
+                            </div>
+                            <span class="priority-count" id="count-medium">0</span>
+                        </div>
+                        <div class="priority-item">
+                            <span class="priority-label">Low</span>
+                            <div class="priority-bar-container">
+                                <div class="priority-bar low" id="bar-low" style="width: 0%"></div>
+                            </div>
+                            <span class="priority-count" id="count-low">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Automation Actions -->
+                <div class="automation-section full-width">
+                    <h3><i data-lucide="settings"></i> Automation Actions</h3>
+                    <div class="automation-actions-grid">
+                        <div class="action-card" onclick="autoCreateTasksForLeads()">
+                            <i data-lucide="plus-circle"></i>
+                            <h4>Auto-Create Follow-ups</h4>
+                            <p>Create follow-up tasks for leads without recent activity</p>
+                        </div>
+                        <div class="action-card" onclick="escalateOverdueTasks()">
+                            <i data-lucide="arrow-up-circle"></i>
+                            <h4>Escalate Overdue</h4>
+                            <p>Increase priority of tasks overdue by 3+ days</p>
+                        </div>
+                        <div class="action-card" onclick="switchTaskView('overdue')">
+                            <i data-lucide="eye"></i>
+                            <h4>View Overdue</h4>
+                            <p>See all overdue tasks that need attention</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Overdue View -->
+        <div id="tasksOverdueView" style="display: none;">
+            <div class="overdue-dashboard">
+                <div class="overdue-header">
+                    <div class="overdue-count-badge">
+                        <i data-lucide="alert-triangle"></i>
+                        <span id="overdue-total-count">0</span> Overdue Tasks
+                    </div>
+                    <button class="btn btn-warning" onclick="escalateOverdueTasks()">
+                        <i data-lucide="arrow-up-circle"></i> Escalate All
+                    </button>
+                </div>
+                <div class="overdue-list-container" id="overdueListContainer">
+                    <!-- Will be populated by JS -->
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 

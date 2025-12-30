@@ -1,0 +1,189 @@
+<!-- Add Deal/Opportunity Full Page - VEGA CRM Theme -->
+<style>
+    .vega-form-page { min-height: calc(100vh - 60px); background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); padding: 40px 20px; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    .vega-form-container { max-width: 900px; margin: 0 auto; }
+    .vega-form-header { text-align: center; margin-bottom: 40px; }
+    .vega-form-badge { display: inline-block; padding: 8px 16px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%); color: #6366f1; border-radius: 50px; font-size: 0.85rem; font-weight: 600; margin-bottom: 16px; }
+    .vega-form-title { font-size: 2rem; font-weight: 800; color: #1e293b; margin-bottom: 8px; }
+    .vega-form-subtitle { color: #64748b; font-size: 1rem; }
+    .vega-form-card { background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); overflow: hidden; }
+    .vega-form-card-header { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 24px 32px; color: white; }
+    .vega-form-card-header h2 { margin: 0; font-size: 1.4rem; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+    .vega-form-card-body { padding: 32px; }
+    .vega-form-section { margin-bottom: 32px; }
+    .vega-form-section-title { font-size: 0.9rem; font-weight: 700; color: #6366f1; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb; display: flex; align-items: center; gap: 8px; }
+    .vega-form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .vega-form-group { display: flex; flex-direction: column; }
+    .vega-form-group.full-width { grid-column: 1 / -1; }
+    .vega-form-label { font-size: 0.85rem; font-weight: 600; color: #374151; margin-bottom: 8px; }
+    .vega-form-label .required { color: #ef4444; }
+    .vega-form-input, .vega-form-select, .vega-form-textarea { padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 0.95rem; font-family: inherit; transition: all 0.3s; background: #f8fafc; }
+    .vega-form-input:focus, .vega-form-select:focus, .vega-form-textarea:focus { outline: none; border-color: #6366f1; background: white; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+    .vega-form-textarea { min-height: 100px; resize: vertical; }
+    .vega-form-actions { display: flex; justify-content: flex-end; gap: 16px; padding-top: 24px; border-top: 2px solid #e5e7eb; margin-top: 32px; }
+    .vega-btn { padding: 14px 28px; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
+    .vega-btn-primary { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border: none; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4); }
+    .vega-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5); }
+    .vega-btn-secondary { background: white; color: #64748b; border: 2px solid #e5e7eb; }
+    .vega-back-link { display: inline-flex; align-items: center; gap: 8px; color: #6366f1; text-decoration: none; font-weight: 500; margin-bottom: 24px; }
+    @media (max-width: 768px) { .vega-form-grid { grid-template-columns: 1fr; } }
+</style>
+
+<section id="add-deal" class="section vega-form-page">
+    <div class="vega-form-container">
+        <a href="#" class="vega-back-link" onclick="loadPage('deals'); return false;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 10H5M5 10L10 5M5 10L10 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Back to Opportunities
+        </a>
+
+        <div class="vega-form-header">
+            <span class="vega-form-badge">💰 Sales Pipeline</span>
+            <h1 class="vega-form-title">Add New Opportunity</h1>
+            <p class="vega-form-subtitle">Track a new sales opportunity</p>
+        </div>
+
+        <div class="vega-form-card">
+            <div class="vega-form-card-header">
+                <h2>💰 Opportunity Details</h2>
+            </div>
+            <div class="vega-form-card-body">
+                <form id="dealFormPage" onsubmit="handleDealPageSubmit(event)">
+                    <div class="vega-form-section">
+                        <h3 class="vega-form-section-title">📋 Basic Information</h3>
+                        <div class="vega-form-grid">
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Deal Name <span class="required">*</span></label>
+                                <input type="text" id="fpDealName" class="vega-form-input" placeholder="Enterprise License Deal" required>
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Account <span class="required">*</span></label>
+                                <select id="fpDealCustomer" class="vega-form-select" required>
+                                    <option value="">Select Account</option>
+                                </select>
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Contact</label>
+                                <select id="fpDealContact" class="vega-form-select">
+                                    <option value="">Select Contact</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vega-form-section">
+                        <h3 class="vega-form-section-title">💵 Deal Value</h3>
+                        <div class="vega-form-grid">
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Amount (₹) <span class="required">*</span></label>
+                                <input type="number" id="fpDealAmount" class="vega-form-input" placeholder="100000" required>
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Probability (%)</label>
+                                <input type="number" id="fpDealProbability" class="vega-form-input" placeholder="50" min="0" max="100">
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Expected Close Date</label>
+                                <input type="date" id="fpDealCloseDate" class="vega-form-input">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vega-form-section">
+                        <h3 class="vega-form-section-title">📊 Pipeline Stage</h3>
+                        <div class="vega-form-grid">
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Stage <span class="required">*</span></label>
+                                <select id="fpDealStage" class="vega-form-select" required>
+                                    <option value="prospecting">Prospecting</option>
+                                    <option value="qualification">Qualification</option>
+                                    <option value="proposal">Proposal</option>
+                                    <option value="negotiation">Negotiation</option>
+                                    <option value="closed_won">Closed Won</option>
+                                    <option value="closed_lost">Closed Lost</option>
+                                </select>
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Deal Type</label>
+                                <select id="fpDealType" class="vega-form-select">
+                                    <option value="new_business">New Business</option>
+                                    <option value="existing_business">Existing Business</option>
+                                    <option value="renewal">Renewal</option>
+                                </select>
+                            </div>
+                            <div class="vega-form-group">
+                                <label class="vega-form-label">Lead Source</label>
+                                <select id="fpDealSource" class="vega-form-select">
+                                    <option value="website">Website</option>
+                                    <option value="referral">Referral</option>
+                                    <option value="cold_call">Cold Call</option>
+                                    <option value="trade_show">Trade Show</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vega-form-section">
+                        <h3 class="vega-form-section-title">📝 Description</h3>
+                        <div class="vega-form-group full-width">
+                            <textarea id="fpDealDescription" class="vega-form-textarea" placeholder="Deal details, requirements, notes..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="vega-form-actions">
+                        <button type="button" class="vega-btn vega-btn-secondary" onclick="loadPage('deals')">Cancel</button>
+                        <button type="submit" class="vega-btn vega-btn-primary" id="fpDealSubmitBtn">
+                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 4.5L6.75 12.75L3 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            Save Opportunity
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Load customers and contacts
+(async function() {
+    try {
+        const custResponse = await fetch(`${API_BASE}/companies/${companyId}/customers`, { headers: getHeaders() });
+        if (custResponse.ok) {
+            const data = await custResponse.json();
+            const select = document.getElementById('fpDealCustomer');
+            if (select && data.data) { data.data.forEach(c => { const opt = document.createElement('option'); opt.value = c.id; opt.textContent = c.name; select.appendChild(opt); }); }
+        }
+        const contResponse = await fetch(`${API_BASE}/companies/${companyId}/contacts`, { headers: getHeaders() });
+        if (contResponse.ok) {
+            const data = await contResponse.json();
+            const select = document.getElementById('fpDealContact');
+            if (select && data.data) { data.data.forEach(c => { const opt = document.createElement('option'); opt.value = c.id; opt.textContent = `${c.first_name} ${c.last_name}`; select.appendChild(opt); }); }
+        }
+    } catch (e) { console.error('Error:', e); }
+})();
+
+window.handleDealPageSubmit = async function(e) {
+    e.preventDefault();
+    const submitBtn = document.getElementById('fpDealSubmitBtn');
+    submitBtn.disabled = true; submitBtn.innerHTML = '<span>Saving...</span>';
+    
+    const dealData = {
+        name: document.getElementById('fpDealName').value,
+        customer_id: document.getElementById('fpDealCustomer').value,
+        contact_id: document.getElementById('fpDealContact').value || null,
+        amount: parseFloat(document.getElementById('fpDealAmount').value),
+        probability: document.getElementById('fpDealProbability').value ? parseInt(document.getElementById('fpDealProbability').value) : 50,
+        expected_close_date: document.getElementById('fpDealCloseDate').value || null,
+        stage: document.getElementById('fpDealStage').value,
+        deal_type: document.getElementById('fpDealType').value,
+        source: document.getElementById('fpDealSource').value,
+        description: document.getElementById('fpDealDescription').value || null
+    };
+    
+    try {
+        const response = await fetch(`${API_BASE}/companies/${companyId}/deals`, { method: 'POST', headers: getHeaders(), body: JSON.stringify(dealData) });
+        if (response.ok) { alert('Opportunity created!'); loadPage('deals'); }
+        else { const error = await response.json(); alert('Error: ' + (error.detail || 'Failed')); submitBtn.disabled = false; submitBtn.innerHTML = 'Save Opportunity'; }
+    } catch (error) { alert('Error: ' + error.message); submitBtn.disabled = false; submitBtn.innerHTML = 'Save Opportunity'; }
+};
+</script>

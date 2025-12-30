@@ -9,6 +9,7 @@ from typing import List, Optional
 from app.models.activity import Activity
 from app.models.user import User
 from app.schemas.activity import ActivityCreate, ActivityUpdate
+from app.services import audit_service
 
 
 class ActivityController:
@@ -111,6 +112,19 @@ class ActivityController:
                     reason=reason
                 )
         
+        # Log audit trail
+        try:
+            audit_service.log_create(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="Activity",
+                resource_id=new_activity.id,
+                new_values={"activity_type": new_activity.activity_type, "subject": new_activity.subject}
+            )
+        except Exception:
+            pass
+        
         return new_activity
     
     @staticmethod
@@ -148,7 +162,12 @@ class ActivityController:
         # Store old customer_id before update
         old_customer_id = activity.customer_id
         
+        # Store old values for audit
         update_data = activity_data.model_dump(exclude_unset=True)
+        old_values = {}
+        for key in update_data.keys():
+            old_values[key] = getattr(activity, key, None)
+        
         for key, value in update_data.items():
             setattr(activity, key, value)
         
@@ -172,6 +191,20 @@ class ActivityController:
                     db,
                     force_update=True
                 )
+        
+        # Log audit trail
+        try:
+            audit_service.log_update(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="Activity",
+                resource_id=activity.id,
+                old_values=old_values,
+                new_values=update_data
+            )
+        except Exception:
+            pass
         
         return activity
     
@@ -199,6 +232,19 @@ class ActivityController:
         
         db.delete(activity)
         db.commit()
+        
+        # Log audit trail
+        try:
+            audit_service.log_delete(
+                db=db,
+                user_id=current_user.id,
+                user_email=current_user.email,
+                resource_type="Activity",
+                resource_id=activity_id,
+                old_values={"activity_type": activity.activity_type, "subject": activity.subject}
+            )
+        except Exception:
+            pass
         
         # Auto-update customer health score after deletion
         if customer_id:
