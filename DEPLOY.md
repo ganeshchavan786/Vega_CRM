@@ -77,9 +77,50 @@ PORT=80
 
 ---
 
-## 🔒 SSL/HTTPS Setup (Optional)
+## 🔒 SSL/HTTPS Setup (Automatic - सर्वात सोपे!)
 
-Nginx reverse proxy सह SSL:
+### Option 1: One Command SSL Deployment (Recommended)
+
+```bash
+curl -sSL https://raw.githubusercontent.com/ganeshchavan786/Vega_CRM/main/deploy-ssl.sh | bash -s your-domain.com your-email@example.com
+```
+
+**Example:**
+```bash
+curl -sSL https://raw.githubusercontent.com/ganeshchavan786/Vega_CRM/main/deploy-ssl.sh | bash -s crm.mycompany.com admin@mycompany.com
+```
+
+हे automatically:
+- ✅ Docker install करेल
+- ✅ Traefik reverse proxy setup करेल
+- ✅ Let's Encrypt SSL certificate घेईल (FREE!)
+- ✅ Auto-renew setup करेल
+- ✅ HTTP → HTTPS redirect करेल
+
+---
+
+### Option 2: Manual SSL Setup
+
+```bash
+# 1. Download SSL compose file
+cd /opt/vega-crm
+curl -sSL https://raw.githubusercontent.com/ganeshchavan786/Vega_CRM/main/docker-compose.ssl.yml -o docker-compose.yml
+
+# 2. Create .env file
+cat > .env << EOF
+DOMAIN=your-domain.com
+SSL_EMAIL=your-email@example.com
+SECRET_KEY=$(openssl rand -hex 32)
+DATABASE_URL=sqlite:///./data/crm.db
+EOF
+
+# 3. Start
+docker-compose up -d
+```
+
+---
+
+### Option 3: Nginx + Certbot (Traditional)
 
 ```bash
 # Install Nginx & Certbot

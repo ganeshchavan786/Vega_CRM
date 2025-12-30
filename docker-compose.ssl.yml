@@ -1,0 +1,49 @@
+version: '3.8'
+
+# VEGA CRM - Production with SSL (Traefik + Let's Encrypt)
+# Automatic HTTPS with free SSL certificate
+
+services:
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    restart: always
+    command:
+      - "--api.dashboard=false"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.letsencrypt.acme.email=${SSL_EMAIL}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - letsencrypt:/letsencrypt
+
+  vega-crm:
+    image: ghcr.io/ganeshchavan786/vega_crm:latest
+    container_name: vega-crm
+    restart: always
+    environment:
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-change-this}
+      - DATABASE_URL=${DATABASE_URL:-sqlite:///./data/crm.db}
+      - ENVIRONMENT=production
+    volumes:
+      - ./data:/app/data
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vegacrm.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.vegacrm.entrypoints=websecure"
+      - "traefik.http.routers.vegacrm.tls.certresolver=letsencrypt"
+      - "traefik.http.services.vegacrm.loadbalancer.server.port=8000"
+
+volumes:
+  letsencrypt:
+  data:
