@@ -30,7 +30,7 @@ window.loadCompanies = async function() {
     companyList.innerHTML = '';
     
     try {
-        const response = await fetch(`${API_BASE}/companies`, {
+        const response = await fetch(`${API_BASE}/companies?per_page=500`, {
             headers: getHeaders()
         });
         const data = await response.json();

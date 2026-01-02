@@ -463,6 +463,13 @@ window.loadPage = async function(pageName) {
             }
         });
         
+        // Skip loading JS for pages that have inline scripts (add-* pages)
+        const pagesWithInlineScripts = ['add-lead', 'add-customer', 'add-contact', 'add-deal', 'add-task', 'add-activity', 'add-user', 'add-role', 'add-company', 'settings'];
+        if (pagesWithInlineScripts.includes(pageName)) {
+            console.log(`Page ${pageName} uses inline script, skipping external JS load`);
+            return;
+        }
+        
         const script = document.createElement('script');
         // Add cache-busting timestamp to force fresh load
         const timestamp = new Date().getTime();
@@ -653,18 +660,21 @@ window.showToast = function(message, type = 'info') {
 };
 
 // Global Delete Confirmation Modal
-window.showDeleteConfirmModal = function(title, message, onConfirm) {
+window.showDeleteConfirmModal = function(title, message, onConfirm, buttonText = 'Delete', buttonClass = 'btn-danger') {
     // Remove existing modal if any
     const existingModal = document.getElementById('deleteConfirmModal');
     if (existingModal) {
         existingModal.remove();
     }
     
+    // Determine icon color based on button class
+    const iconColor = buttonClass === 'btn-danger' ? '#dc3545' : (buttonClass === 'btn-success' ? '#28a745' : '#007bff');
+    
     const modalHtml = `
         <div id="deleteConfirmModal" class="modal delete-confirm-modal" style="display: flex;">
             <div class="modal-content delete-confirm-content">
                 <div class="delete-confirm-icon">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#dc3545" stroke-width="2">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="2">
                         <circle cx="12" cy="12" r="10"/>
                         <line x1="12" y1="8" x2="12" y2="12"/>
                         <line x1="12" y1="16" x2="12.01" y2="16"/>
@@ -674,7 +684,7 @@ window.showDeleteConfirmModal = function(title, message, onConfirm) {
                 <p class="delete-confirm-message">${message}</p>
                 <div class="delete-confirm-actions">
                     <button class="btn btn-secondary" onclick="closeDeleteConfirmModal()">Cancel</button>
-                    <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                    <button class="btn ${buttonClass}" id="confirmDeleteBtn">${buttonText}</button>
                 </div>
             </div>
         </div>
@@ -686,7 +696,7 @@ window.showDeleteConfirmModal = function(title, message, onConfirm) {
     document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
         const btn = document.getElementById('confirmDeleteBtn');
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-small"></span> Deleting...';
+        btn.innerHTML = `<span class="spinner-small"></span> ${buttonText}ing...`;
         
         await onConfirm();
         closeDeleteConfirmModal();

@@ -6,8 +6,16 @@ if (typeof window.currentEditingLeadId === 'undefined') {
 }
 
 function initLeads() {
+    // Re-read auth from localStorage (in case global vars are stale)
+    const token = localStorage.getItem('authToken');
+    const company = localStorage.getItem('companyId');
+    
+    // Update global vars if needed
+    if (token && !authToken) authToken = token;
+    if (company && !companyId) companyId = company;
+    
     // Check auth before loading
-    if (!authToken || !companyId) {
+    if (!token || !company) {
         console.warn('No auth token or company ID - skipping lead load');
         const table = document.getElementById('leadsTable');
         if (table) {
@@ -64,12 +72,21 @@ window.loadLeads = async function() {
         const data = await response.json();
         const leads = Array.isArray(data.data) ? data.data : [];
 
+        // Update stats cards
+        if (typeof window.updateLeadStats === 'function') {
+            window.updateLeadStats(leads);
+        }
+
         const table = document.getElementById('leadsTable');
         if (!table) return;
 
         // Initialize DataTable
         if (window.leadsTable && typeof window.leadsTable.updateData === 'function') {
             window.leadsTable.updateData(leads);
+            // Re-initialize Lucide icons after update
+            if (typeof lucide !== 'undefined') {
+                setTimeout(() => lucide.createIcons(), 100);
+            }
         } else {
             window.leadsTable = new DataTable('leadsTable', {
                 data: leads,
@@ -208,6 +225,11 @@ window.loadLeads = async function() {
                 showColumnToggle: true,
                 showExport: true
             });
+        }
+        
+        // Initialize Lucide icons after DataTable renders
+        if (typeof lucide !== 'undefined') {
+            setTimeout(() => lucide.createIcons(), 100);
         }
     } catch (error) {
         console.error('Error loading leads:', error);
@@ -677,8 +699,8 @@ window.showLeadQualification = async function(leadId) {
 
         // Build modal content
         const modalHtml = `
-            <div class="modal-overlay" id="qualificationModal" onclick="closeQualificationModal(event)">
-                <div class="modal-content modal-lg" onclick="event.stopPropagation()">
+            <div id="qualificationModal" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:99999;" onclick="closeQualificationModal(event)">
+                <div class="modal-content modal-lg" style="background:#fff;border-radius:12px;max-width:900px;width:95%;max-height:90vh;overflow-y:auto;" onclick="event.stopPropagation()">
                     <div class="modal-header">
                         <h3><i data-lucide="clipboard-check"></i> Lead Qualification & Risk Assessment</h3>
                         <button class="modal-close" onclick="closeQualificationModal()">&times;</button>
@@ -757,12 +779,6 @@ window.showLeadQualification = async function(leadId) {
                                         </div>
                                     `).join('')}
                                 </div>
-                                ${conv.eligible ? `
-                                <div class="conversion-actions">
-                                    <button class="btn btn-success" onclick="convertLead(${leadId}); closeQualificationModal();">
-                                        <i data-lucide="arrow-right-circle"></i> Convert to Account
-                                    </button>
-                                </div>` : ''}
                             </div>
                         </div>
                     </div>
@@ -992,9 +1008,9 @@ window.showLeadImportModal = function() {
     
     const modal = document.createElement('div');
     modal.id = 'leadImportModal';
-    modal.className = 'modal-overlay';
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:99999;';
     modal.innerHTML = `
-        <div class="modal-container" style="max-width: 600px;">
+        <div class="modal-container" style="max-width: 600px; background:#fff; border-radius:12px;">
             <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 12px 12px 0 0;">
                 <h2 style="margin: 0; display: flex; align-items: center; gap: 10px;">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1105,7 +1121,10 @@ window.closeLeadImportModal = function() {
 };
 
 // Store parsed CSV data
-let parsedCSVData = [];
+if (typeof window.parsedCSVData === 'undefined') {
+    window.parsedCSVData = [];
+}
+var parsedCSVData = window.parsedCSVData;
 
 window.handleCSVFileSelect = function(input) {
     const file = input.files[0];
@@ -1235,16 +1254,21 @@ window.importLeadsFromCSV = async function() {
     
     let imported = 0;
     let failed = 0;
+    const failedLeads = [];
     const total = parsedCSVData.length;
     
     for (let i = 0; i < parsedCSVData.length; i++) {
         const row = parsedCSVData[i];
         
         try {
+            // Build lead_name from first_name + last_name
+            const leadName = `${row.first_name || ''} ${row.last_name || ''}`.trim() || 'Unknown';
+            
             const leadData = {
-                first_name: row.first_name,
-                last_name: row.last_name,
-                email: row.email,
+                lead_name: leadName,
+                first_name: row.first_name || null,
+                last_name: row.last_name || null,
+                email: row.email || null,
                 phone: row.phone || null,
                 company_name: row.company_name || null,
                 source: row.source || 'csv_import',
@@ -1262,9 +1286,20 @@ window.importLeadsFromCSV = async function() {
                 imported++;
             } else {
                 failed++;
+                let errorMsg = 'Unknown error';
+                try {
+                    const errorData = await response.json();
+                    if (response.status === 409) {
+                        errorMsg = 'Duplicate (email/phone already exists)';
+                    } else if (errorData.detail) {
+                        errorMsg = typeof errorData.detail === 'string' ? errorData.detail : JSON.stringify(errorData.detail);
+                    }
+                } catch (e) {}
+                failedLeads.push({ name: leadName, email: row.email, reason: errorMsg });
             }
         } catch (error) {
             failed++;
+            failedLeads.push({ name: `${row.first_name} ${row.last_name}`, email: row.email, reason: 'Network error' });
         }
         
         // Update progress
@@ -1276,10 +1311,18 @@ window.importLeadsFromCSV = async function() {
     // Show complete
     document.getElementById('importStep3').style.display = 'none';
     document.getElementById('importStep4').style.display = 'block';
-    document.getElementById('importResult').innerHTML = `
-        <strong>${imported}</strong> leads imported successfully<br>
-        ${failed > 0 ? `<span style="color: #ef4444;">${failed} failed</span>` : ''}
-    `;
+    
+    let resultHtml = `<strong>${imported}</strong> leads imported successfully`;
+    if (failed > 0) {
+        resultHtml += `<br><span style="color: #ef4444;">${failed} failed</span>`;
+        resultHtml += `<div style="margin-top:10px;text-align:left;max-height:150px;overflow-y:auto;font-size:12px;background:#fef2f2;padding:10px;border-radius:8px;">`;
+        resultHtml += `<strong>Failed leads:</strong><br>`;
+        failedLeads.forEach(fl => {
+            resultHtml += `• ${fl.name} (${fl.email}): <span style="color:#dc2626">${fl.reason}</span><br>`;
+        });
+        resultHtml += `</div>`;
+    }
+    document.getElementById('importResult').innerHTML = resultHtml;
 };
 
 window.downloadSampleCSV = function() {

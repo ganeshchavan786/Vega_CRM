@@ -11,8 +11,16 @@ if (typeof window.contactsAccountsList === 'undefined') {
 }
 
 function initContacts() {
+    // Re-read auth from localStorage (in case global vars are stale)
+    const token = localStorage.getItem('authToken');
+    const company = localStorage.getItem('companyId');
+    
+    // Update global vars if needed
+    if (token && !authToken) authToken = token;
+    if (company && !companyId) companyId = company;
+    
     // Check if we have valid auth before loading
-    if (!authToken || !companyId) {
+    if (!token || !company) {
         console.warn('No auth token or company ID - skipping contact load');
         const table = document.getElementById('contactsTable');
         if (table) {
@@ -101,9 +109,18 @@ window.loadContacts = async function() {
         const table = document.getElementById('contactsTable');
         if (!table) return;
 
+        // Update stats if function exists
+        if (typeof window.updateContactStats === 'function') {
+            window.updateContactStats(contacts);
+        }
+        
         // Initialize DataTable
         if (window.contactsTable && typeof window.contactsTable.updateData === 'function') {
             window.contactsTable.updateData(contacts);
+            // Initialize Lucide icons after update
+            if (typeof lucide !== 'undefined') {
+                setTimeout(() => lucide.createIcons(), 100);
+            }
         } else {
             window.contactsTable = new DataTable('contactsTable', {
                 data: contacts,
@@ -208,6 +225,10 @@ window.loadContacts = async function() {
                 showColumnToggle: true,
                 showExport: true
             });
+            // Initialize Lucide icons after DataTable creation
+            if (typeof lucide !== 'undefined') {
+                setTimeout(() => lucide.createIcons(), 100);
+            }
         }
     } catch (error) {
         console.error('Error loading contacts:', error);
@@ -498,4 +519,288 @@ function escapeHtml(text) {
 
 // Make init function global
 window.initContacts = initContacts;
+
+// ============================================
+// CSV Import Feature for Contacts
+// ============================================
+
+// Store parsed CSV data
+if (typeof window.parsedContactCSVData === 'undefined') {
+    window.parsedContactCSVData = [];
+}
+var parsedContactCSVData = window.parsedContactCSVData;
+
+window.showContactImportModal = function() {
+    const modalHtml = `
+        <div id="contactImportModal" class="modal-overlay" style="display:flex; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:99999; align-items:center; justify-content:center;">
+            <div class="modal-content" style="background:white; border-radius:16px; max-width:700px; width:90%; max-height:90vh; overflow-y:auto; padding:24px;">
+                <div class="form-modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2 style="margin:0; font-size:1.5rem; color:#1e293b;">Import Contacts from CSV</h2>
+                    <button onclick="closeContactImportModal()" style="background:none; border:none; cursor:pointer; padding:8px;">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Step 1: Upload -->
+                <div id="contactImportStep1">
+                    <div style="border:2px dashed #e2e8f0; border-radius:12px; padding:40px; text-align:center; margin-bottom:20px;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" style="margin-bottom:16px;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p style="color:#64748b; margin-bottom:16px;">Drag & drop your CSV file here, or click to browse</p>
+                        <input type="file" id="contactCsvFile" accept=".csv" style="display:none;" onchange="handleContactCSVUpload(event)">
+                        <button onclick="document.getElementById('contactCsvFile').click()" style="background:linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color:white; border:none; padding:12px 24px; border-radius:10px; cursor:pointer; font-weight:600;">
+                            Select CSV File
+                        </button>
+                    </div>
+                    <div style="background:#f8fafc; border-radius:8px; padding:16px;">
+                        <p style="font-weight:600; margin-bottom:8px; color:#1e293b;">CSV Format Requirements:</p>
+                        <p style="color:#64748b; font-size:0.9rem; margin-bottom:8px;">Required columns: <code>name</code>, <code>account_name</code> (or <code>account_id</code>)</p>
+                        <p style="color:#64748b; font-size:0.9rem;">Optional: <code>email, phone, job_title, role, preferred_channel, is_primary</code></p>
+                        <button onclick="downloadContactSampleCSV()" style="margin-top:12px; background:#10b981; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:0.85rem;">
+                            Download Sample CSV
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 2: Preview -->
+                <div id="contactImportStep2" style="display:none;">
+                    <p style="margin-bottom:16px; color:#64748b;">Preview of data to import:</p>
+                    <div id="contactCsvPreview" style="max-height:300px; overflow:auto; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:20px;"></div>
+                    <div style="display:flex; gap:12px; justify-content:flex-end;">
+                        <button onclick="resetContactImport()" style="background:#e2e8f0; color:#64748b; border:none; padding:12px 24px; border-radius:10px; cursor:pointer; font-weight:600;">
+                            Back
+                        </button>
+                        <button onclick="importContactsFromCSV()" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:white; border:none; padding:12px 24px; border-radius:10px; cursor:pointer; font-weight:600;">
+                            Import Contacts
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Progress -->
+                <div id="contactImportStep3" style="display:none; text-align:center; padding:40px 0;">
+                    <div style="width:60px; height:60px; border:4px solid #e2e8f0; border-top-color:#6366f1; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 20px;"></div>
+                    <p id="contactImportProgress" style="color:#64748b;">Importing contacts...</p>
+                    <div style="width:100%; height:8px; background:#e2e8f0; border-radius:4px; margin-top:16px; overflow:hidden;">
+                        <div id="contactImportProgressBar" style="width:0%; height:100%; background:linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); transition:width 0.3s;"></div>
+                    </div>
+                </div>
+                
+                <!-- Step 4: Complete -->
+                <div id="contactImportStep4" style="display:none; text-align:center; padding:40px 0;">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="margin-bottom:16px;">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <h3 style="color:#1e293b; margin-bottom:8px;">Import Complete!</h3>
+                    <p id="contactImportResult" style="color:#64748b;"></p>
+                    <button onclick="closeContactImportModal(); loadContacts();" style="margin-top:20px; background:linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color:white; border:none; padding:12px 24px; border-radius:10px; cursor:pointer; font-weight:600;">
+                        View Contacts
+                    </button>
+                </div>
+            </div>
+        </div>
+        <style>
+            @keyframes spin { to { transform: rotate(360deg); } }
+        </style>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+};
+
+window.closeContactImportModal = function() {
+    const modal = document.getElementById('contactImportModal');
+    if (modal) modal.remove();
+    window.parsedContactCSVData = [];
+    parsedContactCSVData = [];
+};
+
+window.resetContactImport = function() {
+    document.getElementById('contactImportStep1').style.display = 'block';
+    document.getElementById('contactImportStep2').style.display = 'none';
+    window.parsedContactCSVData = [];
+    parsedContactCSVData = [];
+};
+
+window.handleContactCSVUpload = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const text = e.target.result;
+        const lines = text.split('\n').filter(line => line.trim());
+        
+        if (lines.length < 2) {
+            alert('CSV file must have at least a header row and one data row');
+            return;
+        }
+        
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/['"]/g, ''));
+        const data = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split(',').map(v => v.trim().replace(/^["']|["']$/g, ''));
+            const row = {};
+            headers.forEach((header, index) => {
+                row[header] = values[index] || '';
+            });
+            if (row.name) {
+                data.push(row);
+            }
+        }
+        
+        if (data.length === 0) {
+            alert('No valid data found. Make sure CSV has "name" column.');
+            return;
+        }
+        
+        window.parsedContactCSVData = data;
+        parsedContactCSVData = data;
+        
+        // Show preview
+        let previewHtml = '<table style="width:100%; border-collapse:collapse; font-size:0.85rem;">';
+        previewHtml += '<thead><tr style="background:#f8fafc;">';
+        ['Name', 'Email', 'Phone', 'Job Title', 'Account'].forEach(h => {
+            previewHtml += `<th style="padding:10px; text-align:left; border-bottom:1px solid #e2e8f0;">${h}</th>`;
+        });
+        previewHtml += '</tr></thead><tbody>';
+        
+        data.slice(0, 10).forEach(row => {
+            previewHtml += '<tr>';
+            previewHtml += `<td style="padding:10px; border-bottom:1px solid #e2e8f0;">${row.name || '-'}</td>`;
+            previewHtml += `<td style="padding:10px; border-bottom:1px solid #e2e8f0;">${row.email || '-'}</td>`;
+            previewHtml += `<td style="padding:10px; border-bottom:1px solid #e2e8f0;">${row.phone || '-'}</td>`;
+            previewHtml += `<td style="padding:10px; border-bottom:1px solid #e2e8f0;">${row.job_title || '-'}</td>`;
+            previewHtml += `<td style="padding:10px; border-bottom:1px solid #e2e8f0;">${row.account_name || row.account_id || '-'}</td>`;
+            previewHtml += '</tr>';
+        });
+        
+        if (data.length > 10) {
+            previewHtml += `<tr><td colspan="5" style="padding:10px; text-align:center; color:#64748b;">... and ${data.length - 10} more rows</td></tr>`;
+        }
+        
+        previewHtml += '</tbody></table>';
+        previewHtml += `<p style="margin-top:12px; color:#64748b; font-size:0.85rem;">Total: ${data.length} contacts to import</p>`;
+        
+        document.getElementById('contactCsvPreview').innerHTML = previewHtml;
+        document.getElementById('contactImportStep1').style.display = 'none';
+        document.getElementById('contactImportStep2').style.display = 'block';
+    };
+    
+    reader.readAsText(file);
+};
+
+window.importContactsFromCSV = async function() {
+    if (parsedContactCSVData.length === 0) {
+        showToast('No data to import', 'error');
+        return;
+    }
+    
+    document.getElementById('contactImportStep2').style.display = 'none';
+    document.getElementById('contactImportStep3').style.display = 'block';
+    
+    let imported = 0;
+    let failed = 0;
+    const failedContacts = [];
+    const total = parsedContactCSVData.length;
+    
+    // Build account name to ID map
+    const accountMap = {};
+    window.contactsAccountsList.forEach(acc => {
+        accountMap[acc.name.toLowerCase()] = acc.id;
+    });
+    
+    for (let i = 0; i < parsedContactCSVData.length; i++) {
+        const row = parsedContactCSVData[i];
+        
+        try {
+            // Find account ID
+            let accountId = row.account_id;
+            if (!accountId && row.account_name) {
+                accountId = accountMap[row.account_name.toLowerCase()];
+            }
+            
+            if (!accountId) {
+                failed++;
+                failedContacts.push({ name: row.name, email: row.email, reason: 'Account not found' });
+                continue;
+            }
+            
+            const contactData = {
+                name: row.name,
+                email: row.email || null,
+                phone: row.phone || null,
+                job_title: row.job_title || null,
+                role: row.role || null,
+                preferred_channel: row.preferred_channel || null,
+                is_primary_contact: row.is_primary === 'true' || row.is_primary === '1' || false,
+                account_id: parseInt(accountId)
+            };
+            
+            const response = await fetch(`${API_BASE}/companies/${companyId}/contacts`, {
+                method: 'POST',
+                headers: getHeaders(),
+                body: JSON.stringify(contactData)
+            });
+            
+            if (response.ok) {
+                imported++;
+            } else {
+                failed++;
+                let errorMsg = 'Unknown error';
+                try {
+                    const errorData = await response.json();
+                    if (response.status === 409) {
+                        errorMsg = 'Duplicate (email/phone already exists)';
+                    } else if (errorData.detail) {
+                        errorMsg = typeof errorData.detail === 'string' ? errorData.detail : JSON.stringify(errorData.detail);
+                    }
+                } catch (e) {}
+                failedContacts.push({ name: row.name, email: row.email, reason: errorMsg });
+            }
+        } catch (error) {
+            failed++;
+            failedContacts.push({ name: row.name, email: row.email, reason: 'Network error' });
+        }
+        
+        const progress = Math.round(((i + 1) / total) * 100);
+        document.getElementById('contactImportProgress').textContent = `${i + 1} of ${total} processed`;
+        document.getElementById('contactImportProgressBar').style.width = `${progress}%`;
+    }
+    
+    document.getElementById('contactImportStep3').style.display = 'none';
+    document.getElementById('contactImportStep4').style.display = 'block';
+    
+    let resultHtml = `<strong>${imported}</strong> contacts imported successfully`;
+    if (failed > 0) {
+        resultHtml += `<br><span style="color: #ef4444;">${failed} failed</span>`;
+        resultHtml += `<div style="margin-top:10px;text-align:left;max-height:150px;overflow-y:auto;font-size:12px;background:#fef2f2;padding:10px;border-radius:8px;">`;
+        resultHtml += `<strong>Failed contacts:</strong><br>`;
+        failedContacts.forEach(fc => {
+            resultHtml += `• ${fc.name} (${fc.email || 'no email'}): <span style="color:#dc2626">${fc.reason}</span><br>`;
+        });
+        resultHtml += `</div>`;
+    }
+    document.getElementById('contactImportResult').innerHTML = resultHtml;
+};
+
+window.downloadContactSampleCSV = function() {
+    const sampleData = `name,email,phone,job_title,role,account_name,preferred_channel,is_primary
+John Doe,john@abccorp.com,+91 98765 43210,CEO,decision_maker,ABC Corporation,email,true
+Jane Smith,jane@abccorp.com,+91 87654 32109,Manager,influencer,ABC Corporation,whatsapp,false
+Rahul Sharma,rahul@xyz.com,+91 76543 21098,Director,champion,XYZ Industries,phone,true`;
+    
+    const blob = new Blob([sampleData], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'contact_import_template.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+};
 

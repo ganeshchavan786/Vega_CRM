@@ -6,8 +6,16 @@ if (typeof window.currentEditingCustomerId === 'undefined') {
 }
 
 function initCustomers() {
-    // Check if we have valid auth before loading (use global variables from config.js)
-    if (!authToken || !companyId) {
+    // Re-read auth from localStorage (in case global vars are stale)
+    const token = localStorage.getItem('authToken');
+    const company = localStorage.getItem('companyId');
+    
+    // Update global vars if needed
+    if (token && !authToken) authToken = token;
+    if (company && !companyId) companyId = company;
+    
+    // Check if we have valid auth before loading
+    if (!token || !company) {
         console.warn('No auth token or company ID - skipping customer load');
         const table = document.getElementById('customersTable');
         if (table) {
@@ -66,13 +74,25 @@ window.loadCustomers = async function() {
         
         const data = await response.json();
         const customers = Array.isArray(data.data) ? data.data : [];
+        
+        // Store customers data globally for Cards view
+        window.customersData = customers;
 
         const table = document.getElementById('customersTable');
         if (!table) return;
 
+        // Update stats
+        if (typeof window.updateAccountStats === 'function') {
+            window.updateAccountStats(customers);
+        }
+        
         // Initialize DataTable
         if (window.customersTable && typeof window.customersTable.updateData === 'function') {
             window.customersTable.updateData(customers);
+            // Initialize Lucide icons after update
+            if (typeof lucide !== 'undefined') {
+                setTimeout(() => lucide.createIcons(), 100);
+            }
         } else {
             window.customersTable = new DataTable('customersTable', {
                 data: customers,
@@ -176,6 +196,10 @@ window.loadCustomers = async function() {
                 showColumnToggle: true,
                 showExport: true
             });
+            // Initialize Lucide icons after DataTable creation
+            if (typeof lucide !== 'undefined') {
+                setTimeout(() => lucide.createIcons(), 100);
+            }
         }
     } catch (error) {
         console.error('Error loading customers:', error);
@@ -686,3 +710,273 @@ function renderHealthScoreMeter(value) {
         </div>
     `;
 }
+
+// ============================================
+// CSV Import Feature for Accounts
+// ============================================
+
+// Store parsed CSV data
+if (typeof window.parsedAccountCSVData === 'undefined') {
+    window.parsedAccountCSVData = [];
+}
+var parsedAccountCSVData = window.parsedAccountCSVData;
+
+window.showAccountImportModal = function() {
+    const modalHtml = `
+        <div id="accountImportModal" class="modal-overlay" style="display:flex; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:99999; align-items:center; justify-content:center;">
+            <div class="modal-content" style="background:white; border-radius:16px; max-width:700px; width:90%; max-height:90vh; overflow-y:auto; padding:24px;">
+                <div class="form-modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2 style="margin:0; font-size:1.5rem; color:#1e293b;">Import Accounts from CSV</h2>
+                    <button onclick="closeAccountImportModal()" style="background:none; border:none; cursor:pointer; padding:8px;">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Step 1: Upload -->
+                <div id="accountImportStep1">
+                    <div style="border:2px dashed #e2e8f0; border-radius:12px; padding:40px; text-align:center; margin-bottom:20px;">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" style="margin-bottom:16px;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p style="color:#64748b; margin-bottom:16px;">Drag & drop your CSV file here, or click to browse</p>
+                        <input type="file" id="accountCsvFile" accept=".csv" style="display:none;" onchange="handleAccountCSVUpload(event)">
+                        <button onclick="document.getElementById('accountCsvFile').click()" style="background:linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color:white; border:none; padding:12px 24px; border-radius:10px; cursor:pointer; font-weight:600;">
+                            Select CSV File
+                        </button>
+                    </div>
+                    <div style="background:#f8fafc; border-radius:8px; padding:16px;">
+                        <p style="font-weight:600; margin-bottom:8px; color:#1e293b;">CSV Format Requirements:</p>
+                        <p style="color:#64748b; font-size:0.9rem; margin-bottom:8px;">Required columns: <code>name</code></p>
+                        <p style="color:#64748b; font-size:0.9rem;">Optional: <code>email, phone, customer_type, status, company_name, industry, address, city, state, country, notes</code></p>
+                        <button onclick="downloadAccountSampleCSV()" style="margin-top:12px; background:#10b981; color:white; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:0.85rem;">
+                            Download Sample CSV
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 2: Preview -->
+                <div id="accountImportStep2" style="display:none;">
+                    <p style="margin-bottom:16px; color:#64748b;">Preview of data to import:</p>
+                    <div id="accountCsvPreview" style="max-height:300px; overflow:auto; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:20px;"></div>
+                    <div style="display:flex; gap:12px; justify-content:flex-end;">
+                        <button onclick="resetAccountImport()" style="background:#e2e8f0; color:#64748b; border:none; padding:12px 24px; border-radius:10px; cursor:pointer; font-weight:600;">
+                            Back
+                        </button>
+                        <button onclick="importAccountsFromCSV()" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:white; border:none; padding:12px 24px; border-radius:10px; cursor:pointer; font-weight:600;">
+                            Import Accounts
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Progress -->
+                <div id="accountImportStep3" style="display:none; text-align:center; padding:40px 0;">
+                    <div style="width:60px; height:60px; border:4px solid #e2e8f0; border-top-color:#6366f1; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 20px;"></div>
+                    <p id="accountImportProgress" style="color:#64748b;">Importing accounts...</p>
+                    <div style="width:100%; height:8px; background:#e2e8f0; border-radius:4px; margin-top:16px; overflow:hidden;">
+                        <div id="accountImportProgressBar" style="width:0%; height:100%; background:linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); transition:width 0.3s;"></div>
+                    </div>
+                </div>
+                
+                <!-- Step 4: Complete -->
+                <div id="accountImportStep4" style="display:none; text-align:center; padding:40px 0;">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="margin-bottom:16px;">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <h3 style="color:#1e293b; margin-bottom:8px;">Import Complete!</h3>
+                    <p id="accountImportResult" style="color:#64748b;"></p>
+                    <button onclick="closeAccountImportModal(); loadCustomers();" style="margin-top:20px; background:linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color:white; border:none; padding:12px 24px; border-radius:10px; cursor:pointer; font-weight:600;">
+                        View Accounts
+                    </button>
+                </div>
+            </div>
+        </div>
+        <style>
+            @keyframes spin { to { transform: rotate(360deg); } }
+        </style>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+};
+
+window.closeAccountImportModal = function() {
+    const modal = document.getElementById('accountImportModal');
+    if (modal) modal.remove();
+    window.parsedAccountCSVData = [];
+    parsedAccountCSVData = [];
+};
+
+window.resetAccountImport = function() {
+    document.getElementById('accountImportStep1').style.display = 'block';
+    document.getElementById('accountImportStep2').style.display = 'none';
+    window.parsedAccountCSVData = [];
+    parsedAccountCSVData = [];
+};
+
+window.handleAccountCSVUpload = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const text = e.target.result;
+        const lines = text.split('\n').filter(line => line.trim());
+        
+        if (lines.length < 2) {
+            alert('CSV file must have at least a header row and one data row');
+            return;
+        }
+        
+        const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/['"]/g, ''));
+        const data = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split(',').map(v => v.trim().replace(/^["']|["']$/g, ''));
+            const row = {};
+            headers.forEach((header, index) => {
+                row[header] = values[index] || '';
+            });
+            if (row.name) {
+                data.push(row);
+            }
+        }
+        
+        if (data.length === 0) {
+            alert('No valid data found. Make sure CSV has "name" column.');
+            return;
+        }
+        
+        window.parsedAccountCSVData = data;
+        parsedAccountCSVData = data;
+        
+        // Show preview
+        let previewHtml = '<table style="width:100%; border-collapse:collapse; font-size:0.85rem;">';
+        previewHtml += '<thead><tr style="background:#f8fafc;">';
+        ['Name', 'Email', 'Phone', 'Type', 'Status'].forEach(h => {
+            previewHtml += `<th style="padding:10px; text-align:left; border-bottom:1px solid #e2e8f0;">${h}</th>`;
+        });
+        previewHtml += '</tr></thead><tbody>';
+        
+        data.slice(0, 10).forEach(row => {
+            previewHtml += '<tr>';
+            previewHtml += `<td style="padding:10px; border-bottom:1px solid #e2e8f0;">${row.name || '-'}</td>`;
+            previewHtml += `<td style="padding:10px; border-bottom:1px solid #e2e8f0;">${row.email || '-'}</td>`;
+            previewHtml += `<td style="padding:10px; border-bottom:1px solid #e2e8f0;">${row.phone || '-'}</td>`;
+            previewHtml += `<td style="padding:10px; border-bottom:1px solid #e2e8f0;">${row.customer_type || 'business'}</td>`;
+            previewHtml += `<td style="padding:10px; border-bottom:1px solid #e2e8f0;">${row.status || 'active'}</td>`;
+            previewHtml += '</tr>';
+        });
+        
+        if (data.length > 10) {
+            previewHtml += `<tr><td colspan="5" style="padding:10px; text-align:center; color:#64748b;">... and ${data.length - 10} more rows</td></tr>`;
+        }
+        
+        previewHtml += '</tbody></table>';
+        previewHtml += `<p style="margin-top:12px; color:#64748b; font-size:0.85rem;">Total: ${data.length} accounts to import</p>`;
+        
+        document.getElementById('accountCsvPreview').innerHTML = previewHtml;
+        document.getElementById('accountImportStep1').style.display = 'none';
+        document.getElementById('accountImportStep2').style.display = 'block';
+    };
+    
+    reader.readAsText(file);
+};
+
+window.importAccountsFromCSV = async function() {
+    if (parsedAccountCSVData.length === 0) {
+        showToast('No data to import', 'error');
+        return;
+    }
+    
+    document.getElementById('accountImportStep2').style.display = 'none';
+    document.getElementById('accountImportStep3').style.display = 'block';
+    
+    let imported = 0;
+    let failed = 0;
+    const failedAccounts = [];
+    const total = parsedAccountCSVData.length;
+    
+    for (let i = 0; i < parsedAccountCSVData.length; i++) {
+        const row = parsedAccountCSVData[i];
+        
+        try {
+            const accountData = {
+                name: row.name,
+                email: row.email || null,
+                phone: row.phone || null,
+                customer_type: row.customer_type || 'business',
+                status: row.status || 'active',
+                company_name: row.company_name || null,
+                industry: row.industry || null,
+                address: row.address || null,
+                city: row.city || null,
+                state: row.state || null,
+                country: row.country || 'India',
+                notes: row.notes || null
+            };
+            
+            const response = await fetch(`${API_BASE}/companies/${companyId}/customers`, {
+                method: 'POST',
+                headers: getHeaders(),
+                body: JSON.stringify(accountData)
+            });
+            
+            if (response.ok) {
+                imported++;
+            } else {
+                failed++;
+                let errorMsg = 'Unknown error';
+                try {
+                    const errorData = await response.json();
+                    if (response.status === 409) {
+                        errorMsg = 'Duplicate (email/phone already exists)';
+                    } else if (errorData.detail) {
+                        errorMsg = typeof errorData.detail === 'string' ? errorData.detail : JSON.stringify(errorData.detail);
+                    }
+                } catch (e) {}
+                failedAccounts.push({ name: row.name, email: row.email, reason: errorMsg });
+            }
+        } catch (error) {
+            failed++;
+            failedAccounts.push({ name: row.name, email: row.email, reason: 'Network error' });
+        }
+        
+        const progress = Math.round(((i + 1) / total) * 100);
+        document.getElementById('accountImportProgress').textContent = `${i + 1} of ${total} processed`;
+        document.getElementById('accountImportProgressBar').style.width = `${progress}%`;
+    }
+    
+    document.getElementById('accountImportStep3').style.display = 'none';
+    document.getElementById('accountImportStep4').style.display = 'block';
+    
+    let resultHtml = `<strong>${imported}</strong> accounts imported successfully`;
+    if (failed > 0) {
+        resultHtml += `<br><span style="color: #ef4444;">${failed} failed</span>`;
+        resultHtml += `<div style="margin-top:10px;text-align:left;max-height:150px;overflow-y:auto;font-size:12px;background:#fef2f2;padding:10px;border-radius:8px;">`;
+        resultHtml += `<strong>Failed accounts:</strong><br>`;
+        failedAccounts.forEach(fa => {
+            resultHtml += `• ${fa.name} (${fa.email || 'no email'}): <span style="color:#dc2626">${fa.reason}</span><br>`;
+        });
+        resultHtml += `</div>`;
+    }
+    document.getElementById('accountImportResult').innerHTML = resultHtml;
+};
+
+window.downloadAccountSampleCSV = function() {
+    const sampleData = `name,email,phone,customer_type,status,company_name,industry,address,city,state,country,notes
+ABC Corporation,contact@abccorp.com,+91 98765 43210,business,active,ABC Corp,IT Services,123 Main Street,Mumbai,Maharashtra,India,Key enterprise client
+XYZ Industries,info@xyz.com,+91 87654 32109,business,prospect,XYZ Industries,Manufacturing,456 Industrial Area,Pune,Maharashtra,India,Potential large account
+John Smith,john@email.com,+91 76543 21098,individual,active,,Consulting,789 Park Road,Bangalore,Karnataka,India,Individual consultant`;
+    
+    const blob = new Blob([sampleData], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'account_import_template.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+};

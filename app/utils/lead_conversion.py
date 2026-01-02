@@ -227,7 +227,8 @@ class LeadConversionService:
                 activity_type="note",
                 title="Lead Converted to Account",
                 description=f"Lead '{lead.full_name}' converted to Account '{account.name}'. Created Contact '{contact.name}' and Opportunity '{deal.deal_name}'.",
-                user_id=current_user.id
+                user_id=current_user.id,
+                activity_date=datetime.utcnow()
             )
             
             db.add(activity)

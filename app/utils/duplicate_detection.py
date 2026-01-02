@@ -15,7 +15,7 @@ class DuplicateDetectionEngine:
     
     # Similarity thresholds
     EMAIL_EXACT_MATCH = True  # Email must match exactly
-    PHONE_SIMILARITY_THRESHOLD = 0.9  # Phone numbers must be 90% similar
+    PHONE_SIMILARITY_THRESHOLD = 0.98  # Phone numbers must be 98% similar (almost exact match)
     COMPANY_SIMILARITY_THRESHOLD = 0.85  # Company names must be 85% similar (fuzzy matching)
     
     @staticmethod

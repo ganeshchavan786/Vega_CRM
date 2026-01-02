@@ -9,6 +9,7 @@ from sqlalchemy import func, and_
 from typing import Optional, Dict, List
 from app.models.lead import Lead
 from app.models.activity import Activity
+from app.models.user import User
 
 
 class ConversionTriggerService:
@@ -191,10 +192,15 @@ class ConversionTriggerService:
         
         # Perform conversion
         try:
+            # Get user object from user_id
+            current_user = db.query(User).filter(User.id == user_id).first()
+            if not current_user:
+                return {"success": False, "error": "User not found"}
+            
             result = LeadConversionService.convert_lead_to_account(
                 lead_id=lead_id,
                 company_id=company_id,
-                user_id=user_id,
+                current_user=current_user,
                 db=db
             )
             

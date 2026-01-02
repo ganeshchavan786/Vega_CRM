@@ -20,7 +20,7 @@ router = APIRouter()
 async def get_companies(
     search: Optional[str] = Query(None, description="Search in company name/email"),
     page: int = Query(1, ge=1, description="Page number"),
-    per_page: int = Query(10, ge=1, le=100, description="Items per page"),
+    per_page: int = Query(10, ge=1, le=500, description="Items per page"),
     current_user: User = Depends(get_current_active_user),
     db: Session = Depends(get_db)
 ):

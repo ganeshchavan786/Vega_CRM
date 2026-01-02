@@ -156,28 +156,52 @@ window.handleLeadPageSubmit = async function(e) {
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span>Saving...</span>';
     
+    const firstName = document.getElementById('fpLeadFirstName').value;
+    const lastName = document.getElementById('fpLeadLastName').value;
     const leadData = {
-        first_name: document.getElementById('fpLeadFirstName').value,
-        last_name: document.getElementById('fpLeadLastName').value,
-        email: document.getElementById('fpLeadEmail').value,
+        lead_name: `${firstName} ${lastName}`.trim(),
+        first_name: firstName,
+        last_name: lastName,
+        email: document.getElementById('fpLeadEmail').value || null,
         phone: document.getElementById('fpLeadPhone').value || null,
-        company: document.getElementById('fpLeadCompany').value || null,
-        title: document.getElementById('fpLeadTitle').value || null,
+        company_name: document.getElementById('fpLeadCompany').value || null,
         source: document.getElementById('fpLeadSource').value,
         status: document.getElementById('fpLeadStatus').value,
         industry: document.getElementById('fpLeadIndustry').value || null,
         estimated_value: document.getElementById('fpLeadValue').value ? parseFloat(document.getElementById('fpLeadValue').value) : null,
-        assigned_to: document.getElementById('fpLeadAssigned').value || null,
-        rating: document.getElementById('fpLeadRating').value,
-        description: document.getElementById('fpLeadDescription').value || null
+        assigned_to: document.getElementById('fpLeadAssigned').value ? parseInt(document.getElementById('fpLeadAssigned').value) : null,
+        priority: document.getElementById('fpLeadRating').value === 'hot' ? 'high' : (document.getElementById('fpLeadRating').value === 'cold' ? 'low' : 'medium'),
+        notes: document.getElementById('fpLeadDescription').value || null
     };
     
     try {
         const response = await fetch(`${API_BASE}/companies/${companyId}/leads`, {
             method: 'POST', headers: getHeaders(), body: JSON.stringify(leadData)
         });
-        if (response.ok) { alert('Lead created successfully!'); loadPage('leads'); }
-        else { const error = await response.json(); alert('Error: ' + (error.detail || 'Failed')); submitBtn.disabled = false; submitBtn.innerHTML = 'Save Lead'; }
-    } catch (error) { alert('Error: ' + error.message); submitBtn.disabled = false; submitBtn.innerHTML = 'Save Lead'; }
+        if (response.ok) { 
+            alert('Lead created successfully!'); 
+            // Navigate to leads page - initLeads will load fresh data
+            loadPage('leads'); 
+        } else { 
+            const error = await response.json(); 
+            let errorMsg = 'Failed to create lead';
+            if (response.status === 409) {
+                errorMsg = 'Duplicate lead: A lead with this email already exists';
+            } else if (typeof error.detail === 'string') {
+                errorMsg = error.detail;
+            } else if (error.detail && typeof error.detail === 'object') {
+                errorMsg = JSON.stringify(error.detail);
+            } else if (error.message) {
+                errorMsg = error.message;
+            }
+            alert('Error: ' + errorMsg); 
+            submitBtn.disabled = false; 
+            submitBtn.innerHTML = 'Save Lead'; 
+        }
+    } catch (error) { 
+        alert('Error: ' + (error.message || 'Network error')); 
+        submitBtn.disabled = false; 
+        submitBtn.innerHTML = 'Save Lead'; 
+    }
 };
 </script>

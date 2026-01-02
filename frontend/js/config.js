@@ -1,5 +1,5 @@
-// API Configuration
-const API_BASE = 'http://localhost:8000/api';
+// API Configuration - Auto-detect port based on current URL
+const API_BASE = `${window.location.protocol}//${window.location.hostname}:${window.location.port}/api`;
 let authToken = null;
 let companyId = null;
 let currentUser = null;

@@ -20,8 +20,16 @@ if (typeof window.activitiesTasksList === 'undefined') {
 }
 
 window.initActivities = function() {
+    // Re-read auth from localStorage (in case global vars are stale)
+    const token = localStorage.getItem('authToken');
+    const company = localStorage.getItem('companyId');
+    
+    // Update global vars if needed
+    if (token && !authToken) authToken = token;
+    if (company && !companyId) companyId = company;
+    
     // Check auth before loading
-    if (!authToken || !companyId) {
+    if (!token || !company) {
         console.warn('No auth token or company ID - skipping activity load');
         const table = document.getElementById('activitiesTable');
         if (table) {
@@ -122,9 +130,18 @@ window.loadActivities = async function() {
         const table = document.getElementById('activitiesTable');
         if (!table) return;
 
+        // Update stats if function exists
+        if (typeof window.updateActivityStats === 'function') {
+            window.updateActivityStats(activities);
+        }
+        
         // Initialize DataTable
         if (window.activitiesTable && typeof window.activitiesTable.updateData === 'function') {
             window.activitiesTable.updateData(activities);
+            // Initialize Lucide icons after update
+            if (typeof lucide !== 'undefined') {
+                setTimeout(() => lucide.createIcons(), 100);
+            }
         } else {
             window.activitiesTable = new DataTable('activitiesTable', {
                 data: activities,
@@ -219,6 +236,10 @@ window.loadActivities = async function() {
                 showColumnToggle: true,
                 showExport: true
             });
+            // Initialize Lucide icons after DataTable creation
+            if (typeof lucide !== 'undefined') {
+                setTimeout(() => lucide.createIcons(), 100);
+            }
         }
     } catch (error) {
         console.error('Error loading activities:', error);

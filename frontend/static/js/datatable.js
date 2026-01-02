@@ -328,7 +328,13 @@ class DataTable {
             if (!this.visibleColumns.has(index)) return;
             
             const th = document.createElement('th');
-            th.textContent = col.label || col.key;
+            // Use innerHTML if label contains HTML tags, otherwise textContent
+            const labelText = col.label || col.key;
+            if (labelText.includes('<')) {
+                th.innerHTML = labelText;
+            } else {
+                th.textContent = labelText;
+            }
             th.className = col.align || 'left';
             
             if (col.sortable !== false && this.options.sorting) {

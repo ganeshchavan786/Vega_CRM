@@ -40,8 +40,21 @@ app = FastAPI(
 @app.get("/", include_in_schema=False)
 async def serve_vega_website():
     """Serve VEGA CRM Website as homepage"""
-    website_path = "/app/frontend/website/index.html"
-    fallback_path = "/app/frontend/index.html"
+    import sys
+    
+    # Determine base path based on environment
+    if getattr(sys, 'frozen', False):
+        # PyInstaller EXE
+        base_path = sys._MEIPASS
+    elif os.path.exists("/app/frontend"):
+        # Docker
+        base_path = "/app"
+    else:
+        # Development
+        base_path = os.path.dirname(os.path.dirname(__file__))
+    
+    website_path = os.path.join(base_path, "frontend", "website", "index.html")
+    fallback_path = os.path.join(base_path, "frontend", "index.html")
     
     if os.path.exists(website_path):
         return FileResponse(website_path)
@@ -199,10 +212,18 @@ async def global_exception_handler(request, exc):
 # Mount frontend static files
 # Check if frontend directory exists (for Docker deployment)
 # Use absolute path for Docker compatibility
-if os.path.exists("/app/frontend"):
+import sys
+if getattr(sys, 'frozen', False):
+    # Running as PyInstaller EXE
+    base_path = sys._MEIPASS
+    frontend_path = os.path.join(base_path, "frontend")
+    guides_path = os.path.join(base_path, "guides")
+elif os.path.exists("/app/frontend"):
+    # Docker deployment
     frontend_path = "/app/frontend"
     guides_path = "/app/guides"
 else:
+    # Development
     frontend_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
     guides_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "guides")
 

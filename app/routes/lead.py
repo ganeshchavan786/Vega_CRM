@@ -20,7 +20,7 @@ router = APIRouter()
 async def get_leads(
     company_id: int = Path(..., description="Company ID"),
     search: Optional[str] = Query(None, description="Search in name/email/phone"),
-    status: Optional[str] = Query(None, description="Filter by status"),
+    lead_status: Optional[str] = Query(None, alias="status", description="Filter by status"),
     priority: Optional[str] = Query(None, description="Filter by priority"),
     assigned_to: Optional[int] = Query(None, description="Filter by assigned user"),
     page: int = Query(1, ge=1, description="Page number"),
@@ -31,7 +31,7 @@ async def get_leads(
     """Get all leads in company"""
     try:
         leads = LeadController.get_leads(
-            company_id, current_user, db, search, status, priority, assigned_to
+            company_id, current_user, db, search, lead_status, priority, assigned_to
         )
         
         # Pagination
