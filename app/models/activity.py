@@ -19,6 +19,9 @@ class Activity(Base):
     # Foreign Key
     company_id = Column(Integer, ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
     
+    # Unique ID (v2.1.0 feature)
+    unique_id = Column(String(50), nullable=True, unique=True, index=True)
+    
     # Activity Information
     activity_type = Column(String(50), nullable=False, index=True)  # call, email, meeting, note, status_change
     title = Column(String(255), nullable=False)
@@ -57,6 +60,7 @@ class Activity(Base):
         data = {
             "id": self.id,
             "company_id": self.company_id,
+            "unique_id": self.unique_id,
             "activity_type": self.activity_type,
             "title": self.title,
             "description": self.description,

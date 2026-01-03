@@ -19,6 +19,9 @@ class Task(Base):
     # Foreign Key
     company_id = Column(Integer, ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
     
+    # Unique ID (v2.1.0 feature)
+    unique_id = Column(String(50), nullable=True, unique=True, index=True)
+    
     # Task Information
     title = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
@@ -61,6 +64,7 @@ class Task(Base):
         data = {
             "id": self.id,
             "company_id": self.company_id,
+            "unique_id": self.unique_id,
             "title": self.title,
             "description": self.description,
             "task_type": self.task_type,

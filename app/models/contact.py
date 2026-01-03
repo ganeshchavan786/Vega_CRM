@@ -20,6 +20,9 @@ class Contact(Base):
     company_id = Column(Integer, ForeignKey("companies.id", ondelete="CASCADE"), nullable=False, index=True)
     account_id = Column(Integer, ForeignKey("customers.id", ondelete="CASCADE"), nullable=False, index=True)
     
+    # Unique ID (v2.1.0 feature)
+    unique_id = Column(String(50), nullable=True, unique=True, index=True)
+    
     # Basic Information
     name = Column(String(200), nullable=False)
     job_title = Column(String(100), nullable=True)
@@ -55,6 +58,7 @@ class Contact(Base):
             "id": self.id,
             "company_id": self.company_id,
             "account_id": self.account_id,
+            "unique_id": self.unique_id,
             "name": self.name,
             "job_title": self.job_title,
             "role": self.role,

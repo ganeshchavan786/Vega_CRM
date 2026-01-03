@@ -22,6 +22,9 @@ class Customer(Base):
     # Customer Code
     customer_code = Column(String(50), nullable=True, index=True)
     
+    # Unique ID (v2.1.0 feature)
+    unique_id = Column(String(50), nullable=True, unique=True, index=True)
+    
     # Basic Information
     name = Column(String(255), nullable=False)
     email = Column(String(255), nullable=True, index=True)
@@ -86,6 +89,7 @@ class Customer(Base):
             "id": self.id,
             "company_id": self.company_id,
             "customer_code": self.customer_code,
+            "unique_id": self.unique_id,
             "name": self.name,
             "email": self.email,
             "phone": self.phone,

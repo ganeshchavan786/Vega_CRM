@@ -15,6 +15,9 @@ class Report(Base):
     description = Column(Text, nullable=True)
     report_type = Column(String(50), nullable=False, index=True)  # sales, leads, activities, custom
     
+    # Unique ID (v2.1.0 feature)
+    unique_id = Column(String(50), nullable=True, unique=True, index=True)
+    
     # Report configuration
     config = Column(JSON, nullable=True)  # Filters, columns, grouping, etc.
     query_template = Column(Text, nullable=True)  # SQL or query template
@@ -46,6 +49,7 @@ class Report(Base):
         return {
             "id": self.id,
             "name": self.name,
+            "unique_id": self.unique_id,
             "description": self.description,
             "report_type": self.report_type,
             "config": self.config,

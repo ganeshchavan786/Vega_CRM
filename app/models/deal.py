@@ -23,6 +23,9 @@ class Deal(Base):
     primary_contact_id = Column(Integer, ForeignKey("contacts.id", ondelete="SET NULL"), nullable=True, index=True)  # Enterprise: primary contact
     lead_id = Column(Integer, ForeignKey("leads.id", ondelete="SET NULL"), nullable=True, index=True)
     
+    # Unique ID (v2.1.0 feature)
+    unique_id = Column(String(50), nullable=True, unique=True, index=True)
+    
     # Deal Information
     deal_name = Column(String(255), nullable=False)
     deal_value = Column(Numeric(15, 2), nullable=False)
@@ -72,6 +75,7 @@ class Deal(Base):
             "company_id": self.company_id,
             "customer_id": self.customer_id,
             "lead_id": self.lead_id,
+            "unique_id": self.unique_id,
             "deal_name": self.deal_name,
             "deal_value": float(self.deal_value) if self.deal_value else 0,
             "currency": self.currency,

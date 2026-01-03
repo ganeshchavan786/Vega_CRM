@@ -11,6 +11,7 @@ from app.models.task import Task
 from app.models.user import User
 from app.schemas.task import TaskCreate, TaskUpdate
 from app.services import audit_service
+from app.utils.unique_id import generate_task_id
 
 
 class TaskController:
@@ -66,6 +67,11 @@ class TaskController:
         )
         
         db.add(new_task)
+        db.flush()
+        
+        # Generate unique ID (v2.1.0 feature)
+        new_task.unique_id = generate_task_id(company_id, db=db)
+        
         db.commit()
         db.refresh(new_task)
         

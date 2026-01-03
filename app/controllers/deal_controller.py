@@ -11,6 +11,7 @@ from app.models.user import User
 from app.models.user_company import UserCompany
 from app.schemas.deal import DealCreate, DealUpdate
 from app.services import audit_service
+from app.utils.unique_id import generate_opportunity_id
 
 
 class DealController:
@@ -60,6 +61,11 @@ class DealController:
         )
         
         db.add(new_deal)
+        db.flush()
+        
+        # Generate unique ID (v2.1.0 feature)
+        new_deal.unique_id = generate_opportunity_id(company_id, db=db)
+        
         db.commit()
         db.refresh(new_deal)
         

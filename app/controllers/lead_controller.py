@@ -15,6 +15,7 @@ from app.utils.duplicate_detection import DuplicateDetectionEngine
 from app.utils.assignment_rules import AssignmentRulesEngine, AssignmentRuleType
 from app.utils.nurturing_automation import NurturingAutomation
 from app.services import audit_service, log_service
+from app.utils.unique_id import generate_lead_id
 
 
 class LeadController:
@@ -130,6 +131,9 @@ class LeadController:
         
         db.add(new_lead)
         db.flush()  # Flush to get ID
+        
+        # Generate unique ID (v2.1.0 feature)
+        new_lead.unique_id = generate_lead_id(company_id, db=db)
         
         # Calculate initial lead score
         new_lead.lead_score = LeadScoringAlgorithm.calculate_lead_score(new_lead, db)

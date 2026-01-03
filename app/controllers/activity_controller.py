@@ -10,6 +10,7 @@ from app.models.activity import Activity
 from app.models.user import User
 from app.schemas.activity import ActivityCreate, ActivityUpdate
 from app.services import audit_service
+from app.utils.unique_id import generate_activity_id
 
 
 class ActivityController:
@@ -62,6 +63,11 @@ class ActivityController:
         )
         
         db.add(new_activity)
+        db.flush()
+        
+        # Generate unique ID (v2.1.0 feature)
+        new_activity.unique_id = generate_activity_id(company_id, db=db)
+        
         db.commit()
         db.refresh(new_activity)
         

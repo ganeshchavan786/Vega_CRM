@@ -120,6 +120,13 @@ window.loadTasks = async function() {
                 data: tasks,
                 columns: [
                     {
+                        key: 'unique_id',
+                        label: 'ID',
+                        sortable: true,
+                        filterable: true,
+                        render: (value) => `<code style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:0.85rem;">${escapeHtml(value || '-')}</code>`
+                    },
+                    {
                         key: 'title',
                         label: 'Title',
                         sortable: true,

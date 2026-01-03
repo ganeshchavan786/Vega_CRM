@@ -50,6 +50,9 @@ class Lead(Base):
     customer_id = Column(Integer, ForeignKey("customers.id", ondelete="SET NULL"), nullable=True, index=True)
     converted_to_account_id = Column(Integer, ForeignKey("customers.id", ondelete="SET NULL"), nullable=True, index=True)
     
+    # Unique ID (v2.1.0 feature)
+    unique_id = Column(String(50), nullable=True, unique=True, index=True)
+    
     # Basic Information (Enterprise Model)
     first_name = Column(String(100), nullable=True)  # Allow null for backward compatibility
     last_name = Column(String(100), nullable=True)  # Allow null for backward compatibility
@@ -134,6 +137,7 @@ class Lead(Base):
             "company_id": self.company_id,
             "customer_id": self.customer_id,
             "converted_to_account_id": self.converted_to_account_id,
+            "unique_id": self.unique_id,
             
             # Basic Information
             "first_name": self.first_name,

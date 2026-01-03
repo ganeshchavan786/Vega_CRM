@@ -11,6 +11,7 @@ from app.models.user import User
 from app.models.user_company import UserCompany
 from app.schemas.customer import CustomerCreate, CustomerUpdate
 from app.utils.helpers import generate_customer_code
+from app.utils.unique_id import generate_account_id
 from app.utils.health_score import HealthScoreCalculator
 from app.utils.lifecycle_stage import LifecycleStageAutomation
 from app.services import audit_service, log_service
@@ -97,6 +98,9 @@ class CustomerController:
         
         # Generate customer code
         new_customer.customer_code = generate_customer_code(company_id, new_customer.id)
+        
+        # Generate unique ID (v2.1.0 feature)
+        new_customer.unique_id = generate_account_id(company_id, db=db)
         
         # Calculate initial health score
         new_customer.health_score = HealthScoreCalculator.calculate_health_score(

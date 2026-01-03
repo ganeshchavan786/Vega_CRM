@@ -12,6 +12,7 @@ from app.models.user import User
 from app.models.user_company import UserCompany
 from app.schemas.contact import ContactCreate, ContactUpdate
 from app.services import audit_service
+from app.utils.unique_id import generate_contact_id
 
 
 class ContactController:
@@ -135,6 +136,11 @@ class ContactController:
         )
         
         db.add(contact)
+        db.flush()
+        
+        # Generate unique ID (v2.1.0 feature)
+        contact.unique_id = generate_contact_id(company_id, db=db)
+        
         db.commit()
         db.refresh(contact)
         
